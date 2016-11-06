@@ -167,7 +167,7 @@ public class Minion9533_TestRotations extends MMOpMode_Linear {
         robot.ElevatorStop();
         robot.dashboard.displayText(4, "Waiting for 1 second");
         waitFor(1);
-        //robot.shooterLeft.setPower(0.01);
+
         robot.dashboard.displayText(4, "Turning on elevator");
         robot.ElevatorLiftBalls();
         robot.dashboard.displayText(4, "Waiting for 1 second");
@@ -202,15 +202,21 @@ public class Minion9533_TestRotations extends MMOpMode_Linear {
 
         waitFor(0.1);
         robot.dashboard.displayText(1, "Turning on shooter");
-        robot.shooterLeft.setPower(.30);
+        robot.shooterLeft.setPower(.36);
         robot.dashboard.displayText(2, "Waiting for 3 seconds");
 
 
-        //goStraight("Step 0", 0.5);
+        goStraight("Step 0", 0.45);
         waitFor(4);
 
 
         shootBalls();
+
+        pauseBetweenSteps();
+
+        goStraight("Push Ball", 1.5);
+        //turnRight("Turn to square", 45);
+        goStraight("Park", .5);
 
 //        waitFor(1);
 //

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.ftcrobotcontroller.R;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -91,9 +92,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 @Autonomous(name = "Vuforia-Doug", group = "vuf")
-//@Disabled
-//@Autonomous(name="Concept: Vuforia Navigation", group ="Concept")
-
+@Disabled
 public class VuforiaOp9533 extends LinearOpMode {
 
     Hardware9533   robot           = new Hardware9533();              // Use a K9'shardware

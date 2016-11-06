@@ -108,7 +108,7 @@ import java.util.List;
  * is explained below.
  */
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Vuforia - Ryan", group = "vuf")
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Vuforia-Ryan", group = "vuf")
 //@Autonomous(name="Concept: Vuforia Navigation", group ="Concept")
 @Disabled
 public class VuforiaOp extends LinearOpMode {

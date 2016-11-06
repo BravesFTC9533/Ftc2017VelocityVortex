@@ -56,7 +56,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
  */
 
 @Autonomous(name="AutoBots: VuforiaTest", group="Linear Opmode")  // @Autonomous(...) is the other common choice
-//@Disabled
+@Disabled
 public class VuforiaTest extends LinearOpMode {
 
 

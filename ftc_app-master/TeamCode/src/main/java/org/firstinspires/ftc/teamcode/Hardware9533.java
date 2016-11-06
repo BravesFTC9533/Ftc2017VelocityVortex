@@ -40,7 +40,7 @@ public class Hardware9533
 
     public final static double ACCEL_RATE = 0.2;
 
-    private final static double MAX_SPEED = 0.7;
+    private final static double MAX_SPEED = 0.6;
 
     public boolean invertedDrive = false;
 
@@ -69,6 +69,13 @@ public class Hardware9533
 
     }
 
+
+    static final double     COUNTS_PER_MOTOR_REV    = 21000 ;    // eg: TETRIX Motor Encoder
+    static final double     DRIVE_GEAR_REDUCTION    = 2.0 ;     // This is < 1.0 if geared UP
+    static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
+    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+            (WHEEL_DIAMETER_INCHES * 3.1415);
+
     /* Initialize standard Hardware interfaces */
     public void init(HardwareMap ahwMap) {
 
@@ -88,7 +95,7 @@ public class Hardware9533
 
 
         intake = hwMap.dcMotor.get("ballGrabber");
-        intake.setDirection(DcMotorSimple.Direction.REVERSE);
+        //intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
         elevator = hwMap.dcMotor.get("elevator");
         elevator.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -126,7 +133,10 @@ public class Hardware9533
         elevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
+
         shooterLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+
         //shooterRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         // Define and initialize ALL installed servos.
 
