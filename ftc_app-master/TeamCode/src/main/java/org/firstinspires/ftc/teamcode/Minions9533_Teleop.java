@@ -35,9 +35,16 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.HardwareK9bot;
+
+import hallib.HalDashboard;
+import trclib.TrcGyro;
+import trclib.TrcRobot;
+import trclib.TrcSensor;
+import trclib.TrcTaskMgr;
 
 /**
  * This OpMode uses the common HardwareK9bot class to define the devices on the robot.
@@ -56,16 +63,21 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwareK9bot;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="USE ME", group="9533")
-public class TeleopTank_Linear_9533 extends LinearOpMode {
+@TeleOp(name="Tele: Main Op (USE THIS)", group="9533")
+public class Minions9533_Teleop extends MMOpMode_Linear {
 
     /* Declare OpMode members. */
-    Hardware9533   robot           = new Hardware9533();              // Use a K9'shardware
+    //Hardware9533   robot           = new Hardware9533();              // Use a K9'shardware
 
 
+    ElapsedTime timer = new ElapsedTime();
 
-    private double shooterPower = 1;
-    static final double SHOOTER_POWER_INCREMENT    = 0.05;
+    MinionsGyro gyro = null;
+
+    private HalDashboard dashboard;
+
+    private double shooterPower = .5;
+    static final double SHOOTER_POWER_INCREMENT    = 0.025;
 
     private boolean currentButtonState = false;
     private boolean previousButtonState = false;
@@ -84,26 +96,26 @@ public class TeleopTank_Linear_9533 extends LinearOpMode {
     }
     private void handleElevator(){
         if(gamepad2.right_bumper) {
-
-            robot.elevator.setPower(1);
+            robot.ElevatorLiftBalls();
+            //robot.elevator.setPower(1);
         } else if(gamepad2.left_bumper) {
-
-            robot.elevator.setPower(-1);
+            robot.ElevatorDropBalls();
+            //robot.elevator.setPower(-1);
         } else {
-
-            robot.elevator.setPower(0);
+            robot.ElevatorStop();
         }
     }
     private void handleShooter() {
         if(gamepad2.a) {
             robot.shooterLeft.setPower(shooterPower);
-            robot.shooterRight.setPower(shooterPower);
+            //robot.shooterRight.setPower(shooterPower);
         } else {
-            robot.shooterRight.setPower(0);
+            //robot.shooterRight.setPower(0);
             robot.shooterLeft.setPower(0);
         }
 
-        telemetry.addData("Shooter", shooterPower);
+        robot.dashboard.displayPrintf(5, "Shooter: %.2f", shooterPower);
+        //telemetry.addData("Shooter", shooterPower);
     }
 
 
@@ -122,23 +134,41 @@ public class TeleopTank_Linear_9533 extends LinearOpMode {
     }
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {
 
+        super.runOpMode();
 
-        /* Initialize the hardware variables.
-         * The init() method of the hardware class does all the work here
-         */
-        robot.init(hardwareMap);
+        gyro = new MinionsGyro(robot, "gyro");
 
-        // Send telemetry message to signify robot waiting;
-        telemetry.addData("Say", "Hello Driver");    //
-        telemetry.update();
+        robot.dashboard.displayPrintf(1, "Hello Driver");
 
         // Wait for the game to start (driver presses PLAY)
+
+        robot.dashboard.displayPrintf(2, "Calibrating..");
+        gyro.calibrateGyro();
+        //robot.calibrateGyro();
+
+
+        robot.dashboard.displayPrintf(2, "Waiting for start..");
         waitForStart();
 
+
+        robot.dashboard.clearDisplay();
         // run until the end of the match (driver presses STOP)
+
+        timer.reset();
+
+
+
         while (opModeIsActive()) {
+
+
+
+            //robot.integrateGyro();
+
+            //robot.dashboard.displayPrintf(6, "Rot: %s", currRot);
+            robot.dashboard.displayPrintf(7, "Heading: %s", gyro.getHeading());
+
 
             currentButtonState = gamepad1.right_bumper;
 
@@ -149,10 +179,11 @@ public class TeleopTank_Linear_9533 extends LinearOpMode {
                 previousButtonState = currentButtonState;
             }
 
+            robot.dashboard.displayPrintf(1, "Drive Mode:");
             if(robot.invertedDrive) {
-                telemetry.addData("DriveMode", "Reverse");
+                robot.dashboard.displayPrintf(2, "Reverse");
             } else {
-                telemetry.addData("DriveMode", "Normal");
+                robot.dashboard.displayPrintf(2, "Normal");
             }
 
 
@@ -162,12 +193,16 @@ public class TeleopTank_Linear_9533 extends LinearOpMode {
             handleShooter();
             handleShooterSpeed();
 
-            robot.DriveRobot(-gamepad1.left_stick_y, -gamepad1.right_stick_y, telemetry);
+            robot.DriveRobot(-gamepad1.left_stick_y, -gamepad1.right_stick_y);
 
-            telemetry.update();
 
             // Pause for metronome tick.  40 mS each cycle = update 25 times a second.
             robot.waitForTick(40);
         }
+
     }
+
+
+
+
 }

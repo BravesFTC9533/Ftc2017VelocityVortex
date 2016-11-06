@@ -1,14 +1,19 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.hitechnic.HiTechnicNxtGyroSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+import ftclib.FtcHiTechnicGyro;
+import hallib.HalDashboard;
 
 import static java.lang.Math.abs;
 
@@ -47,9 +52,11 @@ public class Hardware9533
     public DcMotor intake = null;
 
     public DcMotor shooterLeft = null;
-    public DcMotor shooterRight = null;
+    //public DcMotor shooterRight = null;
 
+    public HiTechnicNxtGyroSensor gyro = null;
 
+    public HalDashboard dashboard;
 
 
     /* Local OpMode members. */
@@ -58,12 +65,21 @@ public class Hardware9533
 
     /* Constructor */
     public Hardware9533() {
+
+
     }
 
     /* Initialize standard Hardware interfaces */
     public void init(HardwareMap ahwMap) {
+
+        dashboard = MMOpMode_Linear.getDashboard();
+
         // save reference to HW Map
         hwMap = ahwMap;
+
+        // Define gyro
+        gyro = (HiTechnicNxtGyroSensor)hwMap.gyroSensor.get("gyro");
+
 
         // Define and Initialize Motors
         leftMotor   = hwMap.dcMotor.get("left");
@@ -72,14 +88,20 @@ public class Hardware9533
 
 
         intake = hwMap.dcMotor.get("ballGrabber");
+        intake.setDirection(DcMotorSimple.Direction.REVERSE);
+
         elevator = hwMap.dcMotor.get("elevator");
         elevator.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
 
         shooterLeft = hwMap.dcMotor.get("shooterLeft");
-        shooterRight = hwMap.dcMotor.get("shooterRight");
-        shooterRight.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        shooterLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+
+
+//        shooterRight = hwMap.dcMotor.get("shooterRight");
+//        shooterRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
         // Set all motors to zero power
@@ -90,7 +112,7 @@ public class Hardware9533
         elevator.setPower(0);
 
         shooterLeft.setPower(0);
-        shooterRight.setPower(0);
+        //shooterRight.setPower(0);
 
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
@@ -105,7 +127,7 @@ public class Hardware9533
 
 
         shooterLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        shooterRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //shooterRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         // Define and initialize ALL installed servos.
 
     }
@@ -136,11 +158,14 @@ public class Hardware9533
     }
 
     public void Stop(){
-        AccelerateMotor(this.leftMotor, 0);
-        AccelerateMotor(this.rightMotor, 0);
+        //AccelerateMotor(this.leftMotor, 0);
+        //AccelerateMotor(this.rightMotor, 0);
+
+        this.leftMotor.setPower(0);
+        this.rightMotor.setPower(0);
     }
 
-    public void DriveRobot(double leftPower, double rightPower, Telemetry telemetry) {
+    public void DriveRobot(double leftPower, double rightPower) {
 
         double left = 0;
         double right = 0;
@@ -159,10 +184,8 @@ public class Hardware9533
         }
 
 
-
-        telemetry.addData("left",  "%.2f", left);
-        telemetry.addData("right", "%.2f", right);
-
+        dashboard.displayPrintf(3, "left: %.2f", left);
+        dashboard.displayPrintf(4, "right: %.2f", right);
 
 
     }
@@ -176,6 +199,16 @@ public class Hardware9533
 
     }
 
+    public void ElevatorLiftBalls(){
+        this.elevator.setPower(-1);
+    }
+    public void ElevatorDropBalls(){
+        this.elevator.setPower(1);
+    }
+
+    public void ElevatorStop(){
+        this.elevator.setPower(0);
+    }
 
     private double accel(double motorPower, double targetPower, double accelRate) {
 
@@ -191,4 +224,10 @@ public class Hardware9533
             return  targetPower;
         }
     }
+
+
+
+
+
+
 }

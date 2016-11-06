@@ -55,9 +55,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="AutoBots: Vuforia", group="Linear Opmode")  // @Autonomous(...) is the other common choice
+@Autonomous(name="AutoBots: VuforiaTest", group="Linear Opmode")  // @Autonomous(...) is the other common choice
 //@Disabled
-public class TemplateOpMode_Linear extends LinearOpMode {
+public class VuforiaTest extends LinearOpMode {
 
 
     private final boolean USE_VISION = true;

@@ -30,14 +30,13 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
 TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-package org.firstinspires.ftc.robotcontroller.external.samples;
+package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.util.ElapsedTime;
+import hallib.HalDashboard;
+import trclib.TrcTaskMgr;
 
 
 /**
@@ -53,12 +52,33 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-public abstract class TemplateOpMode_Linear extends LinearOpMode {
+public abstract class  MMOpMode_Linear extends LinearOpMode {
+
+    protected Hardware9533 robot = new Hardware9533();
+
+    private static HalDashboard dashboard = null;
+
+    /**
+     * This method returns a global dashboard object for accessing the dashboard on the Driver Station.
+     *
+     * @return dashboard object.
+     */
+    public static HalDashboard getDashboard()
+    {
+        return dashboard;
+    }   //getDashboard
 
 
+    public MMOpMode_Linear() {
+
+    }
 
     @Override
     public void runOpMode() {
+        dashboard = new HalDashboard(telemetry);
+        robot.init(hardwareMap);
+
+
 
     }
 }
