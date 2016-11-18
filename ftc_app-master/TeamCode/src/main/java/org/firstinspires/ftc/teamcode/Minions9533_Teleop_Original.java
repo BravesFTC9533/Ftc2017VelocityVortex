@@ -33,6 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -113,6 +114,23 @@ public class Minions9533_Teleop_Original extends MMOpMode_Linear {
 
 
 
+
+    private void handleShooter2(){
+
+        int revTicks = 28;
+        int targetRPM = 2000;
+
+        int targetSpeed = (revTicks * targetRPM) / 60;
+
+        if(gamepad2.y){
+            robot.shooterLeft.setMaxSpeed(targetSpeed);
+        }
+
+        if(gamepad2.x) {
+            robot.shooterLeft.setMaxSpeed(0);
+        }
+    }
+
     private void handleShooterSpeed() {
         if(gamepad2.dpad_down) {
             shooterPower -= SHOOTER_POWER_INCREMENT;
@@ -130,6 +148,10 @@ public class Minions9533_Teleop_Original extends MMOpMode_Linear {
     public void runOpMode() {
 
         super.runOpMode();
+
+
+
+
 
         if(USE_GYRO) {
             gyro = new MinionsGyro(robot, "gyro");
@@ -153,6 +175,8 @@ public class Minions9533_Teleop_Original extends MMOpMode_Linear {
         // run until the end of the match (driver presses STOP)
 
         timer.reset();
+
+        robot.shooterLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         while (opModeIsActive()) {
 
@@ -179,6 +203,8 @@ public class Minions9533_Teleop_Original extends MMOpMode_Linear {
             handleElevator();
             handleShooter();
             handleShooterSpeed();
+
+            handleShooter2();
 
             robot.DriveRobot(-gamepad1.left_stick_y, -gamepad1.right_stick_y);
 

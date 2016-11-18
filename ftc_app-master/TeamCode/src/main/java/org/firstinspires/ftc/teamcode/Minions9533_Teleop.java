@@ -38,6 +38,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.util.RollingAverage;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.HardwareK9bot;
 
@@ -77,12 +78,13 @@ public class Minions9533_Teleop extends MMOpMode_Linear {
 
 
     ElapsedTime timer = new ElapsedTime();
+    ElapsedTime timer2 = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
     MinionsGyro gyro = null;
 
     private HalDashboard dashboard;
 
-    private double shooterPower = .5;
+    private double shooterPower = 1;
     static final double SHOOTER_POWER_INCREMENT  = 0.02;
     static int targetRPM = 2500;
     static final int targetIncrement = 50;
@@ -93,8 +95,8 @@ public class Minions9533_Teleop extends MMOpMode_Linear {
 
     int lastPos = 0;
 
-    double armp[] = new double[50];
-    int count = 0;
+
+    RollingAvg rollingAverage = null;
 
 
     private void handleIntake(){
@@ -120,77 +122,154 @@ public class Minions9533_Teleop extends MMOpMode_Linear {
             robot.ElevatorStop();
         }
     }
+
+
+    double shooterAvg = 0;
+    double lastTime = 0;
+    int counter = 0;
+    private void calcAvgRPM(){
+
+
+        robot.dashboard.displayPrintf(11, "Time: %s", timer.seconds());
+
+        int currentPos = robot.shooterLeft.getCurrentPosition();
+        double currentTime = System.nanoTime();
+        if(counter > 0) {
+
+
+            int delta = abs(currentPos - lastPos);
+            double deltaT = (currentTime - lastTime) / ElapsedTime.MILLIS_IN_NANO;
+
+            robot.dashboard.displayPrintf(12, "Encoder Delta: %s", delta);
+            robot.dashboard.displayPrintf(13, "Time Delta: %s", deltaT);
+
+            double rpm = (delta * ((1000/deltaT) * 60)) / 28;
+            robot.dashboard.displayPrintf(14, "Instant RPM: %s", rpm);
+
+            rollingAverage.add(rpm);
+
+            shooterAvg = rollingAverage.getAverage();
+//            int index = count % 50;
+//            armp[index] = rpm;
+//
+//            int avg = 0;
+//            if (count > 50) {
+//
+//                for (int i = 0; i < 50; i++) {
+//                    avg += armp[i];
+//                }
+//                avg /= 50;
+//
+//            }
+//            shooterAvg = avg;
+        }
+
+        lastTime = currentTime;
+        lastPos = currentPos;
+        timer2.reset();
+        counter ++;
+    }
+
+//    private void handleShooterPID() {
+//
+//
+//
+//        if(gamepad2.a) {
+//
+//
+//            if(lastPos > 0) {
+//
+//
+//
+//                int currentPos = robot.shooterLeft.getCurrentPosition();
+//
+//                int delta = abs(currentPos - lastPos);
+//
+//                double rpm = (delta * ((1000/tickInterval) * 60)) / 28;
+//
+//                int index = count % 50;
+//                armp[index] = rpm;
+//                if (count > 50)
+//                {
+//                    int avg = 0;
+//                    for (int i = 0; i < 50; i++)
+//                    {
+//                        avg += armp[i];
+//                    }
+//                    avg /= 50;
+//
+//                    if (count % 25 == 0)
+//                    {
+//                        if (avg < targetRPM-75)// && avg < targetRPM+25)
+//                        {
+//                            shooterPower+=0.01;
+//                        }
+//                        else if (avg > targetRPM+75)
+//                        {
+//                            shooterPower-=0.01;
+//                        }
+//                        else if (avg < targetRPM-25)// && avg < targetRPM+25)
+//                        {
+//                            shooterPower+=0.005;
+//                        }
+//                        else if (avg > targetRPM+25)
+//                        {
+//                            shooterPower-=0.005;
+//                        }
+//
+//                        shooterPower = Range.clip(shooterPower, 0, 1);
+//                    }
+//
+//
+//                    robot.dashboard.displayPrintf(9, "TargetRPM: %s", targetRPM);
+//                    robot.dashboard.displayPrintf(10, "RPM: %s", avg);
+//                }
+//
+//
+//            }
+//
+//            robot.shooterLeft.setPower(shooterPower);
+//        } else {
+//            //robot.shooterRight.setPower(0);
+//            robot.shooterLeft.setPower(0);
+//        }
+//
+//        lastPos = robot.shooterLeft.getCurrentPosition();
+//
+//        robot.dashboard.displayPrintf(5, "Shooter: %.2f", shooterPower);
+//        //telemetry.addData("Shooter", shooterPower);
+//    }
+
+
+
+    double currentPower = 0;
     private void handleShooter() {
 
-
-
+        //currentPower = robot.shooterLeft.getPower();
         if(gamepad2.a) {
 
-
-            if(lastPos > 0) {
-
-
-
-                int currentPos = robot.shooterLeft.getCurrentPosition();
-
-                int delta = abs(currentPos - lastPos);
-
-                double rpm = (delta * ((1000/tickInterval) * 60)) / 28;
-
-                int index = count % 50;
-                armp[index] = rpm;
-                if (count > 50)
-                {
-                    int avg = 0;
-                    for (int i = 0; i < 50; i++)
-                    {
-                        avg += armp[i];
-                    }
-                    avg /= 50;
-
-                    if (count % 25 == 0)
-                    {
-                        if (avg < targetRPM-75)// && avg < targetRPM+25)
-                        {
-                            shooterPower+=0.01;
-                        }
-                        else if (avg > targetRPM+75)
-                        {
-                            shooterPower-=0.01;
-                        }
-                        else if (avg < targetRPM-25)// && avg < targetRPM+25)
-                        {
-                            shooterPower+=0.005;
-                        }
-                        else if (avg > targetRPM+25)
-                        {
-                            shooterPower-=0.005;
-                        }
-
-                        shooterPower = Range.clip(shooterPower, 0, 1);
-                    }
-
-
-                    robot.dashboard.displayPrintf(9, "TargetRPM: %s", targetRPM);
-                    robot.dashboard.displayPrintf(10, "RPM: %s", avg);
-                }
-
-
+            if(currentPower == 0) {
+                currentPower = 0.4;
+            } else if(currentPower < 1) {
+                currentPower += 0.005;
             }
 
-            robot.shooterLeft.setPower(shooterPower);
+            currentPower = Range.clip(currentPower, 0, 1);
+
+
+            robot.shooterLeft.setPower(currentPower);
+
+            //robot.shooterLeft.setPower(shooterPower);
+            //robot.shooterRight.setPower(shooterPower);
         } else {
             //robot.shooterRight.setPower(0);
             robot.shooterLeft.setPower(0);
+            currentPower = 0;
         }
 
-        lastPos = robot.shooterLeft.getCurrentPosition();
-
-        robot.dashboard.displayPrintf(5, "Shooter: %.2f", shooterPower);
+        robot.dashboard.displayPrintf(5, "Shooter: %.2f", currentPower);
         //telemetry.addData("Shooter", shooterPower);
     }
-
-
 
     private void handleShooterSpeed() {
         if(gamepad2.dpad_down) {
@@ -247,6 +326,9 @@ public class Minions9533_Teleop extends MMOpMode_Linear {
 
         timer.reset();
 
+        robot.shooterLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        robot.shooterLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
 
@@ -254,34 +336,20 @@ public class Minions9533_Teleop extends MMOpMode_Linear {
         //long next;
 
 
+        rollingAverage = new RollingAvg(50);
         while (opModeIsActive()) {
 
-            count++;
-
             handleTargetRPM();
+            int targetSpeed = (targetRPM * 28) / 60;
+
+            robot.shooterLeft.setMaxSpeed(targetSpeed);
+
+            calcAvgRPM();
+
+            robot.dashboard.displayPrintf(9, "TargetRPM: %s", targetRPM);
+            robot.dashboard.displayPrintf(10, "RPM: %s", shooterAvg);
 
 
-
-
-
-
-
-
-            //robot.dashboard.displayPrintf(7, "Heading: %s", gyro.getHeading());
-
-            //next = System.currentTimeMillis()/60000;
-
-            //int targetPos = (int) (shooterPower*28)/(60*(1000/tickInterval));
-
-
-            //robot.dashboard.displayPrintf(8, "Target Pos: " + targetPos);
-
-            //robot.shooterLeft.setTargetPosition(robot.shooterLeft.getCurrentPosition() + targetPos);
-
-            //robot.shooterLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-           // robot.dashboard.displayPrintf(8, "RPM: " + String.valueOf());
-            //21000
 
 
             currentButtonState = gamepad1.right_bumper;
