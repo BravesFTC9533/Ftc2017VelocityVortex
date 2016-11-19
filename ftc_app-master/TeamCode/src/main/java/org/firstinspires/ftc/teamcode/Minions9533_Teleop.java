@@ -78,10 +78,13 @@ public class Minions9533_Teleop extends MMOpMode_Linear {
     private double shooterPower = 1;
     static final double SHOOTER_POWER_INCREMENT  = 0.02;
     static int targetRPM = 2400;
-    static final int targetIncrement = 50;
+    static final int targetIncrement = 25;
 
     private boolean currentButtonState = false;
     private boolean previousButtonState = false;
+
+    private boolean leftPressed = false;
+    private boolean rightPressed = false;
 
 
     int lastPos = 0;
@@ -207,11 +210,30 @@ public class Minions9533_Teleop extends MMOpMode_Linear {
 
 
     private void handleTargetRPM() {
+
+        if(leftPressed && gamepad2.dpad_left){
+            return;
+        }
+        if(rightPressed && gamepad2.dpad_right) {
+            return;
+        }
+
+
+
+
+
+
         if(gamepad2.dpad_left) {
             targetRPM -= targetIncrement;
+            leftPressed = true;
+        } else {
+            leftPressed = false;
         }
         if(gamepad2.dpad_right){
             targetRPM += targetIncrement;
+            rightPressed = true;
+        } else {
+            rightPressed = false;
         }
 
         targetRPM = Range.clip(targetRPM, 0,6000);
