@@ -33,13 +33,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.LightSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
+import com.qualcomm.robotcore.util.Range;
 
 import hallib.HalDashboard;
 
@@ -65,8 +61,8 @@ import static java.lang.Math.abs;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Auto: Test Rotations", group="Pushbot")
-public class Minion9533_TestRotations extends MMOpMode_Linear {
+@Autonomous(name="Autobot Close", group="Pushbot")
+public class Minion9533_AutoBot extends MMOpMode_Linear {
 
     /* Declare OpMode members. */
                                                                // could also use HardwarePushbotMatrix class.
@@ -79,6 +75,7 @@ public class Minion9533_TestRotations extends MMOpMode_Linear {
     static final double     FORWARD_SPEED = 0.4;
     static final double     TURN_SPEED    = 0.6;
 
+    static int targetRPM = 2400;
 
     static final double DEGREES_PER_SECOND = 108;
 
@@ -162,11 +159,11 @@ public class Minion9533_TestRotations extends MMOpMode_Linear {
         robot.dashboard.displayText(3, "Turning on elevator");
         robot.ElevatorLiftBalls();
         robot.dashboard.displayText(4, "Waiting for 0.5 seconds");
-        waitFor(0.3);
+        waitFor(0.5);
         robot.dashboard.displayText(4, "Stopping elevator. let wheels spin back up");
         robot.ElevatorStop();
         robot.dashboard.displayText(4, "Waiting for 1 second");
-        waitFor(1);
+        waitFor(4);
 
         robot.dashboard.displayText(4, "Turning on elevator");
         robot.ElevatorLiftBalls();
@@ -174,7 +171,7 @@ public class Minion9533_TestRotations extends MMOpMode_Linear {
         waitFor(1);
 
 
-        robot.shooterLeft.setPower(0);
+        robot.shooterMotor.setPower(0);
         robot.ElevatorStop();
 
 
@@ -186,8 +183,15 @@ public class Minion9533_TestRotations extends MMOpMode_Linear {
 
        super.runOpMode();
 
-        gyro = new MinionsGyro(robot, "gyro");
-        gyro.calibrateGyro();
+
+        robot.shooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
+        robot.shooterMotor.setMaxSpeed( (targetRPM * 28) / 60);
+
+        //gyro = new MinionsGyro(robot, "gyro");
+        //gyro.calibrateGyro();
 
 
 
@@ -201,68 +205,41 @@ public class Minion9533_TestRotations extends MMOpMode_Linear {
 
 
         waitFor(0.1);
+        robot.dashboard.displayText(0, "Moving Forward half block");
+        goStraight("Step 1", 0.5);
+        pauseBetweenSteps();
+
+
         robot.dashboard.displayText(1, "Turning on shooter");
-        robot.shooterLeft.setPower(.36);
-        robot.dashboard.displayText(2, "Waiting for 3 seconds");
+
+        double power = 0.4;
+        while(power < 1){
+
+            power += 0.005;
+            power = Range.clip(power, 0, 1);
+            robot.shooterMotor.setPower(power);
+
+            if(power == 1) {
+                break;
+            }
+            robot.dashboard.displayPrintf(2, "Waiting for shooter power: %2.5f", power);
+            waitFor(0.02);
+        }
 
 
-        goStraight("Step 0", 0.45);
-        waitFor(4);
 
+        pauseBetweenSteps();
+        pauseBetweenSteps();
 
         shootBalls();
 
         pauseBetweenSteps();
 
-        goStraight("Push Ball", 1.5);
+
+        goStraight("Push Ball", 1);
         //turnRight("Turn to square", 45);
-        goStraight("Park", .5);
+        //goStraight("Park", .5);
 
-//        waitFor(1);
-//
-//
-//        goStraight("Step 1", 0.35);
-//        turnRight("Step 2", 45);
-//        goStraight("Step 3", 1);
-//        turnLeft("Step 4", 45);
-//
-//        goStraight("Step 5", .5);
-//
-//        robot.invertedDrive = true;
-//        goStraight("Step 6", .75);
-//        turnLeft("Step 7", 90);
-//
-//        goStraight("Step 8", 1);
-
-
-
-
-
-//        logPath("Path 2: turn left 90");
-//        turnLeft(90);
-//        pauseBetweenSteps();
-//
-//        robot.invertedDrive = true;
-//        logPath("Path 3: go straight 1 second");
-//        goStraight(1.5);
-        //pauseBetweenSteps();
-
-//        logPath("Path 4: turn left 90");
-//        turnLeft(50);
-//        //pauseBetweenSteps();
-//
-//        logPath("Path 5: go straight 1 second");
-//        goStraight(1);
-//        pauseBetweenSteps();
-
-
-//        logPath("Path 2: turn right 90");
-//        turnRight(360);
-//        robot.Stop();
-//        pauseBetweenSteps();
-//
-//
-//        goStraight(2);
         robot.Stop();
 
     }

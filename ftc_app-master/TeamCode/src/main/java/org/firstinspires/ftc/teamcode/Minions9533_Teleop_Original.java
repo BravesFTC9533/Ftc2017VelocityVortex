@@ -32,6 +32,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -57,6 +58,7 @@ import hallib.HalDashboard;
  */
 
 @TeleOp(name="Tele: Main Op (Old/Power Based)", group="9533")
+@Disabled
 public class Minions9533_Teleop_Original extends MMOpMode_Linear {
 
     /* Declare OpMode members. */
@@ -101,11 +103,11 @@ public class Minions9533_Teleop_Original extends MMOpMode_Linear {
     }
     private void handleShooter() {
         if(gamepad2.a) {
-            robot.shooterLeft.setPower(shooterPower);
+            robot.shooterMotor.setPower(shooterPower);
             //robot.shooterRight.setPower(shooterPower);
         } else {
             //robot.shooterRight.setPower(0);
-            robot.shooterLeft.setPower(0);
+            robot.shooterMotor.setPower(0);
         }
 
         robot.dashboard.displayPrintf(5, "Shooter: %.2f", shooterPower);
@@ -123,11 +125,11 @@ public class Minions9533_Teleop_Original extends MMOpMode_Linear {
         int targetSpeed = (revTicks * targetRPM) / 60;
 
         if(gamepad2.y){
-            robot.shooterLeft.setMaxSpeed(targetSpeed);
+            robot.shooterMotor.setMaxSpeed(targetSpeed);
         }
 
         if(gamepad2.x) {
-            robot.shooterLeft.setMaxSpeed(0);
+            robot.shooterMotor.setMaxSpeed(0);
         }
     }
 
@@ -176,7 +178,7 @@ public class Minions9533_Teleop_Original extends MMOpMode_Linear {
 
         timer.reset();
 
-        robot.shooterLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         while (opModeIsActive()) {
 

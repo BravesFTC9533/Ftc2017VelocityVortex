@@ -32,21 +32,12 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
-import com.qualcomm.robotcore.util.RollingAverage;
-
-import org.firstinspires.ftc.robotcontroller.external.samples.HardwareK9bot;
 
 import hallib.HalDashboard;
-import trclib.TrcGyro;
-import trclib.TrcRobot;
-import trclib.TrcSensor;
-import trclib.TrcTaskMgr;
 
 import static java.lang.Math.abs;
 
@@ -86,7 +77,7 @@ public class Minions9533_Teleop extends MMOpMode_Linear {
 
     private double shooterPower = 1;
     static final double SHOOTER_POWER_INCREMENT  = 0.02;
-    static int targetRPM = 2500;
+    static int targetRPM = 2400;
     static final int targetIncrement = 50;
 
     private boolean currentButtonState = false;
@@ -132,7 +123,7 @@ public class Minions9533_Teleop extends MMOpMode_Linear {
 
         robot.dashboard.displayPrintf(11, "Time: %s", timer.seconds());
 
-        int currentPos = robot.shooterLeft.getCurrentPosition();
+        int currentPos = robot.shooterMotor.getCurrentPosition();
         double currentTime = System.nanoTime();
         if(counter > 0) {
 
@@ -170,82 +161,12 @@ public class Minions9533_Teleop extends MMOpMode_Linear {
         counter ++;
     }
 
-//    private void handleShooterPID() {
-//
-//
-//
-//        if(gamepad2.a) {
-//
-//
-//            if(lastPos > 0) {
-//
-//
-//
-//                int currentPos = robot.shooterLeft.getCurrentPosition();
-//
-//                int delta = abs(currentPos - lastPos);
-//
-//                double rpm = (delta * ((1000/tickInterval) * 60)) / 28;
-//
-//                int index = count % 50;
-//                armp[index] = rpm;
-//                if (count > 50)
-//                {
-//                    int avg = 0;
-//                    for (int i = 0; i < 50; i++)
-//                    {
-//                        avg += armp[i];
-//                    }
-//                    avg /= 50;
-//
-//                    if (count % 25 == 0)
-//                    {
-//                        if (avg < targetRPM-75)// && avg < targetRPM+25)
-//                        {
-//                            shooterPower+=0.01;
-//                        }
-//                        else if (avg > targetRPM+75)
-//                        {
-//                            shooterPower-=0.01;
-//                        }
-//                        else if (avg < targetRPM-25)// && avg < targetRPM+25)
-//                        {
-//                            shooterPower+=0.005;
-//                        }
-//                        else if (avg > targetRPM+25)
-//                        {
-//                            shooterPower-=0.005;
-//                        }
-//
-//                        shooterPower = Range.clip(shooterPower, 0, 1);
-//                    }
-//
-//
-//                    robot.dashboard.displayPrintf(9, "TargetRPM: %s", targetRPM);
-//                    robot.dashboard.displayPrintf(10, "RPM: %s", avg);
-//                }
-//
-//
-//            }
-//
-//            robot.shooterLeft.setPower(shooterPower);
-//        } else {
-//            //robot.shooterRight.setPower(0);
-//            robot.shooterLeft.setPower(0);
-//        }
-//
-//        lastPos = robot.shooterLeft.getCurrentPosition();
-//
-//        robot.dashboard.displayPrintf(5, "Shooter: %.2f", shooterPower);
-//        //telemetry.addData("Shooter", shooterPower);
-//    }
-
 
 
     double currentPower = 0;
     private void handleShooter() {
 
-        //currentPower = robot.shooterLeft.getPower();
+        //currentPower = robot.shooterMotor.getPower();
         if(gamepad2.a) {
 
             if(currentPower == 0) {
@@ -257,13 +178,13 @@ public class Minions9533_Teleop extends MMOpMode_Linear {
             currentPower = Range.clip(currentPower, 0, 1);
 
 
-            robot.shooterLeft.setPower(currentPower);
+            robot.shooterMotor.setPower(currentPower);
 
-            //robot.shooterLeft.setPower(shooterPower);
+            //robot.shooterMotor.setPower(shooterPower);
             //robot.shooterRight.setPower(shooterPower);
         } else {
             //robot.shooterRight.setPower(0);
-            robot.shooterLeft.setPower(0);
+            robot.shooterMotor.setPower(0);
             currentPower = 0;
         }
 
@@ -326,9 +247,9 @@ public class Minions9533_Teleop extends MMOpMode_Linear {
 
         timer.reset();
 
-        robot.shooterLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.shooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
-        robot.shooterLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
 
@@ -342,7 +263,7 @@ public class Minions9533_Teleop extends MMOpMode_Linear {
             handleTargetRPM();
             int targetSpeed = (targetRPM * 28) / 60;
 
-            robot.shooterLeft.setMaxSpeed(targetSpeed);
+            robot.shooterMotor.setMaxSpeed(targetSpeed);
 
             calcAvgRPM();
 
@@ -373,7 +294,7 @@ public class Minions9533_Teleop extends MMOpMode_Linear {
             handleIntake();
             handleElevator();
             handleShooter();
-            handleShooterSpeed();
+            //handleShooterSpeed();
 
             robot.DriveRobot(-gamepad1.left_stick_y, -gamepad1.right_stick_y);
 

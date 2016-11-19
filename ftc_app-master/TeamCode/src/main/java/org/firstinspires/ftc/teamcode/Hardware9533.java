@@ -3,16 +3,10 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.hitechnic.HiTechnicNxtGyroSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Gamepad;
-import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
-import ftclib.FtcHiTechnicGyro;
 import hallib.HalDashboard;
 
 import static java.lang.Math.abs;
@@ -51,8 +45,8 @@ public class Hardware9533
     public DcMotor elevator = null;
     public DcMotor intake = null;
 
-    public DcMotor shooterLeft = null;
-    //public DcMotor shooterRight = null;
+    public DcMotor shooterMotor = null;
+
 
     public HiTechnicNxtGyroSensor gyro = null;
 
@@ -69,12 +63,12 @@ public class Hardware9533
 
     }
 
-
-    static final double     COUNTS_PER_MOTOR_REV    = 21000 ;    // eg: TETRIX Motor Encoder
-    static final double     DRIVE_GEAR_REDUCTION    = 2.0 ;     // This is < 1.0 if geared UP
-    static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
-    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
-            (WHEEL_DIAMETER_INCHES * 3.1415);
+//
+//    static final double     COUNTS_PER_MOTOR_REV    = 21000 ;    // eg: TETRIX Motor Encoder
+//    static final double     DRIVE_GEAR_REDUCTION    = 2.0 ;     // This is < 1.0 if geared UP
+//    static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
+//    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+//            (WHEEL_DIAMETER_INCHES * 3.1415);
 
     /* Initialize standard Hardware interfaces */
     public void init(HardwareMap ahwMap) {
@@ -85,7 +79,7 @@ public class Hardware9533
         hwMap = ahwMap;
 
         // Define gyro
-        gyro = (HiTechnicNxtGyroSensor)hwMap.gyroSensor.get("gyro");
+        //gyro = (HiTechnicNxtGyroSensor)hwMap.gyroSensor.get("gyro");
 
 
         // Define and Initialize Motors
@@ -95,20 +89,16 @@ public class Hardware9533
 
 
         intake = hwMap.dcMotor.get("ballGrabber");
-        //intake.setDirection(DcMotorSimple.Direction.REVERSE);
+        intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
         elevator = hwMap.dcMotor.get("elevator");
         elevator.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
 
-        shooterLeft = hwMap.dcMotor.get("shooterLeft");
+        shooterMotor = hwMap.dcMotor.get("shooterMotor");
 
-        shooterLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-
-
-//        shooterRight = hwMap.dcMotor.get("shooterRight");
-//        shooterRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        shooterMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
         // Set all motors to zero power
@@ -118,7 +108,7 @@ public class Hardware9533
         intake.setPower(0);
         elevator.setPower(0);
 
-        shooterLeft.setPower(0);
+        shooterMotor.setPower(0);
         //shooterRight.setPower(0);
 
         // Set all motors to run without encoders.
@@ -134,7 +124,7 @@ public class Hardware9533
 
 
 
-        shooterLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
         //shooterRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -210,7 +200,7 @@ public class Hardware9533
     }
 
     public void ElevatorLiftBalls(){
-        this.elevator.setPower(-1);
+        this.elevator.setPower(-0.75);
     }
     public void ElevatorDropBalls(){
         this.elevator.setPower(1);
