@@ -64,6 +64,14 @@ import static java.lang.Math.abs;
 @Autonomous(name="Autobot Close", group="Pushbot")
 public class Minion9533_AutoBot extends MMOpMode_Linear {
 
+    public static double initialMoveTime = 0.5;  //defaults to near
+    public static double pushBallTime = 1;      //defaults to near
+    public static boolean shoot = true;
+    public static boolean capBall = true;
+    public static boolean park = true;
+    public static double delayStartTime = 0;
+
+
     /* Declare OpMode members. */
                                                                // could also use HardwarePushbotMatrix class.
     private ElapsedTime runtime = new ElapsedTime();
@@ -204,41 +212,41 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
         waitForStart();
 
 
-        waitFor(0.1);
+        waitFor(0.1+delayStartTime);
         robot.dashboard.displayText(0, "Moving Forward half block");
-        goStraight("Step 1", 0.5);
+        goStraight("Initial Move", initialMoveTime);
         pauseBetweenSteps();
 
 
-        robot.dashboard.displayText(1, "Turning on shooter");
+        if (shoot)
+        {
+            robot.dashboard.displayText(1, "Turning on shooter");
 
-        double power = 0.4;
-        while(power < 1){
+            double power = 0.4;
+            while(power < 1){
 
-            power += 0.005;
-            power = Range.clip(power, 0, 1);
-            robot.shooterMotor.setPower(power);
+                power += 0.005;
+                power = Range.clip(power, 0, 1);
+                robot.shooterMotor.setPower(power);
 
-            if(power == 1) {
-                break;
+                if(power == 1) {
+                    break;
+                }
+                robot.dashboard.displayPrintf(2, "Waiting for shooter power: %2.5f", power);
+                waitFor(0.02);
             }
-            robot.dashboard.displayPrintf(2, "Waiting for shooter power: %2.5f", power);
-            waitFor(0.02);
+
+            pauseBetweenSteps();
+            pauseBetweenSteps();
+
+            shootBalls();
+
+            pauseBetweenSteps();
         }
-
-
-
-        pauseBetweenSteps();
-        pauseBetweenSteps();
-
-        shootBalls();
-
-        pauseBetweenSteps();
-
-
-        goStraight("Push Ball", 1);
-        //turnRight("Turn to square", 45);
-        //goStraight("Park", .5);
+        if (capBall)   //or pushball
+        {
+            goStraight("Push Ball", pushBallTime);
+        }
 
         robot.Stop();
 
