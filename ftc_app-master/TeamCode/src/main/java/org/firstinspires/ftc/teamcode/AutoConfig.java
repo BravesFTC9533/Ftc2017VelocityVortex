@@ -14,10 +14,12 @@ import hallib.HalDashboard;
 @TeleOp (name = "(MENU) AutoConfig", group = "Menu")
 public class AutoConfig extends LinearOpMode {
 
+    static FtcSimpleMenu menu = new FtcSimpleMenu("Autonomous Configuration", telemetry, gamepad1);
+
     @Override
     public void runOpMode() {
 
-        FtcSimpleMenu menu = new FtcSimpleMenu("Autonomous Configuration", telemetry, gamepad1);
+
         menu.addOption("Team", new String[]{"RED", "BLUE"});
         menu.addOption("Proximity", new String[]{"NEAR", "FAR"});
         menu.addOption("Shoot?", new String[]{"YES", "NO"});
