@@ -68,14 +68,13 @@ public abstract class  MMOpMode_Linear extends LinearOpMode {
         return dashboard;
     }   //getDashboard
 
-
     public MMOpMode_Linear() {
 
     }
 
     @Override
     public void runOpMode() {
-        dashboard = new HalDashboard(telemetry);
+        //dashboard = new HalDashboard(telemetry);
         robot.init(hardwareMap);
 
 

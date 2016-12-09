@@ -1,45 +1,14 @@
-/*
-Copyright (c) 2016 Robert Atkinson
 
-All rights reserved.
+        package org.firstinspires.ftc.teamcode;
 
-Redistribution and use in source and binary forms, with or without modification,
-are permitted (subject to the limitations in the disclaimer below) provided that
-the following conditions are met:
+        import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+        import com.qualcomm.robotcore.hardware.DcMotor;
+        import com.qualcomm.robotcore.util.ElapsedTime;
+        import com.qualcomm.robotcore.util.Range;
 
-Redistributions of source code must retain the above copyright notice, this list
-of conditions and the following disclaimer.
+        import hallib.HalDashboard;
 
-Redistributions in binary form must reproduce the above copyright notice, this
-list of conditions and the following disclaimer in the documentation and/or
-other materials provided with the distribution.
-
-Neither the name of Robert Atkinson nor the names of his contributors may be used to
-endorse or promote products derived from this software without specific prior
-written permission.
-
-NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
-LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESSFOR A PARTICULAR PURPOSE
-ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
-TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
-THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
-package org.firstinspires.ftc.teamcode;
-
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
-
-import hallib.HalDashboard;
-
-import static java.lang.Math.abs;
+        import static java.lang.Math.abs;
 
 /**
  * This OpMode uses the common HardwareK9bot class to define the devices on the robot.
@@ -58,8 +27,8 @@ import static java.lang.Math.abs;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Tele: Main Op (USE THIS)", group="9533")
-public class Minions9533_Teleop extends MMOpMode_Linear {
+@TeleOp(name="Tele: Mech Op (USE THIS)", group="9533")
+public class Minion9533_Mech extends MMOpMode_Linear {
 
     /* Declare OpMode members. */
     //Hardware9533   robot           = new Hardware9533();              // Use a K9'shardware
@@ -124,7 +93,7 @@ public class Minions9533_Teleop extends MMOpMode_Linear {
     private void calcAvgRPM(){
 
 
-        //robot.dashboard.displayPrintf(11, "Time: %s", timer.seconds());
+        robot.dashboard.displayPrintf(11, "Time: %s", timer.seconds());
 
         int currentPos = robot.shooterMotor.getCurrentPosition();
         double currentTime = System.nanoTime();
@@ -134,11 +103,11 @@ public class Minions9533_Teleop extends MMOpMode_Linear {
             int delta = abs(currentPos - lastPos);
             double deltaT = (currentTime - lastTime) / ElapsedTime.MILLIS_IN_NANO;
 
-            //robot.dashboard.displayPrintf(12, "Encoder Delta: %s", delta);
-            //robot.dashboard.displayPrintf(13, "Time Delta: %s", deltaT);
+            robot.dashboard.displayPrintf(12, "Encoder Delta: %s", delta);
+            robot.dashboard.displayPrintf(13, "Time Delta: %s", deltaT);
 
             double rpm = (delta * ((1000/deltaT) * 60)) / 28;
-            //robot.dashboard.displayPrintf(14, "Instant RPM: %s", rpm);
+            robot.dashboard.displayPrintf(14, "Instant RPM: %s", rpm);
 
             rollingAverage.add(rpm);
 
@@ -191,7 +160,7 @@ public class Minions9533_Teleop extends MMOpMode_Linear {
             currentPower = 0;
         }
 
-        //robot.dashboard.displayPrintf(5, "Shooter: %.2f", currentPower);
+        robot.dashboard.displayPrintf(5, "Shooter: %.2f", currentPower);
         //telemetry.addData("Shooter", shooterPower);
     }
 
@@ -250,21 +219,21 @@ public class Minions9533_Teleop extends MMOpMode_Linear {
             gyro = new MinionsGyro(robot, "gyro");
 
         }
-        //robot.dashboard.displayPrintf(1, "Hello Driver");
+        robot.dashboard.displayPrintf(1, "Hello Driver");
 
         // Wait for the game to start (driver presses PLAY)
 
         if(USE_GYRO) {
-            //robot.dashboard.displayPrintf(2, "Calibrating..");
+            robot.dashboard.displayPrintf(2, "Calibrating..");
             gyro.calibrateGyro();
 
         }
 
-        //robot.dashboard.displayPrintf(2, "Waiting for start..");
+        robot.dashboard.displayPrintf(2, "Waiting for start..");
         waitForStart();
 
 
-        //robot.dashboard.clearDisplay();
+        robot.dashboard.clearDisplay();
         // run until the end of the match (driver presses STOP)
 
         timer.reset();
@@ -289,8 +258,8 @@ public class Minions9533_Teleop extends MMOpMode_Linear {
 
             calcAvgRPM();
 
-            //robot.dashboard.displayPrintf(9, "TargetRPM: %s", targetRPM);
-            //robot.dashboard.displayPrintf(10, "RPM: %s", shooterAvg);
+            robot.dashboard.displayPrintf(9, "TargetRPM: %s", targetRPM);
+            robot.dashboard.displayPrintf(10, "RPM: %s", shooterAvg);
 
 
 
@@ -304,11 +273,11 @@ public class Minions9533_Teleop extends MMOpMode_Linear {
                 previousButtonState = currentButtonState;
             }
 
-            //robot.dashboard.displayPrintf(1, "Drive Mode:");
+            robot.dashboard.displayPrintf(1, "Drive Mode:");
             if(robot.invertedDrive) {
-                //robot.dashboard.displayPrintf(2, "Reverse");
+                robot.dashboard.displayPrintf(2, "Reverse");
             } else {
-                //robot.dashboard.displayPrintf(2, "Normal");
+                robot.dashboard.displayPrintf(2, "Normal");
             }
 
 
@@ -318,7 +287,8 @@ public class Minions9533_Teleop extends MMOpMode_Linear {
             handleShooter();
             //handleShooterSpeed();
 
-            robot.DriveRobot(-gamepad1.left_stick_y, -gamepad1.right_stick_y);
+            //robot.DriveRobot(-gamepad1.left_stick_y, -gamepad1.right_stick_y);
+            robot.DriveMech(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
 
 
             // Pause for metronome tick.  40 mS each cycle = update 25 times a second.
@@ -331,3 +301,4 @@ public class Minions9533_Teleop extends MMOpMode_Linear {
 
 
 }
+

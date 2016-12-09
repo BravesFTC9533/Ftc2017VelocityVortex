@@ -156,18 +156,18 @@ public class AutoTempNear extends MMOpMode_Linear {
     private void shootBalls() {
 
 
-        robot.dashboard.displayText(3, "Turning on elevator");
+        //robot.dashboard.displayText(3, "Turning on elevator");
         robot.ElevatorLiftBalls();
-        robot.dashboard.displayText(4, "Waiting for 0.5 seconds");
+        //robot.dashboard.displayText(4, "Waiting for 0.5 seconds");
         waitFor(0.5);
-        robot.dashboard.displayText(4, "Stopping elevator. let wheels spin back up");
+        //robot.dashboard.displayText(4, "Stopping elevator. let wheels spin back up");
         robot.ElevatorStop();
-        robot.dashboard.displayText(4, "Waiting for 1 second");
+        //robot.dashboard.displayText(4, "Waiting for 1 second");
         waitFor(4);
 
-        robot.dashboard.displayText(4, "Turning on elevator");
+        //robot.dashboard.displayText(4, "Turning on elevator");
         robot.ElevatorLiftBalls();
-        robot.dashboard.displayText(4, "Waiting for 1 second");
+        //robot.dashboard.displayText(4, "Waiting for 1 second");
         waitFor(1);
 
 
@@ -192,18 +192,18 @@ public class AutoTempNear extends MMOpMode_Linear {
 
 
 
-        dashboard = getDashboard();
+        //dashboard = getDashboard();
 
         waitForStart();
 
 
         waitFor(0.1);
-        robot.dashboard.displayText(0, "Moving Forward half block");
+        //robot.dashboard.displayText(0, "Moving Forward half block");
         goStraight("Step 1", 0.5);
         pauseBetweenSteps();
 
 
-        robot.dashboard.displayText(1, "Turning on shooter");
+        //robot.dashboard.displayText(1, "Turning on shooter");
 
         double power = 0.4;
         while(power < 1){
@@ -215,7 +215,7 @@ public class AutoTempNear extends MMOpMode_Linear {
             if(power == 1) {
                 break;
             }
-            robot.dashboard.displayPrintf(2, "Waiting for shooter power: %2.5f", power);
+            //robot.dashboard.displayPrintf(2, "Waiting for shooter power: %2.5f", power);
             waitFor(0.02);
         }
 
@@ -239,7 +239,7 @@ public class AutoTempNear extends MMOpMode_Linear {
 
     private void logPath(String msg){
 
-        robot.dashboard.displayText(1, msg);
+        //robot.dashboard.displayText(1, msg);
 
     }
 

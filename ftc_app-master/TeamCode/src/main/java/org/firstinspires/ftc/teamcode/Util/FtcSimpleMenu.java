@@ -42,12 +42,34 @@ public class FtcSimpleMenu {
     private Gamepad gamepad;
     int currentOption = 0;
     private boolean[] buttonStates = new boolean[4];
-    private ArrayList<Option> options = new ArrayList();
+    private ArrayList<Option> options;
 
-    public FtcSimpleMenu(String menuTitle, Telemetry telemetry, Gamepad gamepad) {
+    public FtcSimpleMenu(String menuTitle) {
         this.menuTitle = menuTitle;
-        this.telemetry = telemetry;
+        options = new ArrayList();
+    }
+
+
+    public void setTelemetry(Telemetry t)
+    {
+        this.telemetry = t;
+    }
+    public void setGamepad(Gamepad gamepad)
+    {
         this.gamepad = gamepad;
+    }
+
+    public void clearOptions()
+    {
+        options.clear();
+    }
+    public void loadFrom(ArrayList<Option>options)
+    {
+        this.options = options;
+    }
+    public ArrayList<Option> getOptionsConfig()
+    {
+        return options;
     }
 
     public void addOption(String option, String[] choices) {
@@ -79,13 +101,22 @@ public class FtcSimpleMenu {
         int count = 0;
         for (Option o2 : this.options) {
             if (this.currentOption == count) {
-                this.telemetry.addData(">> " + o2.getName(), (Object)o2.getCurrentChoice());
+                this.telemetry.addData(">> " + o2.getName(), o2.getCurrentChoice());
             } else {
-                this.telemetry.addData(o2.getName(), (Object)o2.getCurrentChoice());
+                this.telemetry.addData(o2.getName(), o2.getCurrentChoice());
             }
             ++count;
         }
         this.telemetry.update();
+    }
+
+    public void displayConfig(Telemetry telemetry)
+    {
+        for (Option o2 : this.options)
+        {
+            telemetry.addData(o2.getName(), o2.getCurrentChoice());
+            telemetry.update();
+        }
     }
 
     private boolean checkButton(boolean b, int i) {

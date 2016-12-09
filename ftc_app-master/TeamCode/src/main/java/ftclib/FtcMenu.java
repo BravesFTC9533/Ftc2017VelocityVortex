@@ -156,7 +156,7 @@ public abstract class FtcMenu
             throw new NullPointerException("menuTitle/menuButtons cannot be null.");
         }
 
-        dashboard = MMOpMode_Linear.getDashboard();
+        //dashboard = MMOpMode_Linear.getDashboard();
         this.menuTitle = menuTitle;
         this.parent = parent;
         this.menuButtons = menuButtons;
@@ -285,7 +285,7 @@ public abstract class FtcMenu
                         //
                         // We are done with the menus. Let's clear the dashboard.
                         //
-                        MMOpMode_Linear.getDashboard().clearDisplay();
+                       // MMOpMode_Linear.getDashboard().clearDisplay();
                     }
                 }
                 else if ((buttonsPressed & MENUBUTTON_UP) != 0)

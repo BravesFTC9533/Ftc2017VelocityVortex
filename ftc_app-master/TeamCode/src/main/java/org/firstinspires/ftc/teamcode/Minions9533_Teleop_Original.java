@@ -110,7 +110,7 @@ public class Minions9533_Teleop_Original extends MMOpMode_Linear {
             robot.shooterMotor.setPower(0);
         }
 
-        robot.dashboard.displayPrintf(5, "Shooter: %.2f", shooterPower);
+        //robot.dashboard.displayPrintf(5, "Shooter: %.2f", shooterPower);
         //telemetry.addData("Shooter", shooterPower);
     }
 
@@ -159,21 +159,21 @@ public class Minions9533_Teleop_Original extends MMOpMode_Linear {
             gyro = new MinionsGyro(robot, "gyro");
 
         }
-        robot.dashboard.displayPrintf(1, "Hello Driver");
+        //robot.dashboard.displayPrintf(1, "Hello Driver");
 
         // Wait for the game to start (driver presses PLAY)
 
         if(USE_GYRO) {
-            robot.dashboard.displayPrintf(2, "Calibrating..");
+            //robot.dashboard.displayPrintf(2, "Calibrating..");
             gyro.calibrateGyro();
 
         }
 
-        robot.dashboard.displayPrintf(2, "Waiting for start..");
+        //robot.dashboard.displayPrintf(2, "Waiting for start..");
         waitForStart();
 
 
-        robot.dashboard.clearDisplay();
+        //robot.dashboard.clearDisplay();
         // run until the end of the match (driver presses STOP)
 
         timer.reset();
@@ -192,11 +192,11 @@ public class Minions9533_Teleop_Original extends MMOpMode_Linear {
                 previousButtonState = currentButtonState;
             }
 
-            robot.dashboard.displayPrintf(1, "Drive Mode:");
+            //robot.dashboard.displayPrintf(1, "Drive Mode:");
             if(robot.invertedDrive) {
-                robot.dashboard.displayPrintf(2, "Reverse");
+                //robot.dashboard.displayPrintf(2, "Reverse");
             } else {
-                robot.dashboard.displayPrintf(2, "Normal");
+                //robot.dashboard.displayPrintf(2, "Normal");
             }
 
 

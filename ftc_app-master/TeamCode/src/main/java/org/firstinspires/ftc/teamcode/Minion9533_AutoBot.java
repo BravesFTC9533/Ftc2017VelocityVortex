@@ -37,6 +37,8 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 import hallib.HalDashboard;
 
 import static java.lang.Math.abs;
@@ -61,7 +63,36 @@ import static java.lang.Math.abs;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Autobot Close", group="Pushbot")
+class NewTele implements Runnable
+{
+    private boolean running = false;
+    private Telemetry telemetry;
+    private Thread t;
+
+    public NewTele(boolean running, Telemetry telemetry)
+    {
+        this.running = running;
+        this.telemetry = telemetry;
+    }
+    public void run()
+    {
+        while (running)
+        {
+            AutoConfig.menu.displayConfig(telemetry);
+            telemetry.addData("ello", "");
+        }
+    }
+
+    public void start()
+    {
+        if (t == null) {
+            t = new Thread (this, "NewTele");
+            t.start ();
+        }
+    }
+}
+
+@Autonomous(name="(USE THIS) Autobot", group="Pushbot")
 public class Minion9533_AutoBot extends MMOpMode_Linear {
 
     public static double initialMoveTime = 0.5;  //defaults to near
@@ -76,7 +107,7 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
                                                                // could also use HardwarePushbotMatrix class.
     private ElapsedTime runtime = new ElapsedTime();
 
-    private HalDashboard dashboard;
+    //private HalDashboard dashboard;
     MinionsGyro gyro = null;
 
 
@@ -90,11 +121,11 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
     private void goStraight(String step, double time){
         //robot.DriveRobot(FORWARD_SPEED, FORWARD_SPEED, telemetry);
 
-        dashboard.displayPrintf(0, "%s: Drive straight for %s second(s)", step, time);
+        //dashboard.displayPrintf(0, "%s: Drive straight for %s second(s)", step, time);
 
         runtime.reset();
         while(opModeIsActive() && runtime.seconds() < time) {
-            dashboard.displayPrintf(1, "Straight: %2.5f S Elapsed: %s", runtime.seconds(), robot.leftMotor.getCurrentPosition());
+           // dashboard.displayPrintf(1, "Straight: %2.5f S Elapsed: %s", runtime.seconds(), robot.leftMotor.getCurrentPosition());
 
             robot.DriveRobot(FORWARD_SPEED, FORWARD_SPEED);
             robot.waitForTick(40);
@@ -117,13 +148,13 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
 
     private void turnLeft(String step, int degrees){
 
-        dashboard.displayPrintf(0, "%s: Turn Left %s degrees", step, degrees);
+        //dashboard.displayPrintf(0, "%s: Turn Left %s degrees", step, degrees);
         gyro.reset();
 
 
         while(opModeIsActive()) {
             double heading = gyro.getHeading();
-            dashboard.displayPrintf(6, "Heading: %.2f", heading);
+            //dashboard.displayPrintf(6, "Heading: %.2f", heading);
             if(inRange(degrees, heading , 5)) {
                 break;
             }
@@ -140,13 +171,13 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
 
     private void turnRight(String step, int degrees){
 
-        dashboard.displayPrintf(0, "%s: Turn Right %s degrees", step, degrees);
+        //dashboard.displayPrintf(0, "%s: Turn Right %s degrees", step, degrees);
         gyro.reset();
 
 
         while(opModeIsActive()) {
             double heading = gyro.getHeading();
-            dashboard.displayPrintf(6, "Heading: %.2f", heading);
+            //dashboard.displayPrintf(6, "Heading: %.2f", heading);
             if(inRange(degrees, heading, 5)) {
 
                 break;
@@ -164,18 +195,18 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
     private void shootBalls() {
 
 
-        robot.dashboard.displayText(3, "Turning on elevator");
+        //robot.dashboard.displayText(3, "Turning on elevator");
         robot.ElevatorLiftBalls();
-        robot.dashboard.displayText(4, "Waiting for 0.5 seconds");
+        //robot.dashboard.displayText(4, "Waiting for 0.5 seconds");
         waitFor(0.5);
-        robot.dashboard.displayText(4, "Stopping elevator. let wheels spin back up");
+        //robot.dashboard.displayText(4, "Stopping elevator. let wheels spin back up");
         robot.ElevatorStop();
-        robot.dashboard.displayText(4, "Waiting for 1 second");
+       // robot.dashboard.displayText(4, "Waiting for 1 second");
         waitFor(4);
 
-        robot.dashboard.displayText(4, "Turning on elevator");
+       // robot.dashboard.displayText(4, "Turning on elevator");
         robot.ElevatorLiftBalls();
-        robot.dashboard.displayText(4, "Waiting for 1 second");
+        //robot.dashboard.displayText(4, "Waiting for 1 second");
         waitFor(1);
 
 
@@ -186,10 +217,14 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
     }
 
 
+
     @Override
     public void runOpMode() {
 
        super.runOpMode();
+
+
+
 
 
         robot.shooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -203,7 +238,8 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
 
 
 
-        dashboard = getDashboard();
+
+        //dashboard = getDashboard();
         // Send telemetry message to signify robot waiting;
 
 
@@ -211,28 +247,37 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
+        while (opModeIsActive())
+        {
+            AutoConfig.menu.displayConfig(telemetry);
+            //telemetry.addData("fg",0);
+            telemetry.update();
+        }
+
+        //NewTele test = new NewTele(opModeIsActive(), telemetry);
+        //test.start();
 
         waitFor(0.1+delayStartTime);
-        robot.dashboard.displayText(0, "Moving Forward half block");
+        //robot.dashboard.displayText(0, "Moving Forward half block");
         goStraight("Initial Move", initialMoveTime);
         pauseBetweenSteps();
 
 
         if (shoot)
         {
-            robot.dashboard.displayText(1, "Turning on shooter");
+            //robot.dashboard.displayText(1, "Turning on shooter");
 
             double power = 0.4;
             while(power < 1){
 
                 power += 0.005;
                 power = Range.clip(power, 0, 1);
-                robot.shooterMotor.setPower(power);
+                //robot.shooterMotor.setPower(power);
 
                 if(power == 1) {
                     break;
                 }
-                robot.dashboard.displayPrintf(2, "Waiting for shooter power: %2.5f", power);
+                //robot.dashboard.displayPrintf(2, "Waiting for shooter power: %2.5f", power);
                 waitFor(0.02);
             }
 
@@ -254,14 +299,14 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
 
 
     private void pauseBetweenSteps(){
-        logPath("pausing waiting 2 seconds");
+        //logPath("pausing waiting 2 seconds");
         waitFor(1);
     }
 
 
     private void logPath(String msg){
 
-        robot.dashboard.displayText(1, msg);
+        //robot.dashboard.displayText(1, msg);
 
     }
 

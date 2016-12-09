@@ -78,7 +78,7 @@ public class TestMenuOp extends MMOpMode_Linear  implements FtcMenu.MenuButtons 
 
 
   private ElapsedTime runtime = new ElapsedTime();
-  private HalDashboard dashboard;
+  //private HalDashboard dashboard;
   //
   // Menu choices.
   //
@@ -97,9 +97,9 @@ public class TestMenuOp extends MMOpMode_Linear  implements FtcMenu.MenuButtons 
 
 
 
-    dashboard = getDashboard();
+    //dashboard = getDashboard();
 
-    dashboard.clearDisplay();
+    //dashboard.clearDisplay();
     doMenus();
 
     waitForStart();
@@ -169,7 +169,7 @@ public class TestMenuOp extends MMOpMode_Linear  implements FtcMenu.MenuButtons 
     alliance = (Alliance)allianceMenu.getCurrentChoiceObject();
     wallDistance = wallDistanceMenu.getCurrentValue();
 
-    dashboard.displayPrintf(0, "Test: %s", testMenu.getCurrentChoiceText());
+    //dashboard.displayPrintf(0, "Test: %s", testMenu.getCurrentChoiceText());
   }   //doMenus
 
 

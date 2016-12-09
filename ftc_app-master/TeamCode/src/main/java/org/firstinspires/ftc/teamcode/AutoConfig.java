@@ -6,19 +6,19 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import ftclib.FtcMenu;
 import org.firstinspires.ftc.teamcode.Util.FtcSimpleMenu;
-
-import hallib.HalDashboard;
+import static org.firstinspires.ftc.teamcode.Util.Global.*;
 
 @TeleOp (name = "(MENU) AutoConfig", group = "Menu")
 public class AutoConfig extends LinearOpMode {
 
-    static FtcSimpleMenu menu = new FtcSimpleMenu("Autonomous Configuration", telemetry, gamepad1);
+    public static FtcSimpleMenu menu = new FtcSimpleMenu("Autonomous Configuration");
 
     @Override
     public void runOpMode() {
 
+        menu.setGamepad(gamepad1);
+        menu.setTelemetry(telemetry);
 
         menu.addOption("Team", new String[]{"RED", "BLUE"});
         menu.addOption("Proximity", new String[]{"NEAR", "FAR"});
@@ -26,6 +26,13 @@ public class AutoConfig extends LinearOpMode {
         menu.addOption("Push de CapBall?", new String[]{"YES", "NO"});
         menu.addOption("Park?", new String[]{"YES", "NO"});
         menu.addOption("Delay Start?", new String[]{"NO", "YES"});
+
+        /*if (lastMenuConfig != null)
+        {
+            telemetry.addData("Happenin", "");
+            menu.loadFrom(lastMenuConfig);
+        }*/
+
 
         waitForStart();
 
@@ -90,5 +97,10 @@ public class AutoConfig extends LinearOpMode {
                     break;
             }
         }
+
+
+        //lastMenuConfig = menu.getOptionsConfig();
+        menu.clearOptions();
+
     }
 }

@@ -28,7 +28,7 @@ public class MinionsGyro {
 
         this.robot = robot;
         this.gyro = (HiTechnicNxtGyroSensor)robot.hwMap.gyroSensor.get(name);
-        this.dashboard = robot.dashboard;
+        //this.dashboard = robot.dashboard;
     }
 
     public void reset() {

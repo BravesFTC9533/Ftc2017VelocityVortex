@@ -41,6 +41,8 @@ public class Hardware9533
     /* Public OpMode members. */
     public DcMotor  leftMotor   = null;
     public DcMotor  rightMotor  = null;
+    public DcMotor  backLeftMotor = null;
+    public DcMotor  backRightMotor = null;
 
     public DcMotor elevator = null;
     public DcMotor intake = null;
@@ -85,6 +87,10 @@ public class Hardware9533
         // Define and Initialize Motors
         leftMotor   = hwMap.dcMotor.get("left");
         rightMotor  = hwMap.dcMotor.get("right");
+        backLeftMotor = hwMap.dcMotor.get("backLeft");
+        backRightMotor = hwMap.dcMotor.get("backRight");
+
+        //TODO direction may be different for mech wheels
         rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
@@ -104,6 +110,8 @@ public class Hardware9533
         // Set all motors to zero power
         leftMotor.setPower(0);
         rightMotor.setPower(0);
+        backLeftMotor.setPower(0);
+        backRightMotor.setPower(0);
 
         intake.setPower(0);
         elevator.setPower(0);
@@ -115,9 +123,13 @@ public class Hardware9533
         // May want to use RUN_USING_ENCODERS if encoders are installed.
         leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         elevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -164,6 +176,30 @@ public class Hardware9533
         this.leftMotor.setPower(0);
         this.rightMotor.setPower(0);
     }
+
+
+    /***********************************************************************************************/
+    public void DriveMech(double h, double v, double r)
+    {
+        leftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        backLeftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        backRightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        double frontLeft = Range.clip(v-h+r, -MAX_SPEED, MAX_SPEED);
+        double frontRight = Range.clip(v+h-r, -MAX_SPEED, MAX_SPEED);
+        double backRight = Range.clip(v-h-r, -MAX_SPEED, MAX_SPEED);
+        double backLeft = Range.clip(v+h+r, -MAX_SPEED, MAX_SPEED);
+
+
+        leftMotor.setPower(frontLeft);
+        rightMotor.setPower(frontRight);
+        backRightMotor.setPower(backRight);
+        backLeftMotor.setPower(backLeft);
+
+    }
+
+
 
     public void DriveRobot(double leftPower, double rightPower) {
 
@@ -231,3 +267,4 @@ public class Hardware9533
 
 
 }
+
