@@ -38,9 +38,11 @@ public class AutoConfig extends LinearOpMode {
 
             switch (menu.getCurrentChoiceOf("Team")) {
                 case "RED":
+                    team = RED;
                     //set red team
                     break;
                 case "BLUE":
+                    team = BLUE;
                     //set blue team
                     break;
             }
@@ -51,8 +53,8 @@ public class AutoConfig extends LinearOpMode {
                     pushBallTime = 3;
                     break;
                 case "FAR":
-                    initialMoveTime = 2;
-                    pushBallTime = 2;
+                    initialMoveTime = 1.2 ;
+                    pushBallTime = 4;
                     break;
             }
 

@@ -108,7 +108,7 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
     private ElapsedTime runtime = new ElapsedTime();
 
     private HalDashboard dashboard;
-    MinionsGyro gyro = null;
+    //MinionsGyro gyro = null;
 
 
     static final double     FORWARD_SPEED = 0.4;
@@ -147,18 +147,19 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
         return false;
     }
 
-    private void turnLeft(String step, int degrees){
+
+    private void turnLeft(String step, int degrees, int time){
 
         dashboard.displayPrintf(0, "%s: Turn Left %s degrees", step, degrees);
-        gyro.reset();
+        //gyro.reset();
 
-
-        while(opModeIsActive()) {
-            double heading = gyro.getHeading();
-            dashboard.displayPrintf(6, "Heading: %.2f", heading);
-            if(inRange(degrees, heading , 5)) {
-                break;
-            }
+        runtime.reset();
+        while(opModeIsActive() && runtime.seconds() < time) {
+            //double heading = gyro.getHeading();
+            //dashboard.displayPrintf(6, "Heading: %.2f", heading);
+            //if(inRange(degrees, heading , 5)) {
+            //    break;
+            //}
             //robot.DriveRobot(-TURN_SPEED, TURN_SPEED);
             robot.DriveMech(0, 0, -TURN_SPEED);
 
@@ -171,19 +172,15 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
 
     }
 
-    private void turnRight(String step, int degrees){
+    private void turnRight(String step, int degrees, int time){
 
         dashboard.displayPrintf(0, "%s: Turn Right %s degrees", step, degrees);
-        gyro.reset();
+
+        runtime.reset();
+        while(opModeIsActive() && runtime.seconds() < time) {
 
 
-        while(opModeIsActive()) {
-            double heading = gyro.getHeading();
-            dashboard.displayPrintf(6, "Heading: %.2f", heading);
-            if(inRange(degrees, heading, 5)) {
 
-                break;
-            }
             //robot.DriveRobot(TURN_SPEED, -TURN_SPEED);
             robot.DriveMech(0, 0, TURN_SPEED);
 
@@ -269,7 +266,7 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
         pauseBetweenSteps();
 
 
-        if (shoot)
+        if (shoot && opModeIsActive())
         {
             robot.dashboard.displayText(1, "Turning on shooter");
 
@@ -297,7 +294,18 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
         if (capBall)   //or pushball
         {
             goStraight("Push Ball", pushBallTime);
+
+            if (team == RED)
+            {
+                turnLeft("Unstuck spin -red", 360, 1);
+            }
+            else if (team == BLUE)
+            {
+                turnRight("Unstuck spin -blue", 360, 1);
+            }
         }
+
+
 
         robot.Stop();
 

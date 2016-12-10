@@ -8,6 +8,8 @@ import android.content.Context;
 
 public class Global {
 
+    public static final int RED = 0, BLUE = 1;
+
     public static FtcSimpleMenu menu = new FtcSimpleMenu("Autonomous Menu");
 
     public static Context context;
@@ -19,6 +21,7 @@ public class Global {
     public static boolean capBall = true;
     public static boolean park = true;
     public static double delayStartTime = 0;
+    public static int team = RED;
 
     public static void init()
     {
