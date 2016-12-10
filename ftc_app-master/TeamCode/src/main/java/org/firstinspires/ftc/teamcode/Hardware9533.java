@@ -90,9 +90,9 @@ public class Hardware9533
         backLeftMotor = hwMap.dcMotor.get("backLeft");
         backRightMotor = hwMap.dcMotor.get("backRight");
 
-        //TODO direction may be different for mech wheels
-        rightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        leftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         intake = hwMap.dcMotor.get("ballGrabber");
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -175,12 +175,19 @@ public class Hardware9533
 
         this.leftMotor.setPower(0);
         this.rightMotor.setPower(0);
+        this.backLeftMotor.setPower(0);
+        this.backRightMotor.setPower(0);
     }
 
 
     /***********************************************************************************************/
     public void DriveMech(double h, double v, double r)
     {
+        if(this.invertedDrive) {
+            h*=-1;
+            v*=-1;
+        }
+
         leftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         rightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
         backLeftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -192,38 +199,35 @@ public class Hardware9533
         double backLeft = Range.clip(v+h+r, -MAX_SPEED, MAX_SPEED);
 
 
-        leftMotor.setPower(frontLeft);
-        rightMotor.setPower(frontRight);
-        backRightMotor.setPower(backRight);
-        backLeftMotor.setPower(backLeft);
+        leftMotor.setPower(scale(frontLeft));
+        rightMotor.setPower(scale(frontRight));
+        backRightMotor.setPower(scale(backRight));
+        backLeftMotor.setPower(scale(backLeft));
 
     }
 
+    private double scale(double power){
+        int modifier = 1;
+        if(power < 0){
+            modifier *= -1;
+        }
 
+        return 1 / (power * power * modifier);
+    }
 
     public void DriveRobot(double leftPower, double rightPower) {
-
         double left = 0;
         double right = 0;
-
         if(this.invertedDrive) {
-
             //reverse all the things
             left = AccelerateMotor(this.rightMotor, -leftPower);
             right = AccelerateMotor(this.leftMotor, -rightPower);
-
         } else {
-
             left = AccelerateMotor(this.leftMotor, leftPower);
             right = AccelerateMotor(this.rightMotor, rightPower);
-
         }
-
-
         dashboard.displayPrintf(3, "left: %.2f", left);
         dashboard.displayPrintf(4, "right: %.2f", right);
-
-
     }
 
     public double AccelerateMotor(DcMotor motor, double targetPower) {

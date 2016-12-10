@@ -164,19 +164,6 @@ public class Minion9533_Mech extends MMOpMode_Linear {
         //telemetry.addData("Shooter", shooterPower);
     }
 
-    private void handleShooterSpeed() {
-        if(gamepad2.dpad_down) {
-            shooterPower -= SHOOTER_POWER_INCREMENT;
-        }
-        if(gamepad2.dpad_up){
-            shooterPower += SHOOTER_POWER_INCREMENT;
-        }
-
-        shooterPower = Range.clip(shooterPower, 0,1);
-
-
-    }
-
 
     private void handleTargetRPM() {
 
@@ -288,7 +275,7 @@ public class Minion9533_Mech extends MMOpMode_Linear {
             //handleShooterSpeed();
 
             //robot.DriveRobot(-gamepad1.left_stick_y, -gamepad1.right_stick_y);
-            robot.DriveMech(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
+            robot.DriveMech(gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x);
 
 
             // Pause for metronome tick.  40 mS each cycle = update 25 times a second.
