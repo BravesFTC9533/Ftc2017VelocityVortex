@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Old;
 
 import com.qualcomm.ftcrobotcontroller.R;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -19,6 +19,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.firstinspires.ftc.teamcode.Hardware9533;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,7 +96,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 @Disabled
 public class VuforiaOp9533 extends LinearOpMode {
 
-    Hardware9533   robot           = new Hardware9533();              // Use a K9'shardware
+    Hardware9533 robot           = new Hardware9533();              // Use a K9'shardware
 
 
 
