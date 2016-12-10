@@ -33,8 +33,8 @@ public class AutoConfig extends LinearOpMode {
 
             menu.displayMenu();
 
-            Minion9533_AutoBot.pushBallTime = Double.parseDouble(menu.getCurrentChoiceOf("PushBall Time"));
-            Minion9533_AutoBot.initialMoveTime = Double.parseDouble(menu.getCurrentChoiceOf("Initial Move Time"));
+            //pushBallTime = Double.parseDouble(menu.getCurrentChoiceOf("PushBall Time"));
+            //initialMoveTime = Double.parseDouble(menu.getCurrentChoiceOf("Initial Move Time"));
 
             switch (menu.getCurrentChoiceOf("Team")) {
                 case "RED":
@@ -47,30 +47,30 @@ public class AutoConfig extends LinearOpMode {
 
             switch (menu.getCurrentChoiceOf("Proximity")) {
                 case "NEAR":
-                    Minion9533_AutoBot.initialMoveTime = 0.5 *1.5;
-                    Minion9533_AutoBot.pushBallTime = 1 *2;
+                    initialMoveTime = 0.8;
+                    pushBallTime = 3;
                     break;
                 case "FAR":
-                    Minion9533_AutoBot.initialMoveTime = 1.1 *1.5;
-                    Minion9533_AutoBot.pushBallTime = 1.5 *2;
+                    initialMoveTime = 2;
+                    pushBallTime = 2;
                     break;
             }
 
             switch (menu.getCurrentChoiceOf("Shoot?")) {
                 case "YES":
-                    Minion9533_AutoBot.shoot = true;
+                    shoot = true;
                     break;
                 case "NO":
-                    Minion9533_AutoBot.shoot = false;
+                    shoot = false;
                     break;
             }
 
             switch (menu.getCurrentChoiceOf("Push de CapBall?")) {
                 case "YES":
-                    Minion9533_AutoBot.capBall = true;
+                    capBall = true;
                     break;
                 case "NO":
-                    Minion9533_AutoBot.capBall = false;
+                    capBall = false;
                     break;
             }
 
@@ -86,10 +86,10 @@ public class AutoConfig extends LinearOpMode {
 
             switch (menu.getCurrentChoiceOf("Delay Start?")) {
                 case "YES":
-                    Minion9533_AutoBot.delayStartTime = 15;
+                    delayStartTime = 15;
                     break;
                 case "NO":
-                    Minion9533_AutoBot.delayStartTime = 0;
+                    delayStartTime = 0;
                     break;
             }
         }

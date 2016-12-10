@@ -66,6 +66,8 @@ import static java.lang.Math.abs;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
+import static org.firstinspires.ftc.robotcontroller.Util.Global.*;
+
 class NewTele implements Runnable
 {
     private boolean running = false;
@@ -98,12 +100,7 @@ class NewTele implements Runnable
 @Autonomous(name="(USE THIS) Autobot", group="Pushbot")
 public class Minion9533_AutoBot extends MMOpMode_Linear {
 
-    public static double initialMoveTime = 0.5 *1.5;  //defaults to near
-    public static double pushBallTime = 1 *1.5;      //defaults to near
-    public static boolean shoot = true;
-    public static boolean capBall = true;
-    public static boolean park = true;
-    public static double delayStartTime = 0;
+
 
 
     /* Declare OpMode members. */
