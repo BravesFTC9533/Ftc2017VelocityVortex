@@ -66,7 +66,7 @@ import static java.lang.Math.abs;
  */
 
 @Autonomous(name="Autobot Far", group="Pushbot")
-//@Disabled
+@Disabled
 public class Minion9533_AutoBot_Far extends MMOpMode_Linear {
 
     /* Declare OpMode members. */

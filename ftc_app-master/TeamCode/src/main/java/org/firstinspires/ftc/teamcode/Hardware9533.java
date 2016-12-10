@@ -188,16 +188,18 @@ public class Hardware9533
             v*=-1;
         }
 
-        leftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        rightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        backLeftMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        backRightMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         double frontLeft = Range.clip(v-h+r, -MAX_SPEED, MAX_SPEED);
         double frontRight = Range.clip(v+h-r, -MAX_SPEED, MAX_SPEED);
         double backRight = Range.clip(v-h-r, -MAX_SPEED, MAX_SPEED);
         double backLeft = Range.clip(v+h+r, -MAX_SPEED, MAX_SPEED);
 
+
+        dashboard.displayPrintf(6, "H: " + String.valueOf(h));
+        dashboard.displayPrintf(7, "V: " + String.valueOf(v));
+        dashboard.displayPrintf(8, "R: " + String.valueOf(r));
+
+        dashboard.displayPrintf(3, "Mech Power: " + scale(frontLeft));
 
         leftMotor.setPower(scale(frontLeft));
         rightMotor.setPower(scale(frontRight));
@@ -208,6 +210,12 @@ public class Hardware9533
 
     private double scale(double power){
         int modifier = 1;
+
+        if (power == 0 )
+        {
+            return 0;
+        }
+
         if(power < 0){
             modifier *= -1;
         }
