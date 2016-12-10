@@ -45,11 +45,11 @@ public class AutoConfig extends LinearOpMode {
             switch (menu.getCurrentChoiceOf("Proximity")) {
                 case "NEAR":
                     Minion9533_AutoBot.initialMoveTime = 0.5 *1.5;
-                    Minion9533_AutoBot.pushBallTime = 1 *1.5;
+                    Minion9533_AutoBot.pushBallTime = 1 *2;
                     break;
                 case "FAR":
                     Minion9533_AutoBot.initialMoveTime = 1.1 *1.5;
-                    Minion9533_AutoBot.pushBallTime = 1.5 *1.5;
+                    Minion9533_AutoBot.pushBallTime = 1.5 *2;
                     break;
             }
 
