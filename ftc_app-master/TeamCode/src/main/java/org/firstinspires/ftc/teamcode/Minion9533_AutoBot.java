@@ -37,6 +37,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcontroller.Util.Global;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 import hallib.HalDashboard;
@@ -78,7 +79,7 @@ class NewTele implements Runnable
     {
         while (running)
         {
-            AutoConfig.menu.displayConfig(telemetry);
+            Global.menu.displayConfig(telemetry);
             telemetry.addData("ello", "");
         }
     }
@@ -127,7 +128,8 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
         while(opModeIsActive() && runtime.seconds() < time) {
            // dashboard.displayPrintf(1, "Straight: %2.5f S Elapsed: %s", runtime.seconds(), robot.leftMotor.getCurrentPosition());
 
-            robot.DriveRobot(FORWARD_SPEED, FORWARD_SPEED);
+            //robot.DriveRobot(FORWARD_SPEED, FORWARD_SPEED);
+            robot.DriveMech(0, FORWARD_SPEED, 0);
             robot.waitForTick(40);
         }
 
@@ -158,7 +160,8 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
             if(inRange(degrees, heading , 5)) {
                 break;
             }
-            robot.DriveRobot(-TURN_SPEED, TURN_SPEED);
+            //robot.DriveRobot(-TURN_SPEED, TURN_SPEED);
+            robot.DriveMech(0, 0, -TURN_SPEED);
 
             robot.waitForTick(10);
         }
@@ -182,7 +185,8 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
 
                 break;
             }
-            robot.DriveRobot(TURN_SPEED, -TURN_SPEED);
+            //robot.DriveRobot(TURN_SPEED, -TURN_SPEED);
+            robot.DriveMech(0, 0, TURN_SPEED);
 
             robot.waitForTick(10);
         }
@@ -249,7 +253,7 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
 
         while (opModeIsActive())
         {
-            AutoConfig.menu.displayConfig(telemetry);
+            Global.menu.displayConfig(telemetry);
             //telemetry.addData("fg",0);
             telemetry.update();
         }

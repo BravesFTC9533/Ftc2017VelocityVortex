@@ -1,2 +1,3 @@
 include ':FtcRobotController', ':lib'
 include ':TeamCode'
+include ':lib'
