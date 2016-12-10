@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.robotcontroller.Util;
 
+import android.content.Context;
+
 /**
  * Created by Kerfuffle on 12/9/2016.
  */
@@ -7,6 +9,8 @@ package org.firstinspires.ftc.robotcontroller.Util;
 public class Global {
 
     public static FtcSimpleMenu menu = new FtcSimpleMenu("Autonomous Menu");
+
+    public static Context context;
 
     public static void init()
     {

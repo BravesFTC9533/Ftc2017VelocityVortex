@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.view.animation.RotateAnimation;
+
 import com.qualcomm.hardware.hitechnic.HiTechnicNxtGyroSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -34,7 +36,7 @@ public class Hardware9533
 
     public final static double ACCEL_RATE = 0.2;
 
-    private final static double MAX_SPEED = 0.6;
+    private final static double MAX_SPEED = 0.8;
 
     public boolean invertedDrive = false;
 
@@ -189,22 +191,28 @@ public class Hardware9533
         }
 
 
-        double frontLeft = Range.clip(v-h+r, -MAX_SPEED, MAX_SPEED);
-        double frontRight = Range.clip(v+h-r, -MAX_SPEED, MAX_SPEED);
-        double backRight = Range.clip(v-h-r, -MAX_SPEED, MAX_SPEED);
-        double backLeft = Range.clip(v+h+r, -MAX_SPEED, MAX_SPEED);
 
+        double frontLeft = Range.clip(v-h+r, -1, 1);
+        double frontRight = Range.clip(v+h-r, -1, 1);
+        double backRight = Range.clip(v-h-r, -1, 1);
+        double backLeft = Range.clip(v+h+r, -1, 1);
+
+
+        frontLeft = Range.clip(scale(frontLeft), -MAX_SPEED, MAX_SPEED);
+        frontRight = Range.clip(scale(frontRight), -MAX_SPEED, MAX_SPEED);
+        backLeft = Range.clip(scale(backLeft), -MAX_SPEED, MAX_SPEED);
+        backRight = Range.clip(scale(backRight), -MAX_SPEED, MAX_SPEED);
 
         dashboard.displayPrintf(6, "H: " + String.valueOf(h));
         dashboard.displayPrintf(7, "V: " + String.valueOf(v));
         dashboard.displayPrintf(8, "R: " + String.valueOf(r));
 
-        dashboard.displayPrintf(3, "Mech Power: " + scale(frontLeft));
+        dashboard.displayPrintf(3, "Mech Power: " + frontLeft);
 
-        leftMotor.setPower(scale(frontLeft));
-        rightMotor.setPower(scale(frontRight));
-        backRightMotor.setPower(scale(backRight));
-        backLeftMotor.setPower(scale(backLeft));
+        leftMotor.setPower(frontLeft);
+        rightMotor.setPower(frontRight);
+        backRightMotor.setPower(backRight);
+        backLeftMotor.setPower(backLeft);
 
     }
 
@@ -220,7 +228,7 @@ public class Hardware9533
             modifier *= -1;
         }
 
-        return 1 / (power * power * modifier);
+        return  (power * power * modifier);
     }
 
     public void DriveRobot(double leftPower, double rightPower) {

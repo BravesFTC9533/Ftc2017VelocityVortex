@@ -32,6 +32,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode;
 
+import android.media.MediaPlayer;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -96,8 +98,8 @@ class NewTele implements Runnable
 @Autonomous(name="(USE THIS) Autobot", group="Pushbot")
 public class Minion9533_AutoBot extends MMOpMode_Linear {
 
-    public static double initialMoveTime = 0.5;  //defaults to near
-    public static double pushBallTime = 1;      //defaults to near
+    public static double initialMoveTime = 0.5 *1.5;  //defaults to near
+    public static double pushBallTime = 1 *1.5;      //defaults to near
     public static boolean shoot = true;
     public static boolean capBall = true;
     public static boolean park = true;
@@ -230,7 +232,6 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
 
 
 
-
         robot.shooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -261,6 +262,10 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
         //NewTele test = new NewTele(opModeIsActive(), telemetry);
         //test.start();
 
+
+       // MediaPlayer mediaPlayer = MediaPlayer.create(Global.context, com.qualcomm.ftcrobotcontroller.R.raw.lowrider);
+        //mediaPlayer.start();
+
         waitFor(0.1+delayStartTime);
         robot.dashboard.displayText(0, "Moving Forward half block");
         goStraight("Initial Move", initialMoveTime);
@@ -276,7 +281,7 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
 
                 power += 0.005;
                 power = Range.clip(power, 0, 1);
-                //robot.shooterMotor.setPower(power);
+                robot.shooterMotor.setPower(power);
 
                 if(power == 1) {
                     break;

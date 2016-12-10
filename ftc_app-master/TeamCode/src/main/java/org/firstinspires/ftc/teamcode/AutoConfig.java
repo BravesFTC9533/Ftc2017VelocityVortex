@@ -44,12 +44,12 @@ public class AutoConfig extends LinearOpMode {
 
             switch (menu.getCurrentChoiceOf("Proximity")) {
                 case "NEAR":
-                    Minion9533_AutoBot.initialMoveTime = 0.5;
-                    Minion9533_AutoBot.pushBallTime = 1;
+                    Minion9533_AutoBot.initialMoveTime = 0.5 *1.5;
+                    Minion9533_AutoBot.pushBallTime = 1 *1.5;
                     break;
                 case "FAR":
-                    Minion9533_AutoBot.initialMoveTime = 1.1;
-                    Minion9533_AutoBot.pushBallTime = 1.5;
+                    Minion9533_AutoBot.initialMoveTime = 1.1 *1.5;
+                    Minion9533_AutoBot.pushBallTime = 1.5 *1.5;
                     break;
             }
 
@@ -93,7 +93,7 @@ public class AutoConfig extends LinearOpMode {
 
 
         //lastMenuConfig = menu.getOptionsConfig();
-        menu.clearOptions();
+        //menu.clearOptions();
 
     }
 }

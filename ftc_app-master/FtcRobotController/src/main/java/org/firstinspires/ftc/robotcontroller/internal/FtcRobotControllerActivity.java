@@ -40,6 +40,7 @@ import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
+import android.media.MediaPlayer;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -198,7 +199,10 @@ public class FtcRobotControllerActivity extends Activity {
     RobotLog.writeLogcatToDisk();
     RobotLog.vv(TAG, "onCreate()");
 
+
+
     Global.init();   /****** Our stuff that needs to be initialized when the app starts*/
+    Global.context = this;
 
     receivedUsbAttachmentNotifications = new ConcurrentLinkedQueue<UsbDevice>();
     eventLoop = null;
@@ -208,6 +212,7 @@ public class FtcRobotControllerActivity extends Activity {
     context = this;
     utility = new Utility(this);
     appUtil.setThisApp(new PeerAppRobotController(context));
+
 
     entireScreenLayout = (LinearLayout) findViewById(R.id.entire_screen);
     buttonMenu = (ImageButton) findViewById(R.id.menu_buttons);
@@ -229,6 +234,8 @@ public class FtcRobotControllerActivity extends Activity {
       configFile.markClean();
       cfgFileMgr.setActiveConfig(false, configFile);
     }
+
+
 
     textDeviceName = (TextView) findViewById(R.id.textDeviceName);
     textNetworkConnectionStatus = (TextView) findViewById(R.id.textNetworkConnectionStatus);
@@ -259,6 +266,8 @@ public class FtcRobotControllerActivity extends Activity {
     wifiLock.acquire();
     callback.networkConnectionUpdate(WifiDirectAssistant.Event.DISCONNECTED);
     bindToService();
+
+
   }
 
   protected UpdateUI createUpdateUI() {
