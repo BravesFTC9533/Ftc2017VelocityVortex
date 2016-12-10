@@ -17,6 +17,19 @@ class Option
         this.name = name;
         this.choices = choices;
     }
+    public Option(String name, double max, double min, double inc)
+    {
+        this.name = name;
+
+        int size = (int) ((max-min)/inc);
+        choices = new String[size];
+        for (int i = 0; i < size; i++)
+        {
+            choices[i] = String.valueOf(inc*i);
+        }
+
+        choiceIndex = 20;           //fix this rock hard code
+    }
 
     public String getName()
     {
@@ -74,6 +87,10 @@ public class FtcSimpleMenu {
 
     public void addOption(String option, String[] choices) {
         this.options.add(new Option(option, choices));
+    }
+    public void addOption(String option, double max, double min, double inc)
+    {
+        this.options.add(new Option(option, max, min, inc));
     }
 
     public String getCurrentChoiceOf(String option) {

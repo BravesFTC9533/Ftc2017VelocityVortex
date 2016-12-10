@@ -33,6 +33,9 @@ public class AutoConfig extends LinearOpMode {
 
             menu.displayMenu();
 
+            Minion9533_AutoBot.pushBallTime = Double.parseDouble(menu.getCurrentChoiceOf("PushBall Time"));
+            Minion9533_AutoBot.initialMoveTime = Double.parseDouble(menu.getCurrentChoiceOf("Initial Move Time"));
+
             switch (menu.getCurrentChoiceOf("Team")) {
                 case "RED":
                     //set red team
