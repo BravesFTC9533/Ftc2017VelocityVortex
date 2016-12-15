@@ -185,30 +185,59 @@ public class Hardware9533
     /***********************************************************************************************/
     public void DriveMech(double h, double v, double r)
     {
+
+        // invert drive!
         if(this.invertedDrive) {
             h*=-1;
             v*=-1;
         }
 
+        // make sure values are inside valid motor range
+        h = clipMotorPower(h);
+        v = clipMotorPower(v);
+        r = clipMotorPower(r);
+
+        // scale inputs for easier control at lower speeds
+        h = scale(h);
+        v = scale(v);
+        r = scale(r);
 
 
-        double frontLeft = Range.clip(v-h+r, -1, 1);
-        double frontRight = Range.clip(v+h-r, -1, 1);
-        double backRight = Range.clip(v-h-r, -1, 1);
-        double backLeft = Range.clip(v+h+r, -1, 1);
+        // add vectors
+        double frontLeft =  v-h+r;
+        double frontRight = v+h-r;
+        double backRight =  v-h-r;
+        double backLeft =   v+h+r;
+
+        // since adding vectors can go over 1, figure out max to scale other wheels
+        double max = Math.max(
+            Math.abs(backLeft),
+            Math.max(
+                Math.abs(backRight),
+                Math.max(
+                    Math.abs(frontLeft), Math.abs(frontRight)
+                )
+            )
+        );
+
+        // only need to scale power if max > 1
+        if(max > 1){
+            frontLeft = scalePower(frontLeft, max);
+            frontRight = scalePower(frontRight, max);
+            backLeft = scalePower(backLeft, max);
+            backRight = scalePower(backRight, max);
+        }
 
 
-        frontLeft = Range.clip(scale(frontLeft), -MAX_SPEED, MAX_SPEED);
-        frontRight = Range.clip(scale(frontRight), -MAX_SPEED, MAX_SPEED);
-        backLeft = Range.clip(scale(backLeft), -MAX_SPEED, MAX_SPEED);
-        backRight = Range.clip(scale(backRight), -MAX_SPEED, MAX_SPEED);
-
+        // write power to dashboard
         dashboard.displayPrintf(6, "H: " + String.valueOf(h));
         dashboard.displayPrintf(7, "V: " + String.valueOf(v));
         dashboard.displayPrintf(8, "R: " + String.valueOf(r));
 
         dashboard.displayPrintf(3, "Mech Power: " + frontLeft);
 
+
+        // set power
         leftMotor.setPower(frontLeft);
         rightMotor.setPower(frontRight);
         backRightMotor.setPower(backRight);
@@ -284,6 +313,17 @@ public class Hardware9533
 
 
 
+    // Scale motor power based on the max for all wheels
+    // 1, 1, 1, 3 will become .33, .33, .33, 1
+    private static double scalePower(double value, double max){
+        if(max == 0){return  0;}
+        return  value / max;
+    }
+
+    // motor power clipping helper
+    private static double clipMotorPower(double value){
+        return Range.clip(value, -1, 1);
+    }
 
 
 }
