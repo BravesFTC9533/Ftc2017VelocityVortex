@@ -110,7 +110,6 @@ import java.util.List;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Vuforia-Ryan", group = "vuf")
 //@Autonomous(name="Concept: Vuforia Navigation", group ="Concept")
-@Disabled
 public class VuforiaOp extends LinearOpMode {
 
     public static final String TAG = "Vuforia Sample";
@@ -125,421 +124,60 @@ public class VuforiaOp extends LinearOpMode {
 
     DcMotor left, right;
 
-    @Override public void runOpMode() throws InterruptedException {
+    @Override
+    public void runOpMode() throws InterruptedException {
 
-        left = hardwareMap.dcMotor.get("left");
-        right = hardwareMap.dcMotor.get("right");
+       // left = hardwareMap.dcMotor.get("left");
+        //right = hardwareMap.dcMotor.get("right");
 
-        left.setDirection(DcMotorSimple.Direction.REVERSE);
+        //left.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        /**
-         * Start up Vuforia, telling it the id of the view that we wish to use as the parent for
-         * the camera monitor feedback; if no camera monitor feedback is desired, use the parameterless
-         * constructor instead. We also indicate which camera on the RC that we wish to use. For illustration
-         * purposes here, we choose the back camera; for a competition robot, the front camera might
-         * prove to be more convenient.
-         *
-         * Note that in addition to indicating which camera is in use, we also need to tell the system
-         * the location of the phone on the robot; see phoneLocationOnRobot below.
-         *
-         * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
-         * 'parameters.vuforiaLicenseKey' is initialized is for illustration only, and will not function.
-         * Vuforia will not load without a valid license being provided. Vuforia 'Development' license
-         * keys, which is what is needed here, can be obtained free of charge from the Vuforia developer
-         * web site at https://developer.vuforia.com/license-manager.
-         *
-         * Valid Vuforia license keys are always 380 characters long, and look as if they contain mostly
-         * random data. As an example, here is a example of a fragment of a valid key:
-         *      ... yIgIzTqZ4mWjk9wd3cZO9T1axEqzuhxoGlfOOI2dRzKS4T0hQ8kT ...
-         * Once you've obtained a license key, copy the string form of the key from the Vuforia web site
-         * and paste it in to your code as the value of the 'vuforiaLicenseKey' field of the
-         * {@link Parameters} instance with which you initialize Vuforia.
-         */
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
         parameters.vuforiaLicenseKey = "AeWceoD/////AAAAGWvk7AQGLUiTsyU4mSW7gfldjSCDQHX76lt9iPO5D8zaboG428rdS9WN0+AFpAlc/g4McLRAQIb5+ijFCPJJkLc+ynXYdhljdI2k9R4KL8t3MYk/tbmQ75st9VI7//2vNkp0JHV6oy4HXltxVFcEbtBYeTBJ9CFbMW+0cMNhLBPwHV7RYeNPZRgxf27J0oO8VoHOlj70OYdNYos5wvDM+ZbfWrOad/cpo4qbAw5iB95T5I9D2/KRf1HQHygtDl8/OtDFlOfqK6v2PTvnEbNnW1aW3vPglGXknX+rm0k8b0S7GFJkgl7SLq/HFNl0VEIVJGVQe9wt9PB6bJuxOMMxN4asy4rW5PRRBqasSM7OLl4W";
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
         this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
 
-        /**
-         * Load the data sets that for the trackable objects we wish to track. These particular data
-         * sets are stored in the 'assets' part of our application (you'll see them in the Android
-         * Studio 'Project' view over there on the left of the screen). You can make your own datasets
-         * with the Vuforia Target Manager: https://developer.vuforia.com/target-manager. PDFs for the
-         * example "StonesAndChips", datasets can be found in in this project in the
-         * documentation directory.
-         */
+        Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS, 4);
+
+        VuforiaTrackables beacons = this.vuforia.loadTrackablesFromAsset("FTC_2016-17");
+        beacons.get(0).setName("Wheels");
+        beacons.get(1).setName("Tools");
+        beacons.get(2).setName("Legos");
+        beacons.get(3).setName("Gears");
 
 
-        // VuforiaTrackables stonesAndChips = this.vuforia.loadTrackablesFromAsset("StonesAndChips");
-        VuforiaTrackables ftc = this.vuforia.loadTrackablesFromAsset("FTC_2016-17");
-        VuforiaTrackable redTarget = ftc.get(0);
-        redTarget.setName("RedTarget");
 
-        VuforiaTrackable blueTarget  = ftc.get(1);
-        blueTarget.setName("BlueTarget");
-
-        /** For convenience, gather together all the trackable objects in one easily-iterable collection */
-        List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
-        allTrackables.addAll(ftc);
-
-        /**
-         * We use units of mm here because that's the recommended units of measurement for the
-         * size values specified in the XML for the ImageTarget trackables in data sets. E.g.:
-         *      <ImageTarget name="stones" size="247 173"/>
-         * You don't *have to* use mm here, but the units here and the units used in the XML
-         * target configuration files *must* correspond for the math to work out correctly.
-         */
-        float mmPerInch        = 25.4f;
-        float mmBotWidth       = 18 * mmPerInch;            // ... or whatever is right for your robot
-        float mmFTCFieldWidth  = (12*12 - 2) * mmPerInch;   // the FTC field is ~11'10" center-to-center of the glass panels
-
-        /**
-         * In order for localization to work, we need to tell the system where each target we
-         * wish to use for navigation resides on the field, and we need to specify where on the robot
-         * the phone resides. These specifications are in the form of <em>transformation matrices.</em>
-         * Transformation matrices are a central, important concept in the math here involved in localization.
-         * See <a href="https://en.wikipedia.org/wiki/Transformation_matrix">Transformation Matrix</a>
-         * for detailed information. Commonly, you'll encounter transformation matrices as instances
-         * of the {@link OpenGLMatrix} class.
-         *
-         * For the most part, you don't need to understand the details of the math of how transformation
-         * matrices work inside (as fascinating as that is, truly). Just remember these key points:
-         * <ol>
-         *
-         *     <li>You can put two transformations together to produce a third that combines the effect of
-         *     both of them. If, for example, you have a rotation transform R and a translation transform T,
-         *     then the combined transformation matrix RT which does the rotation first and then the translation
-         *     is given by {@code RT = T.multiplied(R)}. That is, the transforms are multiplied in the
-         *     <em>reverse</em> of the chronological order in which they applied.</li>
-         *
-         *     <li>A common way to create useful transforms is to use methods in the {@link OpenGLMatrix}
-         *     class and the Orientation class. See, for example, {@link OpenGLMatrix#translation(float,
-         *     float, float)}, {@link OpenGLMatrix#rotation(AngleUnit, float, float, float, float)}, and
-         *     {@link Orientation#getRotationMatrix(AxesReference, AxesOrder, AngleUnit, float, float, float)}.
-         *     Related methods in {@link OpenGLMatrix}, such as {@link OpenGLMatrix#rotated(AngleUnit,
-         *     float, float, float, float)}, are syntactic shorthands for creating a new transform and
-         *     then immediately multiplying the receiver by it, which can be convenient at times.</li>
-         *
-         *     <li>If you want to break open the black box of a transformation matrix to understand
-         *     what it's doing inside, use {@link MatrixF#getTranslation()} to fetch how much the
-         *     transform will move you in x, y, and z, and use {@link Orientation#getOrientation(MatrixF,
-         *     AxesReference, AxesOrder, AngleUnit)} to determine the rotational motion that the transform
-         *     will impart. See {@link #format(OpenGLMatrix)} below for an example.</li>
-         *
-         * </ol>
-         *
-         * This example places the "stones" image on the perimeter wall to the Left
-         *  of the Red Driver station wall.  Similar to the Red Beacon Location on the Res-Q
-         *
-         * This example places the "chips" image on the perimeter wall to the Right
-         *  of the Blue Driver station.  Similar to the Blue Beacon Location on the Res-Q
-         *
-         * See the doc folder of this project for a description of the field Axis conventions.
-         *
-         * Initially the target is conceptually lying at the origin of the field's coordinate system
-         * (the center of the field), facing up.
-         *
-         * In this configuration, the target's coordinate system aligns with that of the field.
-         *
-         * In a real situation we'd also account for the vertical (Z) offset of the target,
-         * but for simplicity, we ignore that here; for a real robot, you'll want to fix that.
-         *
-         * To place the Stones Target on the Red Audience wall:
-         * - First we rotate it 90 around the field's X axis to flip it upright
-         * - Then we rotate it  90 around the field's Z access to face it away from the audience.
-         * - Finally, we translate it back along the X axis towards the red audience wall.
-         */
-        OpenGLMatrix redTargetLocationOnField = OpenGLMatrix
-                /* Then we translate the target off to the RED WALL. Our translation here
-                is a negative translation in X.*/
-                .translation(-mmFTCFieldWidth/2, 0, 0)
-                .multiplied(Orientation.getRotationMatrix(
-                        /* First, in the fixed (field) coordinate system, we rotate 90deg in X, then 90 in Z */
-                        AxesReference.EXTRINSIC, AxesOrder.XZX,
-                        AngleUnit.DEGREES, 90, 90, 0));
-        redTarget.setLocation(redTargetLocationOnField);
-        RobotLog.ii(TAG, "Red Target=%s", format(redTargetLocationOnField));
-
-       /*
-        * To place the Stones Target on the Blue Audience wall:
-        * - First we rotate it 90 around the field's X axis to flip it upright
-        * - Finally, we translate it along the Y axis towards the blue audience wall.
-        */
-        OpenGLMatrix blueTargetLocationOnField = OpenGLMatrix
-                /* Then we translate the target off to the Blue Audience wall.
-                Our translation here is a positive translation in Y.*/
-                .translation(0, mmFTCFieldWidth/2, 0)
-                .multiplied(Orientation.getRotationMatrix(
-                        /* First, in the fixed (field) coordinate system, we rotate 90deg in X */
-                        AxesReference.EXTRINSIC, AxesOrder.XZX,
-                        AngleUnit.DEGREES, 90, 0, 0));
-        blueTarget.setLocation(blueTargetLocationOnField);
-        RobotLog.ii(TAG, "Blue Target=%s", format(blueTargetLocationOnField));
-
-        /**
-         * Create a transformation matrix describing where the phone is on the robot. Here, we
-         * put the phone on the right hand side of the robot with the screen facing in (see our
-         * choice of BACK camera above) and in landscape mode. Starting from alignment between the
-         * robot's and phone's axes, this is a rotation of -90deg along the Y axis.
-         *
-         * When determining whether a rotation is positive or negative, consider yourself as looking
-         * down the (positive) axis of rotation from the positive towards the origin. Positive rotations
-         * are then CCW, and negative rotations CW. An example: consider looking down the positive Z
-         * axis towards the origin. A positive rotation about Z (ie: a rotation parallel to the the X-Y
-         * plane) is then CCW, as one would normally expect from the usual classic 2D geometry.
-         */
-        OpenGLMatrix phoneLocationOnRobot = OpenGLMatrix
-                .translation(mmBotWidth/2,0,0)
-                .multiplied(Orientation.getRotationMatrix(
-                        AxesReference.EXTRINSIC, AxesOrder.YZY,
-                        AngleUnit.DEGREES, -90, 0, 0));
-        RobotLog.ii(TAG, "phone=%s", format(phoneLocationOnRobot));
-
-        /**
-         * Let the trackable listeners we care about know where the phone is. We know that each
-         * listener is a {@link VuforiaTrackableDefaultListener} and can so safely cast because
-         * we have not ourselves installed a listener of a different type.
-         */
-        ((VuforiaTrackableDefaultListener)redTarget.getListener()).setPhoneInformation(phoneLocationOnRobot, parameters.cameraDirection);
-        ((VuforiaTrackableDefaultListener)blueTarget.getListener()).setPhoneInformation(phoneLocationOnRobot, parameters.cameraDirection);
-
-        /**
-         * A brief tutorial: here's how all the math is going to work:
-         *
-         * C = phoneLocationOnRobot  maps   phone coords -> robot coords
-         * P = tracker.getPose()     maps   image target coords -> phone coords
-         * L = redTargetLocationOnField maps   image target coords -> field coords
-         *
-         * So
-         *
-         * C.inverted()              maps   robot coords -> phone coords
-         * P.inverted()              maps   phone coords -> imageTarget coords
-         *
-         * Putting that all together,
-         *
-         * L x P.inverted() x C.inverted() maps robot coords to field coords.
-         *
-         * @see VuforiaTrackableDefaultListener#getRobotLocation()
-         */
-
-
-        telemetry.update();
         waitForStart();
 
-        /** Start tracking the data sets we care about. */
-        ftc.activate();
+        beacons.activate();
 
 
 
+        while (opModeIsActive())
+        {
+            for (VuforiaTrackable b : beacons)
+            {
+                OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) b.getListener()).getPose();
 
-        while (opModeIsActive()) {
-
-            for (VuforiaTrackable trackable : allTrackables) {
-                /**
-                 * getUpdatedRobotLocation() will return null if no new information is available since
-                 * the last time that call was made, or if the trackable is not currently visible.
-                 * getRobotLocation() will return null if the trackable is not currently visible.
-                 */
-                telemetry.addData(trackable.getName(), ((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible() ? "Visible" : "Not Visible");    //
-
-
-                OpenGLMatrix robotLocationTransform = ((VuforiaTrackableDefaultListener)trackable.getListener()).getUpdatedRobotLocation();
-                if (robotLocationTransform != null) {
-                    lastLocation = robotLocationTransform;
-                }
-            }
-            /**
-             * Provide feedback as to where the robot was last located (if we know).
-             */
-
-            /******************************************************************************************************************************************************************************
-             * ***************************************************************HERE DA STUFF************************************************************************************************
-             * ****************************************************************************************************************************************************************************
-             */
-
-            if (lastLocation != null) {
-                //  RobotLog.vv(TAG, "robot=%s", format(lastLocation));
-
-                telemetry.addData("Pos", format(lastLocation));
-
-                float dat[] = lastLocation.getData();
-
-                float x = dat[13];
-                float y = dat[14];
-                float z = dat[12];
-                boolean visible = ((VuforiaTrackableDefaultListener)allTrackables.get(0).getListener()).isVisible();
-
-                int range = 50;
-
-
-                if (visible)
+                if (pose != null)
                 {
-                    if (x > 0+range)      //
-                    {
-                        double pow = 0.35;//bestPower(dat[13], 0, range);
-                        left.setPower(-pow);
-                        right.setPower(pow);
-                        //go left
-                    }
-                    else if (x < 0-range)
-                    {
-                        double pow = 0.35;//bestPower(dat[13], 0, range);
-                        left.setPower(pow);
-                        right.setPower(-pow);
-                        //go right
-                    }
-                    else    //calls when x axis is in range, now its going to focus on the z axis
-                    {
+                    VectorF translation = pose.getTranslation();
 
-                        if (z > -1300)
-                        {
-                            left.setPower(0.35);
-                            right.setPower(0.35);
-                            //forward
-                        }
-                        else
-                        {
-                            left.setPower(0);
-                            right.setPower(0);
-                        }
-                    }
+                    double x = translation.get(0);
+                    double y = translation.get(1);      //not really used
+                    double z = translation.get(2);
+
+                    double angle = Math.toDegrees(Math.atan2(z, x)) + 90;
+
+                    telemetry.addData("****** ", b.getName());
+                    telemetry.addData("Turn", angle + " degrees");
+                    telemetry.addData("X", x);
+                    telemetry.addData("Z:", z);
                 }
-                else            //calls if not visible
-                {
-
-                    left.setPower(-0.25);
-                    right.setPower(0.25);
-
-
-                    left.setPower(0);
-                    right.setPower(0);
-
-                }
-
-
-
-
-                //***************//
-                //red x      2          get close to 0                  dat[13]
-                //green y    3          get close to 0                  dat[14]
-                //blue  z    1          get close to -1500              dat[12]
-
-
-            } else {
-                telemetry.addData("Pos", "Unknown");
             }
             telemetry.update();
-            idle();
+
         }
+
     }
-
-    /**
-     * A simple utility that extracts positioning information from a transformation matrix
-     * and formats it in a form palatable to a human being.
-     */
-    String format(OpenGLMatrix transformationMatrix) {
-        return transformationMatrix.formatAsTransform();
-    }
-
-
-    double bestPower(double x, int target, int range)
-    {
-        double power = Math.abs(Math.abs(x/(target+range)) - 1)/5;
-        if (power < 0.2)
-        {
-            power = 0.2;
-        }
-        if (power > 0.75)
-        {
-            power = 0.75;
-        }
-        return power;
-    }
-
-
-
-    int range (double num, double target, double range)
-    {
-        if (num < target && num > target-range)
-        {
-            return -1;
-        }
-        if (num > target && num < target+range)
-        {
-            return 1;
-        }
-        else
-        {
-            return 0;   //not in range
-        }
-    }
-
-    boolean inRange (double num, double target, double range)
-    {
-        if (num < target-range || num > target+range)
-        {
-            return false;
-        }
-        return true;
-    }
-
 }
-
-
-
-
-
-/**
- @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Vuforia", group = "vuf")
- public class VuforiaOp extends LinearOpMode{
-
-
- public void runOpMode() throws InterruptedException
- {
- VuforiaLocalizer.Parameters params = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
- params.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
- params.vuforiaLicenseKey = "AeWceoD/////AAAAGWvk7AQGLUiTsyU4mSW7gfldjSCDQHX76lt9iPO5D8zaboG428rdS9WN0+AFpAlc/g4McLRAQIb5+ijFCPJJkLc+ynXYdhljdI2k9R4KL8t3MYk/tbmQ75st9VI7//2vNkp0JHV6oy4HXltxVFcEbtBYeTBJ9CFbMW+0cMNhLBPwHV7RYeNPZRgxf27J0oO8VoHOlj70OYdNYos5wvDM+ZbfWrOad/cpo4qbAw5iB95T5I9D2/KRf1HQHygtDl8/OtDFlOfqK6v2PTvnEbNnW1aW3vPglGXknX+rm0k8b0S7GFJkgl7SLq/HFNl0VEIVJGVQe9wt9PB6bJuxOMMxN4asy4rW5PRRBqasSM7OLl4W";
- params.cameraMonitorFeedback = VuforiaLocalizer.Parameters.CameraMonitorFeedback.AXES;
-
- VuforiaLocalizer vuforia = ClassFactory.createVuforiaLocalizer(params);
- Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS, 4);
-
- VuforiaTrackables beacons = vuforia.loadTrackablesFromAsset("FTC_2016-17");
- beacons.get(0).setName("Wheels");
- beacons.get(1).setName("Tools");
- beacons.get(2).setName("Legos");
- beacons.get(3).setName("Gears");
-
- waitForStart();
-
- beacons.activate();
-
- //opencv
-
- while (opModeIsActive())
- {
- for (VuforiaTrackable b : beacons)
- {
- OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) b.getListener()).getPose();
-
- if (pose != null)
- {
- VectorF translation = pose.getTranslation();
- telemetry.addData(b.getName() + "-Translation", translation);
-
- double degreeTurn = Math.toDegrees(Math.atan2(translation.get(1), translation.get(2)));
- telemetry.addData(b.getName() + "-Degrees", degreeTurn);
-
- }
-
- }
- telemetry.update();
-
- }
-
- }
-
-
- }
- */
-

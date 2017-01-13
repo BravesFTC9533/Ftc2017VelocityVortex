@@ -33,8 +33,8 @@ public class AutoConfig extends LinearOpMode {
 
             menu.displayMenu();
 
-            //pushBallTime = Double.parseDouble(menu.getCurrentChoiceOf("PushBall Time"));
-            //initialMoveTime = Double.parseDouble(menu.getCurrentChoiceOf("Initial Move Time"));
+            pushBallTime = Double.parseDouble(menu.getCurrentChoiceOf("PushBall Time"));
+            initialMoveTime = Double.parseDouble(menu.getCurrentChoiceOf("Initial Move Time"));
 
             switch (menu.getCurrentChoiceOf("Team")) {
                 case "RED":
@@ -49,12 +49,12 @@ public class AutoConfig extends LinearOpMode {
 
             switch (menu.getCurrentChoiceOf("Proximity")) {
                 case "NEAR":
-                    initialMoveTime = 0.8;
-                    pushBallTime = 3;
+                    //initialMoveTime = 0.8;
+                    //pushBallTime = 3;
                     break;
                 case "FAR":
-                    initialMoveTime = 1.2 ;
-                    pushBallTime = 4;
+                    //initialMoveTime = 1.2 ;
+                    //pushBallTime = 4;
                     break;
             }
 
