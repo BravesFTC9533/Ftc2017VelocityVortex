@@ -103,6 +103,11 @@ public class MechDrive {
         hardware.rightMotor.setPower(0);
         hardware.backRightMotor.setPower(0);
         hardware.backLeftMotor.setPower(0);
+
+        // write power to dashboard
+        hardware.dashboard.displayPrintf(6, "H: " + String.valueOf(0));
+        hardware.dashboard.displayPrintf(7, "V: " + String.valueOf(0));
+        hardware.dashboard.displayPrintf(8, "R: " + String.valueOf(0));
     }
 
     //public void Rotate

@@ -81,6 +81,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.firstinspires.ftc.teamcode.Util.ButtonRange;
 import org.lasarobotics.vision.android.Cameras;
 import org.lasarobotics.vision.ftc.resq.Beacon;
 import org.lasarobotics.vision.opmode.LinearVisionOpMode;
@@ -205,6 +206,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
             for (VuforiaTrackable b : beacons) {
                 OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) b.getListener()).getPose();
 
+
                 if (pose != null) {
                     VectorF translation = pose.getTranslation();
 
@@ -213,11 +215,6 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
                     double z = translation.get(2);
 
                     double angle = Math.toDegrees(Math.atan2(z, x)) + 90;
-
-                   /* telemetry.addData("****** ", b.getName());
-                    telemetry.addData("Turn", angle + " degrees");
-                    telemetry.addData("X", x);
-                    telemetry.addData("Z:", z);*/
 
                     robot.dashboard.displayPrintf(0, "****** " + b.getName());
                     robot.dashboard.displayPrintf(1, "Turn " + angle + " degrees");
@@ -231,50 +228,17 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
                     {
                         // move towards beacon, with  x centered
                         moveToBeacon(x, z);
+                        robot.dashboard.displayPrintf(11, "Moving to beacon");
                     }
-                    else
+                    else if(x < -150 || x > -120)
                     {
-                        h = 0;
-                        if (x > 100) {
-                            v = 0.12;   //move left
-                        } else if (x < 30) {
-                            v = -0.12;     //move right
-                        } else {
-                            v = 0;
-                        }
-                        mechDrive.Drive(h, v, r, false);
+
+                        robot.dashboard.displayPrintf(11, "Center on button");
+                        useLeftButton(x, z);
+                    } else {
+                        robot.dashboard.displayPrintf(11, "Where we want to be!");
+                        mechDrive.Stop();
                     }
-
-
-
-//                    if (z < -610)
-//                    {
-//                        h = -0.2;
-//                    }
-//                    else if (z < -300)
-//                    {
-//                        h = -0.15;
-//                    }
-//                    else if (z < -200)
-//                    {
-//                        h = -0.12;
-//                    }
-//
-//                    if (x > 75) {
-//                        v = 0.12;
-//                    } else if (x < -75) {
-//                        v = -0.12;
-//                    } else {
-//                        v = 0;
-//                    }
-
-
-
-                   /* robot.dashboard.displayPrintf(6, "H: " + String.valueOf(h));
-                    robot.dashboard.displayPrintf(7, "V: " + String.valueOf(v));
-                    robot.dashboard.displayPrintf(8, "R: " + String.valueOf(r));*/
-
-                  // mechDrive.Drive(h, v, r, false);
 
                 }
             }
@@ -282,6 +246,26 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
             waitFor(0.02);
         }
+    }
+    private void useLeftButton(double x, double z){
+        moveToX(ButtonRange.LeftButton(), x, z);
+    }
+    private void useRightButton(double x, double z){
+        moveToX(ButtonRange.RightButton(), x, z);
+    }
+    private void moveToX(ButtonRange b, double x, double z) {
+        double h = 0, v = 0, r = 0;
+
+        if (x > b.getMax()) {
+            v = 0.12;   //move left
+        } else if (x < b.getMin()) {
+            v = -0.12;     //move right
+        } else {
+            v = 0;
+        }
+        mechDrive.Drive(h, v, r, false);
+        waitFor(0.2);
+        mechDrive.Stop();
     }
 
     private void moveToBeacon(double x, double z)
@@ -296,24 +280,18 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         {
             h = -0.15;
         }
-        else if (z < -200)
+        else
         {
             h = -0.12;
         }
-        else if (z < -100)
-        {
-            h = 0;
-            v = 0;
-            waitFor(0.5);
-        }
+
 
         if (x > 70) {
             v = 0.12;
-        } else if (x < 40) {
+        } else if (x < -70) {
             v = -0.12;
         } else {
             v = 0;
-            h = 0;
         }
 
         mechDrive.Drive(h, v, r, false);
