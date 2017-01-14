@@ -245,6 +245,34 @@ public class Hardware9533
 
     }
 
+    public void Auto_Mech(double h, double v, double r)
+    {
+        h = clipMotorPower(h);
+        v = clipMotorPower(v);
+        r = clipMotorPower(r);
+
+        // scale inputs for easier control at lower speeds
+        h = scale(h);
+        v = scale(v);
+        r = scale(r);
+
+
+        // add vectors
+        double frontLeft =  v-h+r;
+        double frontRight = v+h-r;
+        double backRight =  v-h-r;
+        double backLeft =   v+h+r;
+
+        dashboard.displayPrintf(6, "H: " + String.valueOf(h));
+        dashboard.displayPrintf(7, "V: " + String.valueOf(v));
+        dashboard.displayPrintf(8, "R: " + String.valueOf(r));
+
+        leftMotor.setPower(frontLeft);
+        rightMotor.setPower(frontRight);
+        backRightMotor.setPower(backRight);
+        backLeftMotor.setPower(backLeft);
+    }
+
     private double scale(double power){
         int modifier = 1;
 

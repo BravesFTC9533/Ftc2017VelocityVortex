@@ -1,3 +1,5 @@
 include ':FtcRobotController', ':lib'
 include ':TeamCode'
 include ':lib'
+include ':opencv-java'
+include ':ftc-visionlib'

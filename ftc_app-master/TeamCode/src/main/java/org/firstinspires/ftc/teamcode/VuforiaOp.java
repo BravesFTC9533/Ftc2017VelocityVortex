@@ -110,7 +110,7 @@ import java.util.List;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Vuforia-Ryan", group = "vuf")
 //@Autonomous(name="Concept: Vuforia Navigation", group ="Concept")
-public class VuforiaOp extends LinearOpMode {
+public class VuforiaOp extends MMOpMode_Linear {
 
     public static final String TAG = "Vuforia Sample";
 
@@ -125,7 +125,9 @@ public class VuforiaOp extends LinearOpMode {
     DcMotor left, right;
 
     @Override
-    public void runOpMode() throws InterruptedException {
+    public void runOpMode() {
+
+        super.runOpMode();
 
        // left = hardwareMap.dcMotor.get("left");
         //right = hardwareMap.dcMotor.get("right");
@@ -134,7 +136,7 @@ public class VuforiaOp extends LinearOpMode {
 
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
         parameters.vuforiaLicenseKey = "AeWceoD/////AAAAGWvk7AQGLUiTsyU4mSW7gfldjSCDQHX76lt9iPO5D8zaboG428rdS9WN0+AFpAlc/g4McLRAQIb5+ijFCPJJkLc+ynXYdhljdI2k9R4KL8t3MYk/tbmQ75st9VI7//2vNkp0JHV6oy4HXltxVFcEbtBYeTBJ9CFbMW+0cMNhLBPwHV7RYeNPZRgxf27J0oO8VoHOlj70OYdNYos5wvDM+ZbfWrOad/cpo4qbAw5iB95T5I9D2/KRf1HQHygtDl8/OtDFlOfqK6v2PTvnEbNnW1aW3vPglGXknX+rm0k8b0S7GFJkgl7SLq/HFNl0VEIVJGVQe9wt9PB6bJuxOMMxN4asy4rW5PRRBqasSM7OLl4W";
-        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
         this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
 
         Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS, 4);
@@ -169,10 +171,25 @@ public class VuforiaOp extends LinearOpMode {
 
                     double angle = Math.toDegrees(Math.atan2(z, x)) + 90;
 
-                    telemetry.addData("****** ", b.getName());
+                   /* telemetry.addData("****** ", b.getName());
                     telemetry.addData("Turn", angle + " degrees");
                     telemetry.addData("X", x);
-                    telemetry.addData("Z:", z);
+                    telemetry.addData("Z:", z);*/
+
+                    robot.dashboard.displayPrintf(0, "****** " + b.getName());
+                    robot.dashboard.displayPrintf(1, "Turn" + angle + " degrees");
+                    robot.dashboard.displayPrintf(2,"X" + x);
+                    robot.dashboard.displayPrintf(3,"Z:" + z);
+
+
+                    if (angle < 15 && angle > -15 && z < -60)
+                    {
+                        robot.Auto_Mech(-0.4, 0, 0);
+                    }
+                    else
+                    {
+                        robot.Auto_Mech(0, 0, 0);
+                    }
                 }
             }
             telemetry.update();
