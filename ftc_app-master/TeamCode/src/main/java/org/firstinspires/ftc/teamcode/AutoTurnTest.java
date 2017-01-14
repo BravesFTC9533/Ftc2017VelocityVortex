@@ -86,12 +86,12 @@ public class AutoTurnTest extends MMOpMode_Linear {
     {
         super.runOpMode();
 
-        rpid.SetTunings(0.8, 0.2, 0.1);
+        rpid.SetTunings(0.1, 0.005, 0.2);
 
         dashboard = getDashboard();
 
 
-        rpid.SetOutputLimits(-1, 1);
+        rpid.SetOutputLimits(-100, 100);
 
 
         waitForStart();
@@ -113,8 +113,12 @@ public class AutoTurnTest extends MMOpMode_Linear {
                     step = 2;
                     break;
                 case 2:
+                    robot.dashboard.displayPrintf(11, "Compass Target: " + mmCompass.GetTarget()); //450
+                    robot.dashboard.displayPrintf(12, "Compass Angle : " + mmCompass.GetCurrentAngle()); //150
+
                     if( Math.abs( mmCompass.GetCurrentAngle() - mmCompass.GetTarget() ) < 5) {
                         step = 3;
+                        mechDrive.Stop();
                     } else {
                         DoTurn();
                     }
@@ -126,7 +130,7 @@ public class AutoTurnTest extends MMOpMode_Linear {
             }
 
             robot.dashboard.displayPrintf(2, "Step: " + step);
-            robot.dashboard.displayPrintf(10, "Compass Says: " + Global.compass);
+            robot.dashboard.displayPrintf(10, "Compass Says: " + Global.compass); //225
 
             robot.waitForTick(10);
 
@@ -135,17 +139,30 @@ public class AutoTurnTest extends MMOpMode_Linear {
 
     public  void DoTurn() {
 
-        rpid.Compute();
         rpid.setInput(mmCompass.GetCurrentAngle());
 
-        mechDrive.Drive(0, 0, rpid.GetOutput(), false);
+        rpid.Compute();
+
+
+        double output = rpid.GetOutput();
+        robot.dashboard.displayPrintf(9, "Output: " + String.valueOf(output));
+
+
+        double r = output / 100.0;
+        if(output > 0 && output < 0.2) { output = 0.2; }
+        if(output < 0 && output > -0.2) { output = -0.2; }
+
+        mechDrive.Drive(0, 0, output, false);
 
 
     }
 
     public void TurnAngle(double angle) {
+        rpid.Initialize();
+        double target = Global.compass + angle;
+        robot.dashboard.displayText(1, "Setting target angle to " + String.valueOf(target));
 
-        mmCompass.SetTargetDegrees(Global.compass + angle);
+        mmCompass.SetTargetDegrees(target);
 
         rpid.setSetpoint(mmCompass.GetTarget());
 

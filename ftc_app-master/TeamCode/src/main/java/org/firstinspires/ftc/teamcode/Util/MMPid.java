@@ -13,7 +13,7 @@ public class MMPid {
 
     int SampleTime = 10; //10ms
     double outMin, outMax;
-    boolean inAuto = false;
+    boolean inAuto = true;
 
     ControlModes controllerDirection = ControlModes.DIRECT;
 
@@ -44,18 +44,18 @@ public class MMPid {
     public void Compute(){
         if(!inAuto) return;;
 
-        long now = System.currentTimeMillis() % 1000;
+        long now = System.currentTimeMillis(); /// 1000;
         long timeChange = (now - lastTime);
         if(timeChange >= SampleTime) {
 
             // compute all the working error variables
             double error = Setpoint - Input;
             ITerm += (ki * error);
-            if(ITerm > outMax) {
-                ITerm = outMax;
+            if(ITerm > (outMax/100)) {
+                ITerm = outMax / 100;
             }
-            else if(ITerm < outMin) {
-                ITerm = outMin;
+            else if(ITerm < (outMin / 100)) {
+                ITerm = (outMin/ 100);
             }
             double dInput = (Input - lastInput);
 
@@ -75,10 +75,10 @@ public class MMPid {
     public void SetTunings(double Kp, double Ki, double Kd){
         if(Kp < 0 || Ki < 0 || Kd < 0) return;
 
-        double SampleTimeInSec = ((double)SampleTime/ 1000);
+        //double SampleTimeInSec = ((double)SampleTime/ 1000);
         kp = Kp;
-        ki = Ki * SampleTimeInSec;
-        kd = Kd / SampleTimeInSec;
+        ki = Ki; // * SampleTimeInSec;
+        kd = Kd; // / SampleTimeInSec;
 
         if(controllerDirection == ControlModes.REVERSE) {
             kp = (0 - kp);

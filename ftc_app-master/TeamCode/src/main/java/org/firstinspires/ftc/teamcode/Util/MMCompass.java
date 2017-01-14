@@ -24,9 +24,7 @@ public class MMCompass {
 
     public void SetTargetDegrees(double degrees) {
 
-
-        double currentAngle = Global.compass;
-        target = currentAngle + degrees;
+        target =  degrees;
         if(target > 360) {
             offset = -180;
         } else if(target < 0) {
