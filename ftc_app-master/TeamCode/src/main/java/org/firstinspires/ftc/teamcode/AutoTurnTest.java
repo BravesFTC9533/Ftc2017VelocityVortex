@@ -96,13 +96,47 @@ public class AutoTurnTest extends MMOpMode_Linear {
 
         waitForStart();
 
+
+        int step = 0;
+
         while (opModeIsActive())
         {
-            goStraight("1st Move", Global.dist1Time);
-            turn(Global.turnDeg);
-            goStraight("3rd Move", Global.dist2Time);
 
-            mechDrive.Stop();
+
+            switch (step) {
+                case 0:
+                    goStraight("1st Move", Global.dist1Time);
+                    step = 1;
+                    break;
+                case 1:
+                    TurnAngle(90);
+                    step = 2;
+                    break;
+                case 2:
+                    if( Math.abs( mmCompass.GetCurrentAngle() - mmCompass.GetTarget() ) < 5) {
+                        step = 3;
+                    } else {
+                        DoTurn();
+                    }
+                    break;
+                case 3:
+                    goStraight("3rd Move", Global.dist2Time);
+                    step = 0;
+                    break;
+            }
+
+//            if(step == 0) {
+//
+//            }
+//
+//
+//            turn(Global.turnDeg);
+//            goStraight("3rd Move", Global.dist2Time);
+//
+//            //mechDrive.Stop();
+
+            robot.waitForTick(10);
+
         }
     }
 

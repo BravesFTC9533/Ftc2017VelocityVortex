@@ -11,7 +11,7 @@ public class MMPid {
     double ITerm, lastInput;
     double ki, kp, kd;
 
-    int SampleTime = 1000; //1 sec
+    int SampleTime = 10; //10ms
     double outMin, outMax;
     boolean inAuto = false;
 
