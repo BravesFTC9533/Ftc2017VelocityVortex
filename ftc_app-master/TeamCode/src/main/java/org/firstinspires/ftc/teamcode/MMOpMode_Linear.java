@@ -57,6 +57,10 @@ public abstract class  MMOpMode_Linear extends LinearOpMode {
     protected Hardware9533 robot = new Hardware9533();
 
     private static HalDashboard dashboard = null;
+    protected MechDrive mechDrive;
+
+
+
 
     /**
      * This method returns a global dashboard object for accessing the dashboard on the Driver Station.
@@ -77,6 +81,7 @@ public abstract class  MMOpMode_Linear extends LinearOpMode {
         dashboard = new HalDashboard(telemetry);
         robot.init(hardwareMap);
 
+        mechDrive = new MechDrive(robot);
 
 
     }

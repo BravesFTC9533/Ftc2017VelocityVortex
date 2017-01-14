@@ -171,151 +171,6 @@ public class Hardware9533
         period.reset();
     }
 
-    public void Stop(){
-        //AccelerateMotor(this.leftMotor, 0);
-        //AccelerateMotor(this.rightMotor, 0);
-
-        this.leftMotor.setPower(0);
-        this.rightMotor.setPower(0);
-        this.backLeftMotor.setPower(0);
-        this.backRightMotor.setPower(0);
-    }
-
-
-    public void DriveMech(double h, double v, double r) {
-        DriveMech(h, v, r, true);
-    }
-
-    /***********************************************************************************************/
-    public void DriveMech(double h, double v, double r, boolean scalePower)
-    {
-
-        // invert drive!
-        if(this.invertedDrive) {
-            h*=-1;
-            v*=-1;
-        }
-
-        // make sure values are inside valid motor range
-        h = clipMotorPower(h);
-        v = clipMotorPower(v);
-        r = clipMotorPower(r);
-
-        // scale inputs for easier control at lower speeds
-        if(scalePower) {
-            h = scale(h);
-            v = scale(v);
-            r = scale(r);
-        }
-
-        // add vectors
-        double frontLeft =  v-h+r;
-        double frontRight = v+h-r;
-        double backRight =  v-h-r;
-        double backLeft =   v+h+r;
-
-        // since adding vectors can go over 1, figure out max to scale other wheels
-        double max = Math.max(
-            Math.abs(backLeft),
-            Math.max(
-                Math.abs(backRight),
-                Math.max(
-                    Math.abs(frontLeft), Math.abs(frontRight)
-                )
-            )
-        );
-
-        // only need to scale power if max > 1
-        if(max > 1){
-            frontLeft = scalePower(frontLeft, max);
-            frontRight = scalePower(frontRight, max);
-            backLeft = scalePower(backLeft, max);
-            backRight = scalePower(backRight, max);
-        }
-
-
-        // write power to dashboard
-        dashboard.displayPrintf(6, "H: " + String.valueOf(h));
-        dashboard.displayPrintf(7, "V: " + String.valueOf(v));
-        dashboard.displayPrintf(8, "R: " + String.valueOf(r));
-
-        dashboard.displayPrintf(3, "Mech Power: " + frontLeft);
-
-
-        // set power
-        leftMotor.setPower(frontLeft);
-        rightMotor.setPower(frontRight);
-        backRightMotor.setPower(backRight);
-        backLeftMotor.setPower(backLeft);
-
-    }
-
-    public void Auto_Mech(double h, double v, double r)
-    {
-        h = clipMotorPower(h);
-        v = clipMotorPower(v);
-        r = clipMotorPower(r);
-
-        // scale inputs for easier control at lower speeds
-        h = scale(h);
-        v = scale(v);
-        r = scale(r);
-
-
-        // add vectors
-        double frontLeft =  v-h+r;
-        double frontRight = v+h-r;
-        double backRight =  v-h-r;
-        double backLeft =   v+h+r;
-
-        dashboard.displayPrintf(6, "H: " + String.valueOf(h));
-        dashboard.displayPrintf(7, "V: " + String.valueOf(v));
-        dashboard.displayPrintf(8, "R: " + String.valueOf(r));
-
-        leftMotor.setPower(frontLeft);
-        rightMotor.setPower(frontRight);
-        backRightMotor.setPower(backRight);
-        backLeftMotor.setPower(backLeft);
-    }
-
-    private double scale(double power){
-        int modifier = 1;
-
-        if (power == 0 )
-        {
-            return 0;
-        }
-
-        if(power < 0){
-            modifier *= -1;
-        }
-
-        return  (power * power * modifier);
-    }
-
-    public void DriveRobot(double leftPower, double rightPower) {
-        double left = 0;
-        double right = 0;
-        if(this.invertedDrive) {
-            //reverse all the things
-            left = AccelerateMotor(this.rightMotor, -leftPower);
-            right = AccelerateMotor(this.leftMotor, -rightPower);
-        } else {
-            left = AccelerateMotor(this.leftMotor, leftPower);
-            right = AccelerateMotor(this.rightMotor, rightPower);
-        }
-        dashboard.displayPrintf(3, "left: %.2f", left);
-        dashboard.displayPrintf(4, "right: %.2f", right);
-    }
-
-    public double AccelerateMotor(DcMotor motor, double targetPower) {
-        targetPower = Range.clip(targetPower, -MAX_SPEED, MAX_SPEED);
-
-        double power = this.accel(motor.getPower(), targetPower, ACCEL_RATE);
-        motor.setPower(power);
-        return power;
-
-    }
 
     public void ElevatorLiftBalls(){
         this.elevator.setPower(-0.75);
@@ -328,35 +183,18 @@ public class Hardware9533
         this.elevator.setPower(0);
     }
 
-    private double accel(double motorPower, double targetPower, double accelRate) {
 
 
+    public void StopAllMotors() {
+        leftMotor.setPower(0);
+        rightMotor.setPower(0);
+        backRightMotor.setPower(0);
+        backLeftMotor.setPower(0);
 
-        if(accelRate < (abs(motorPower - targetPower))){
-            if(motorPower - targetPower < 0) {
-                return  (motorPower + accelRate);
-            } else {
-                return motorPower - accelRate;
-            }
-        } else {
-            return  targetPower;
-        }
+        shooterMotor.setPower(0);
+        elevator.setPower(0);
     }
 
-
-
-
-    // Scale motor power based on the max for all wheels
-    // 1, 1, 1, 3 will become .33, .33, .33, 1
-    private static double scalePower(double value, double max){
-        if(max == 0){return  0;}
-        return  value / max;
-    }
-
-    // motor power clipping helper
-    private static double clipMotorPower(double value){
-        return Range.clip(value, -1, 1);
-    }
 
 
 }

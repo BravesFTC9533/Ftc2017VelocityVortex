@@ -456,8 +456,7 @@ public class VuforiaOp9533 extends LinearOpMode {
                     }
                 }
 
-                robot.AccelerateMotor(robot.leftMotor, left);
-                robot.AccelerateMotor(robot.rightMotor, right);
+
 
                 telemetry.addData("left",  "%.2f", left);
                 telemetry.addData("right", "%.2f", right);

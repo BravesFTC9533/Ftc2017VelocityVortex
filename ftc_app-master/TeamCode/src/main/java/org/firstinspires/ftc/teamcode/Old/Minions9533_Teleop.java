@@ -323,7 +323,7 @@ public class Minions9533_Teleop extends MMOpMode_Linear {
             handleShooter();
             //handleShooterSpeed();
 
-            robot.DriveRobot(-gamepad1.left_stick_y, -gamepad1.right_stick_y);
+            //robot.DriveRobot(-gamepad1.left_stick_y, -gamepad1.right_stick_y);
 
 
             // Pause for metronome tick.  40 mS each cycle = update 25 times a second.

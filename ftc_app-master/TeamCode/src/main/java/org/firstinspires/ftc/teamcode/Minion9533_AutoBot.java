@@ -128,11 +128,11 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
             dashboard.displayPrintf(1, "Straight: %2.5f S Elapsed: %s", runtime.seconds(), robot.leftMotor.getCurrentPosition());
 
             //robot.DriveRobot(FORWARD_SPEED, FORWARD_SPEED);
-            robot.DriveMech(0, FORWARD_SPEED, 0);
+            mechDrive.Drive(0, FORWARD_SPEED, 0);
             robot.waitForTick(40);
         }
 
-        robot.Stop();
+        mechDrive.Stop();
         pauseBetweenSteps();
     }
 
@@ -161,11 +161,11 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
             //    break;
             //}
             //robot.DriveRobot(-TURN_SPEED, TURN_SPEED);
-            robot.DriveMech(0, 0, -TURN_SPEED);
+            mechDrive.Drive(0, 0, -TURN_SPEED);
 
             robot.waitForTick(10);
         }
-        robot.Stop();
+        mechDrive.Stop();
 
         pauseBetweenSteps();
 
@@ -182,12 +182,12 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
 
 
             //robot.DriveRobot(TURN_SPEED, -TURN_SPEED);
-            robot.DriveMech(0, 0, TURN_SPEED);
+            mechDrive.Drive(0, 0, TURN_SPEED);
 
             robot.waitForTick(10);
         }
 
-        robot.Stop();
+        mechDrive.Stop();
         pauseBetweenSteps();
     }
 
@@ -307,7 +307,7 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
 
 
 
-        robot.Stop();
+        mechDrive.Stop();
 
     }
 

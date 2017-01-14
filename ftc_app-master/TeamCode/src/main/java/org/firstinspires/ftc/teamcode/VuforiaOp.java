@@ -184,11 +184,12 @@ public class VuforiaOp extends MMOpMode_Linear {
 
                     if (angle < 15 && angle > -15 && z < -60)
                     {
-                        robot.Auto_Mech(-0.4, 0, 0);
+                        mechDrive.Drive(-0.4, 0, 0, false);
+
                     }
                     else
                     {
-                        robot.Auto_Mech(0, 0, 0);
+                        mechDrive.Stop();
                     }
                 }
             }

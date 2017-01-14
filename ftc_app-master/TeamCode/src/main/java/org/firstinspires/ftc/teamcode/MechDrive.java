@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.Util.Helpers;
 public class MechDrive {
 
     Hardware9533 hardware;
+    private static double MIN_POWER = 0.15;
 
     public MechDrive(Hardware9533 hardware) {
         this.hardware = hardware;
@@ -16,13 +17,24 @@ public class MechDrive {
 
 
 
-    public void DriveMech(double h, double v, double r) {
-        DriveMech(h, v, r, true);
+    public void Drive(double h, double v, double r) {
+        Drive(h, v, r, true);
     }
 
     /***********************************************************************************************/
-    public void DriveMech(double h, double v, double r, boolean scalePower)
+    public void Drive(double h, double v, double r, boolean scalePower)
     {
+
+
+        if(Math.abs(h) < MIN_POWER) {
+            h = 0;
+        }
+        if(Math.abs(v) < MIN_POWER) {
+            v = 0;
+        }
+        if(Math.abs(r) < MIN_POWER) {
+            r = 0;
+        }
 
         // invert drive!
         if(hardware.invertedDrive) {
@@ -84,6 +96,14 @@ public class MechDrive {
 
     }
 
+
+    public void Stop() {
+
+        hardware.leftMotor.setPower(0);
+        hardware.rightMotor.setPower(0);
+        hardware.backRightMotor.setPower(0);
+        hardware.backLeftMotor.setPower(0);
+    }
 
     //public void Rotate
 }
