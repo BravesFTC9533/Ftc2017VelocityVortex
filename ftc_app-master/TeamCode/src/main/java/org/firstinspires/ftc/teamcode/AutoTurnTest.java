@@ -125,15 +125,8 @@ public class AutoTurnTest extends MMOpMode_Linear {
                     break;
             }
 
-//            if(step == 0) {
-//
-//            }
-//
-//
-//            turn(Global.turnDeg);
-//            goStraight("3rd Move", Global.dist2Time);
-//
-//            //mechDrive.Stop();
+            robot.dashboard.displayPrintf(2, "Step: " + step);
+            robot.dashboard.displayPrintf(10, "Compass Says: " + Global.compass);
 
             robot.waitForTick(10);
 

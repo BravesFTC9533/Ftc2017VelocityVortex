@@ -73,7 +73,7 @@ public class MMPid {
     }
 
     public void SetTunings(double Kp, double Ki, double Kd){
-        if(Kp < 0 || Ki < 0 || Kd < 0) return;;
+        if(Kp < 0 || Ki < 0 || Kd < 0) return;
 
         double SampleTimeInSec = ((double)SampleTime/ 1000);
         kp = Kp;
