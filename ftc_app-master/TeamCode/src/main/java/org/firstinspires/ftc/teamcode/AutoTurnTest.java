@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcontroller.Util.Global;
 import org.firstinspires.ftc.teamcode.MMOpMode_Linear;
+import org.firstinspires.ftc.teamcode.Util.MMCompass;
+import org.firstinspires.ftc.teamcode.Util.MMPid;
 
 import hallib.HalDashboard;
 
@@ -18,6 +20,10 @@ public class AutoTurnTest extends MMOpMode_Linear {
     private ElapsedTime runtime = new ElapsedTime();
 
     private HalDashboard dashboard;
+
+    private MMCompass mmCompass = new MMCompass();
+
+    private MMPid rpid = new MMPid();
 
     private void goStraight(String step, double time){
         //robot.DriveRobot(FORWARD_SPEED, FORWARD_SPEED, telemetry);
@@ -79,7 +85,15 @@ public class AutoTurnTest extends MMOpMode_Linear {
     public void runOpMode()
     {
         super.runOpMode();
+
+        rpid.SetTunings(0.8, 0.2, 0.1);
+
         dashboard = getDashboard();
+
+
+        rpid.SetOutputLimits(-1, 1);
+
+
         waitForStart();
 
         while (opModeIsActive())
@@ -90,6 +104,27 @@ public class AutoTurnTest extends MMOpMode_Linear {
 
             mechDrive.Stop();
         }
+    }
+
+    public  void DoTurn() {
+
+        rpid.Compute();
+        rpid.setInput(mmCompass.GetCurrentAngle());
+
+        mechDrive.Drive(0, 0, rpid.GetOutput(), false);
+
+
+    }
+
+    public void TurnAngle(double angle) {
+
+        mmCompass.SetTargetDegrees(Global.compass + angle);
+
+        rpid.setSetpoint(mmCompass.GetTarget());
+
+
+
+
     }
 
 }
