@@ -45,9 +45,9 @@ public class Global {
         menu.addOption("Park?", new String[]{"YES", "NO"});
         menu.addOption("Delay Start?", new String[]{"NO", "YES"});
 
-        turn.addOption("Distance1 (sec)", 10, 0, 0.5);
-        turn.addOption("Degrees", 360, 0, 1);
-        turn.addOption("Distance2 (sec)", 10, 0, 0.5);
+        turn.addOption("Dist1", 10, 0, 0.5);
+        turn.addOption("Degrees", 360, 0, 5);
+        turn.addOption("Dist2", 10, 0, 0.5);
     }
 
 }
