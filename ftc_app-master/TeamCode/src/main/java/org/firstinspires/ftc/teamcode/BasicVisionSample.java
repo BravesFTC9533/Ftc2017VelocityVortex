@@ -33,7 +33,7 @@ public class BasicVisionSample extends VisionOpMode {
          * PRIMARY = Front-facing, larger camera
          * SECONDARY = Screen-facing, "selfie" camera :D
          **/
-        this.setCamera(Cameras.PRIMARY);
+        this.setCamera(Cameras.SECONDARY);
 
         /**
          * Set the frame size

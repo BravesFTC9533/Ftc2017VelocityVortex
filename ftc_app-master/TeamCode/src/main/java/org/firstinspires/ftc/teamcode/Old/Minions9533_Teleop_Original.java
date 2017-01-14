@@ -150,7 +150,7 @@ public class Minions9533_Teleop_Original extends MMOpMode_Linear {
     }
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException{
 
         super.runOpMode();
 

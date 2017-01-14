@@ -219,7 +219,7 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
 
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException{
 
        super.runOpMode();
 

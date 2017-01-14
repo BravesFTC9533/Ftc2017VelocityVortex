@@ -92,7 +92,7 @@ public class TestMenuOp extends MMOpMode_Linear implements FtcMenu.MenuButtons {
   private double wallDistance = 0.0;
 
   @Override
-  public void runOpMode() {
+  public void runOpMode() throws InterruptedException{
 
 
     super.runOpMode();

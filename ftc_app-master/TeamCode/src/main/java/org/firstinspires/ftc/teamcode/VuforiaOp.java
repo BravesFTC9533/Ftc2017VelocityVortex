@@ -81,9 +81,17 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.lasarobotics.vision.android.Cameras;
+import org.lasarobotics.vision.ftc.resq.Beacon;
+import org.lasarobotics.vision.opmode.LinearVisionOpMode;
+import org.lasarobotics.vision.opmode.extensions.CameraControlExtension;
+import org.lasarobotics.vision.util.ScreenOrientation;
+import org.opencv.core.Size;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import hallib.HalDashboard;
 
 
 /**
@@ -119,21 +127,46 @@ import java.util.List;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Vuforia-Ryan", group = "vuf")
 //@Autonomous(name="Concept: Vuforia Navigation", group =sensorManager = (SensorManager) Activity.getSystemService(SENSOR_SERVICE);"Concept")
-public class VuforiaOp extends MMOpMode_Linear{
+public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
     public static final String TAG = "Vuforia Sample";
 
     private OpenGLMatrix lastLocation = null;
     private VuforiaLocalizer vuforia;
 
+    private final int RED = 0, BLUE = 1;
+    private String leftBeacon, rightBeacon;
+
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
 
         super.runOpMode();
 
+        waitForVisionStart();
+
+        this.setCamera(Cameras.SECONDARY);
+        this.setFrameSize(new Size(900, 900));
+
+        enableExtension(Extensions.BEACON);         //Beacon detection
+        enableExtension(Extensions.ROTATION);       //Automatic screen rotation correction
+        enableExtension(Extensions.CAMERA_CONTROL); //Manual camera control
+
+        beacon.setAnalysisMethod(Beacon.AnalysisMethod.FAST);
+        beacon.setColorToleranceRed(0);
+        beacon.setColorToleranceBlue(0);
+
+        rotation.setIsUsingSecondaryCamera(false);
+        rotation.disableAutoRotate();
+        rotation.setActivityOrientationFixed(ScreenOrientation.PORTRAIT);
+
+        cameraControl.setColorTemperature(CameraControlExtension.ColorTemperature.AUTO);
+        cameraControl.setAutoExposureCompensation();
+
+        // end beacon vision init
 
 
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
+
+        /*VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
         parameters.vuforiaLicenseKey = "AeWceoD/////AAAAGWvk7AQGLUiTsyU4mSW7gfldjSCDQHX76lt9iPO5D8zaboG428rdS9WN0+AFpAlc/g4McLRAQIb5+ijFCPJJkLc+ynXYdhljdI2k9R4KL8t3MYk/tbmQ75st9VI7//2vNkp0JHV6oy4HXltxVFcEbtBYeTBJ9CFbMW+0cMNhLBPwHV7RYeNPZRgxf27J0oO8VoHOlj70OYdNYos5wvDM+ZbfWrOad/cpo4qbAw5iB95T5I9D2/KRf1HQHygtDl8/OtDFlOfqK6v2PTvnEbNnW1aW3vPglGXknX+rm0k8b0S7GFJkgl7SLq/HFNl0VEIVJGVQe9wt9PB6bJuxOMMxN4asy4rW5PRRBqasSM7OLl4W";
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
         this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
@@ -150,10 +183,21 @@ public class VuforiaOp extends MMOpMode_Linear{
 
         beacons.activate();
 
-        while (opModeIsActive())
-        {
+*/
+        waitForStart();
+
+        while (opModeIsActive()) {
             robot.dashboard.displayPrintf(10, "Compass Says X: " + Global.compass);
 
+            //Beacons are mirrored
+            rightBeacon = beacon.getAnalysis().getStateLeft().toString();
+            leftBeacon = beacon.getAnalysis().getStateRight().toString();
+
+            robot.dashboard.displayPrintf(6, "Left: %s", leftBeacon);
+            robot.dashboard.displayPrintf(7, "Right: %s", rightBeacon);
+
+        }
+        /*
             for (VuforiaTrackable b : beacons)
             {
                 OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) b.getListener()).getPose();
@@ -171,17 +215,23 @@ public class VuforiaOp extends MMOpMode_Linear{
                    /* telemetry.addData("****** ", b.getName());
                     telemetry.addData("Turn", angle + " degrees");
                     telemetry.addData("X", x);
-                    telemetry.addData("Z:", z);*/
+                    telemetry.addData("Z:", z);
 
                     robot.dashboard.displayPrintf(0, "****** " + b.getName());
-                    robot.dashboard.displayPrintf(1, "Turn" + angle + " degrees");
-                    robot.dashboard.displayPrintf(2,"X" + x);
+                    robot.dashboard.displayPrintf(1, "Turn " + angle + " degrees");
+                    robot.dashboard.displayPrintf(2,"X:" + x);
                     robot.dashboard.displayPrintf(3,"Z:" + z);
 
 
                     if (angle < 15 && angle > -15 && z < -60)
                     {
-                        mechDrive.Drive(-0.4, 0, 0, false);
+                       // mechDrive.Drive(-0.4, 0, 0, false);
+
+                    }
+                    else if (z > -60)
+                    {
+                        mechDrive.Stop();
+
 
                     }
                     else
@@ -191,9 +241,8 @@ public class VuforiaOp extends MMOpMode_Linear{
                 }
             }
             telemetry.update();
-
         }
-
+*/
     }
 
 
