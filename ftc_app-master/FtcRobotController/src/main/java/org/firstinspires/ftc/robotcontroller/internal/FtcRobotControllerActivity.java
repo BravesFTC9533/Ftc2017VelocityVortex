@@ -38,6 +38,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.media.MediaPlayer;
@@ -97,7 +101,7 @@ import java.io.File;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class FtcRobotControllerActivity extends Activity {
+public class FtcRobotControllerActivity extends Activity implements SensorEventListener {
 
   public static final String TAG = "RCActivity";
 
@@ -193,6 +197,15 @@ public class FtcRobotControllerActivity extends Activity {
     }
   }
 
+
+  public void onSensorChanged(SensorEvent event)
+  {
+    Global.compass = Math.round(event.values[0]);
+  }
+  public void onAccuracyChanged(Sensor sensor, int accurracy){}
+
+  private SensorManager sensorManager;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -200,9 +213,9 @@ public class FtcRobotControllerActivity extends Activity {
     RobotLog.vv(TAG, "onCreate()");
 
 
-
     Global.init();   /****** Our stuff that needs to be initialized when the app starts*/
     Global.context = this;
+    sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
     receivedUsbAttachmentNotifications = new ConcurrentLinkedQueue<UsbDevice>();
     eventLoop = null;
@@ -308,6 +321,8 @@ public class FtcRobotControllerActivity extends Activity {
     super.onResume();
     RobotLog.vv(TAG, "onResume()");
     readNetworkType(NETWORK_TYPE_FILENAME);
+
+    sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), SensorManager.SENSOR_DELAY_GAME);
   }
 
   @Override
@@ -317,6 +332,8 @@ public class FtcRobotControllerActivity extends Activity {
     if (programmingModeController.isActive()) {
       programmingModeController.stopProgrammingMode();
     }
+
+    sensorManager.unregisterListener(this);
   }
 
   @Override

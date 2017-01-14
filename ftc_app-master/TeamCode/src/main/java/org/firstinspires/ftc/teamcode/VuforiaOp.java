@@ -1,5 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+
 import com.qualcomm.ftcrobotcontroller.R;
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -7,6 +12,9 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.vuforia.HINT;
 import com.vuforia.Vuforia;
 
+import android.app.Activity;
+
+import org.firstinspires.ftc.robotcontroller.Util.Global;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
@@ -77,6 +85,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * This OpMode illustrates the basics of using the Vuforia localizer to determine
  * positioning and orientation of robot on the FTC field.
@@ -109,30 +118,20 @@ import java.util.List;
  */
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Vuforia-Ryan", group = "vuf")
-//@Autonomous(name="Concept: Vuforia Navigation", group ="Concept")
-public class VuforiaOp extends MMOpMode_Linear {
+//@Autonomous(name="Concept: Vuforia Navigation", group =sensorManager = (SensorManager) Activity.getSystemService(SENSOR_SERVICE);"Concept")
+public class VuforiaOp extends MMOpMode_Linear{
 
     public static final String TAG = "Vuforia Sample";
 
-    OpenGLMatrix lastLocation = null;
-
-    /**
-     * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
-     * localization engine.
-     */
-    VuforiaLocalizer vuforia;
-
-    DcMotor left, right;
+    private OpenGLMatrix lastLocation = null;
+    private VuforiaLocalizer vuforia;
 
     @Override
     public void runOpMode() {
 
         super.runOpMode();
 
-       // left = hardwareMap.dcMotor.get("left");
-        //right = hardwareMap.dcMotor.get("right");
 
-        //left.setDirection(DcMotorSimple.Direction.REVERSE);
 
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
         parameters.vuforiaLicenseKey = "AeWceoD/////AAAAGWvk7AQGLUiTsyU4mSW7gfldjSCDQHX76lt9iPO5D8zaboG428rdS9WN0+AFpAlc/g4McLRAQIb5+ijFCPJJkLc+ynXYdhljdI2k9R4KL8t3MYk/tbmQ75st9VI7//2vNkp0JHV6oy4HXltxVFcEbtBYeTBJ9CFbMW+0cMNhLBPwHV7RYeNPZRgxf27J0oO8VoHOlj70OYdNYos5wvDM+ZbfWrOad/cpo4qbAw5iB95T5I9D2/KRf1HQHygtDl8/OtDFlOfqK6v2PTvnEbNnW1aW3vPglGXknX+rm0k8b0S7GFJkgl7SLq/HFNl0VEIVJGVQe9wt9PB6bJuxOMMxN4asy4rW5PRRBqasSM7OLl4W";
@@ -147,16 +146,14 @@ public class VuforiaOp extends MMOpMode_Linear {
         beacons.get(2).setName("Legos");
         beacons.get(3).setName("Gears");
 
-
-
         waitForStart();
 
         beacons.activate();
 
-
-
         while (opModeIsActive())
         {
+            robot.dashboard.displayPrintf(10, "Compass Says X: " + Global.compass);
+
             for (VuforiaTrackable b : beacons)
             {
                 OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) b.getListener()).getPose();

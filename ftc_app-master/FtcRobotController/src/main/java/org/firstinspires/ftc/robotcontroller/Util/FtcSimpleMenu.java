@@ -28,7 +28,7 @@ class Option
             choices[i] = String.valueOf(inc*i);
         }
 
-        choiceIndex = 20;           //fix this rock hard code
+        choiceIndex = 0;           //fix this rock hard code
     }
 
     public String getName()

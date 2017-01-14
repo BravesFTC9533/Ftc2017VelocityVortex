@@ -18,15 +18,6 @@ public class AutoConfig extends LinearOpMode {
         menu.setGamepad(gamepad1);
         menu.setTelemetry(telemetry);
 
-
-
-        /*if (lastMenuConfig != null)
-        {
-            telemetry.addData("Happenin", "");
-            menu.loadFrom(lastMenuConfig);
-        }*/
-
-
         waitForStart();
 
         while (opModeIsActive()) {

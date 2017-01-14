@@ -207,6 +207,8 @@ public class Minion9533_Mech extends MMOpMode_Linear {
 
         super.runOpMode();
 
+
+
         if(USE_GYRO) {
             gyro = new MinionsGyro(robot, "gyro");
 
@@ -244,6 +246,8 @@ public class Minion9533_Mech extends MMOpMode_Linear {
 
         rollingAverage = new RollingAvg(50);
         while (opModeIsActive()) {
+
+            //robot.dashboard.displayPrintf(0, "Compass Says Z: " + Global.compass);
 
             handleTargetRPM();
             int targetSpeed = (targetRPM * 28) / 60;
