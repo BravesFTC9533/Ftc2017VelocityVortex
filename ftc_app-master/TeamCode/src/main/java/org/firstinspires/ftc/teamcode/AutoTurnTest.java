@@ -82,7 +82,7 @@ public class AutoTurnTest extends MMOpMode_Linear {
         pauseBetweenSteps();
     }
 
-    public void runOpMode()
+    public void runOpMode() throws InterruptedException
     {
         super.runOpMode();
 

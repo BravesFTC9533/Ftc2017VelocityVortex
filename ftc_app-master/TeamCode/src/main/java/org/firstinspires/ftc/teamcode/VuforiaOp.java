@@ -137,11 +137,8 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
     private final int RED = 0, BLUE = 1;
     private String leftBeacon, rightBeacon;
 
-    @Override
-    public void runOpMode() throws InterruptedException {
-
-        super.runOpMode();
-
+    /*private void detectBeacon() throws InterruptedException
+    {
         waitForVisionStart();
 
         this.setCamera(Cameras.SECONDARY);
@@ -161,12 +158,22 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
         cameraControl.setColorTemperature(CameraControlExtension.ColorTemperature.AUTO);
         cameraControl.setAutoExposureCompensation();
+    }*/
+
+    @Override
+    public void runOpMode() throws InterruptedException {
+
+        super.runOpMode();
+
+
+        //detectBeacon();
+
+        //disableExtension(Extensions.BEACON);
 
         // end beacon vision init
 
 
-
-        /*VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
         parameters.vuforiaLicenseKey = "AeWceoD/////AAAAGWvk7AQGLUiTsyU4mSW7gfldjSCDQHX76lt9iPO5D8zaboG428rdS9WN0+AFpAlc/g4McLRAQIb5+ijFCPJJkLc+ynXYdhljdI2k9R4KL8t3MYk/tbmQ75st9VI7//2vNkp0JHV6oy4HXltxVFcEbtBYeTBJ9CFbMW+0cMNhLBPwHV7RYeNPZRgxf27J0oO8VoHOlj70OYdNYos5wvDM+ZbfWrOad/cpo4qbAw5iB95T5I9D2/KRf1HQHygtDl8/OtDFlOfqK6v2PTvnEbNnW1aW3vPglGXknX+rm0k8b0S7GFJkgl7SLq/HFNl0VEIVJGVQe9wt9PB6bJuxOMMxN4asy4rW5PRRBqasSM7OLl4W";
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
         this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
@@ -179,31 +186,26 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         beacons.get(2).setName("Legos");
         beacons.get(3).setName("Gears");
 
-        waitForStart();
-
         beacons.activate();
 
-*/
+
         waitForStart();
 
         while (opModeIsActive()) {
             robot.dashboard.displayPrintf(10, "Compass Says X: " + Global.compass);
 
             //Beacons are mirrored
-            rightBeacon = beacon.getAnalysis().getStateLeft().toString();
+           /* rightBeacon = beacon.getAnalysis().getStateLeft().toString();
             leftBeacon = beacon.getAnalysis().getStateRight().toString();
 
             robot.dashboard.displayPrintf(6, "Left: %s", leftBeacon);
-            robot.dashboard.displayPrintf(7, "Right: %s", rightBeacon);
+            robot.dashboard.displayPrintf(7, "Right: %s", rightBeacon);*/
 
-        }
-        /*
-            for (VuforiaTrackable b : beacons)
-            {
+
+            for (VuforiaTrackable b : beacons) {
                 OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) b.getListener()).getPose();
 
-                if (pose != null)
-                {
+                if (pose != null) {
                     VectorF translation = pose.getTranslation();
 
                     double x = translation.get(0);
@@ -215,36 +217,115 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
                    /* telemetry.addData("****** ", b.getName());
                     telemetry.addData("Turn", angle + " degrees");
                     telemetry.addData("X", x);
-                    telemetry.addData("Z:", z);
+                    telemetry.addData("Z:", z);*/
 
                     robot.dashboard.displayPrintf(0, "****** " + b.getName());
                     robot.dashboard.displayPrintf(1, "Turn " + angle + " degrees");
-                    robot.dashboard.displayPrintf(2,"X:" + x);
-                    robot.dashboard.displayPrintf(3,"Z:" + z);
+                    robot.dashboard.displayPrintf(2, "X:" + x);
+                    robot.dashboard.displayPrintf(3, "Z:" + z);
 
 
-                    if (angle < 15 && angle > -15 && z < -60)
+                    double h = 0, v = 0, r = 0;
+
+                    if (z < -150)
                     {
-                       // mechDrive.Drive(-0.4, 0, 0, false);
-
-                    }
-                    else if (z > -60)
-                    {
-                        mechDrive.Stop();
-
-
+                        // move towards beacon, with  x centered
+                        moveToBeacon(x, z);
                     }
                     else
                     {
-                        mechDrive.Stop();
+                        h = 0;
+                        if (x > 100) {
+                            v = 0.12;   //move left
+                        } else if (x < 30) {
+                            v = -0.12;     //move right
+                        } else {
+                            v = 0;
+                        }
+                        mechDrive.Drive(h, v, r, false);
                     }
+
+
+
+//                    if (z < -610)
+//                    {
+//                        h = -0.2;
+//                    }
+//                    else if (z < -300)
+//                    {
+//                        h = -0.15;
+//                    }
+//                    else if (z < -200)
+//                    {
+//                        h = -0.12;
+//                    }
+//
+//                    if (x > 75) {
+//                        v = 0.12;
+//                    } else if (x < -75) {
+//                        v = -0.12;
+//                    } else {
+//                        v = 0;
+//                    }
+
+
+
+                   /* robot.dashboard.displayPrintf(6, "H: " + String.valueOf(h));
+                    robot.dashboard.displayPrintf(7, "V: " + String.valueOf(v));
+                    robot.dashboard.displayPrintf(8, "R: " + String.valueOf(r));*/
+
+                  // mechDrive.Drive(h, v, r, false);
+
                 }
             }
             telemetry.update();
+
+            waitFor(0.02);
         }
-*/
+    }
+
+    private void moveToBeacon(double x, double z)
+    {
+        double h=0,v=0,r=0;
+
+        if (z < -610)
+        {
+            h = -0.2;
+        }
+        else if (z < -300)
+        {
+            h = -0.15;
+        }
+        else if (z < -200)
+        {
+            h = -0.12;
+        }
+        else if (z < -100)
+        {
+            h = 0;
+            v = 0;
+            waitFor(0.5);
+        }
+
+        if (x > 70) {
+            v = 0.12;
+        } else if (x < 40) {
+            v = -0.12;
+        } else {
+            v = 0;
+            h = 0;
+        }
+
+        mechDrive.Drive(h, v, r, false);
+
+    }
+
+    private void waitFor(double seconds){
+        robot.waitForTick((long)(seconds * 1000));
     }
 
 
-
 }
+
+
+

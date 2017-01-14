@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.Util.Helpers;
 public class MechDrive {
 
     Hardware9533 hardware;
-    private static double MIN_POWER = 0.15;
+    private static double MIN_POWER = 0.1;
 
     public MechDrive(Hardware9533 hardware) {
         this.hardware = hardware;
@@ -85,7 +85,7 @@ public class MechDrive {
         hardware.dashboard.displayPrintf(7, "V: " + String.valueOf(v));
         hardware.dashboard.displayPrintf(8, "R: " + String.valueOf(r));
 
-        hardware.dashboard.displayPrintf(3, "Mech Power: " + frontLeft);
+        //hardware.dashboard.displayPrintf(3, "Mech Power: " + frontLeft);
 
 
         // set power

@@ -61,7 +61,7 @@ import trclib.TrcTaskMgr;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-public abstract class  MMOpMode_Linear extends VisionOpMode {
+public abstract class  MMOpMode_Linear extends LinearOpMode { //extends VisionOpMode {
 
     protected Hardware9533 robot = new Hardware9533();
 
@@ -96,6 +96,7 @@ public abstract class  MMOpMode_Linear extends VisionOpMode {
 
     }
 
+    /*
     private final ElapsedTime timer = new ElapsedTime();
     private Threader threader = null;
     private Thread thread = null;
@@ -274,5 +275,5 @@ public abstract class  MMOpMode_Linear extends VisionOpMode {
         public boolean isReady() {
             return this.ready;
         }
-    }
+    }*/
 }
