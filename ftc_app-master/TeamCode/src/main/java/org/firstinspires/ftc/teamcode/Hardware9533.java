@@ -182,8 +182,12 @@ public class Hardware9533
     }
 
 
+    public void DriveMech(double h, double v, double r) {
+        DriveMech(h, v, r, true);
+    }
+
     /***********************************************************************************************/
-    public void DriveMech(double h, double v, double r)
+    public void DriveMech(double h, double v, double r, boolean scalePower)
     {
 
         // invert drive!
@@ -198,10 +202,11 @@ public class Hardware9533
         r = clipMotorPower(r);
 
         // scale inputs for easier control at lower speeds
-        h = scale(h);
-        v = scale(v);
-        r = scale(r);
-
+        if(scalePower) {
+            h = scale(h);
+            v = scale(v);
+            r = scale(r);
+        }
 
         // add vectors
         double frontLeft =  v-h+r;
