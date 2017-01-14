@@ -31,6 +31,16 @@ public class MMPid {
 
 
 
+    public void setSetpoint(double setpoint) {
+        this.Setpoint = setpoint;
+    }
+    public void setInput(double input){
+        this.Input   = input;
+    }
+    public double GetOutput(){
+        return  this.Output;
+    }
+
     public void Compute(){
         if(!inAuto) return;;
 
