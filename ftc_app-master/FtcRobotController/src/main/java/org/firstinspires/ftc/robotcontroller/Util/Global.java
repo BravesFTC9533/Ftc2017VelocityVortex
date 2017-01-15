@@ -16,6 +16,7 @@ public class Global {
     public static FtcSimpleMenu turn = new FtcSimpleMenu("Autonomous Turn");
 
     public static float compass;
+    public static boolean opModeActive = false;
 
     public static Context context;
 
