@@ -44,6 +44,8 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
     private String leftBeacon, rightBeacon;
     VuforiaTrackables beacons;
 
+    TeamColor teamColor = TeamColor.RED;
+
     private void initVuforia() {
 
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
@@ -218,7 +220,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
                     if(currentLocation!=null)
                     {
-                        state = States.MOVE_TO_BEACON;
+                        state = States.GET_BEACON_COLOR;
                         //pauseBetweenSteps();
                     } else {
                         state = States.FIND_BEACON;
@@ -227,6 +229,25 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
                 case GET_BEACON_COLOR:
 
+
+                    int mycolor = getBeaconColor(visibleBeacon);
+                    if(mycolor == VortexUtils.BEACON_BLUE_RED) {
+
+                        if(teamColor == TeamColor.BLUE) {
+                            targetButton = ButtonRange.LeftButton();
+                        } else {
+                            targetButton = ButtonRange.RightButton();
+                        }
+                    } else if(mycolor == VortexUtils.BEACON_RED_BLUE) {
+                        if(teamColor == TeamColor.BLUE) {
+                            targetButton = ButtonRange.RightButton();
+                        } else {
+                            targetButton = ButtonRange.LeftButton();
+                        }
+                    } else {
+
+                    }
+                    state = States.MOVE_TO_BEACON;
                     break;
                 case MOVE_TO_BEACON: //get closer to beacon
                     logState("[MOVE_TO_BEACON] Move closer to beacon");
