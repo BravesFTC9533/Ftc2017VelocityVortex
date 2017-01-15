@@ -52,6 +52,8 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         parameters.vuforiaLicenseKey = "AeWceoD/////AAAAGWvk7AQGLUiTsyU4mSW7gfldjSCDQHX76lt9iPO5D8zaboG428rdS9WN0+AFpAlc/g4McLRAQIb5+ijFCPJJkLc+ynXYdhljdI2k9R4KL8t3MYk/tbmQ75st9VI7//2vNkp0JHV6oy4HXltxVFcEbtBYeTBJ9CFbMW+0cMNhLBPwHV7RYeNPZRgxf27J0oO8VoHOlj70OYdNYos5wvDM+ZbfWrOad/cpo4qbAw5iB95T5I9D2/KRf1HQHygtDl8/OtDFlOfqK6v2PTvnEbNnW1aW3vPglGXknX+rm0k8b0S7GFJkgl7SLq/HFNl0VEIVJGVQe9wt9PB6bJuxOMMxN4asy4rW5PRRBqasSM7OLl4W";
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
         this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
+        Vuforia.setFrameFormat(PIXEL_FORMAT.RGB565, true);
+        vuforia.setFrameQueueCapacity(1);
 
         Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS, 4);
 
@@ -133,6 +135,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
             robot.dashboard.displayPrintf(15, "Red on left, Blue on right");
         }
 
+
         return color;
     }
 
@@ -150,7 +153,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
         ButtonRange targetButton = ButtonRange.LeftButton();
 
-        States state = States.MOVE_FROM_START;
+        States state = States.FIND_BEACON;
 
 
         VuforiaTrackableDefaultListener visibleBeacon = null;
@@ -167,44 +170,42 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
             robot.dashboard.displayPrintf(10, "Compass Says X: " + Global.compass);
 
-            if(state != States.MOVE_FROM_START) {
 
-                visibleBeacon = getVisibleBeacon();
+            visibleBeacon = getVisibleBeacon();
 
-                if (visibleBeacon != null) {
-                    currentLocation = getCurrentLocation(visibleBeacon);
-                }
-
-                if (currentLocation == null) {
-                    state = States.FIND_BEACON;
-                } else {
-                    //robot.dashboard.displayPrintf(0, "****** " + visibleBeacon.);
-                    robot.dashboard.displayPrintf(1, "Turn " + currentLocation.getAngle() + " degrees");
-                    robot.dashboard.displayPrintf(2, "X:" + currentLocation.getX());
-                    robot.dashboard.displayPrintf(3, "Z:" + currentLocation.getZ());
-                }
-
+            if (visibleBeacon != null) {
+                currentLocation = getCurrentLocation(visibleBeacon);
             }
+
+            if (currentLocation == null) {
+                state = States.FIND_BEACON;
+            } else {
+                //robot.dashboard.displayPrintf(0, "****** " + visibleBeacon.);
+                robot.dashboard.displayPrintf(1, "Turn " + currentLocation.getAngle() + " degrees");
+                robot.dashboard.displayPrintf(2, "X:" + currentLocation.getX());
+                robot.dashboard.displayPrintf(3, "Z:" + currentLocation.getZ());
+            }
+
 
 
 
 
             switch (state){
 
-                case MOVE_FROM_START:
-                    if(runtime.seconds() < 4) {
-                        logState("[MOVE_FROM_START] moving from start");
-                        mechDrive.Drive(-0.1, -0.4, 0, true);
-                    } else {
-                        mechDrive.Stop();
-
-                        state = States.FIND_BEACON;
-                        pauseBetweenSteps();
-                    }
+//                case MOVE_FROM_START:
+//                    if(runtime.seconds() < 4) {
+//                        logState("[MOVE_FROM_START] moving from start");
+//                        mechDrive.Drive(-0.1, -0.4, 0, true);
+//                    } else {
+//                        mechDrive.Stop();
+//
+//                        state = States.FIND_BEACON;
+//                        pauseBetweenSteps();
+//                    }
                 case FIND_BEACON:
                     logState("[FIND_BEACON] Finding beacon");
                     // get visible beacon
-                    //visibleBeacon = getVisibleBeacon();
+
                     if(visibleBeacon != null){
                         state = States.GET_BEACON_LOCATION;
 
@@ -228,26 +229,34 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
                     break;
 
                 case GET_BEACON_COLOR:
-
+                    logState("[GET_BEACON_COLOR] Getting beacon color");
 
                     int mycolor = getBeaconColor(visibleBeacon);
-                    if(mycolor == VortexUtils.BEACON_BLUE_RED) {
 
-                        if(teamColor == TeamColor.BLUE) {
-                            targetButton = ButtonRange.LeftButton();
-                        } else {
-                            targetButton = ButtonRange.RightButton();
-                        }
-                    } else if(mycolor == VortexUtils.BEACON_RED_BLUE) {
-                        if(teamColor == TeamColor.BLUE) {
-                            targetButton = ButtonRange.RightButton();
-                        } else {
-                            targetButton = ButtonRange.LeftButton();
-                        }
+
+                    if(mycolor == -1) {
+                        logState("[GET_BEACON_COLOR] Unable to determine color");
+                        pauseBetweenSteps();
                     } else {
+                        logState("[GET_BEACON_COLOR] Got a beacon color");
+                        if (mycolor == VortexUtils.BEACON_BLUE_RED) {
 
+                            if (teamColor == TeamColor.BLUE) {
+                                targetButton = ButtonRange.LeftButton();
+                            } else {
+                                targetButton = ButtonRange.RightButton();
+                            }
+                        } else if (mycolor == VortexUtils.BEACON_RED_BLUE) {
+                            if (teamColor == TeamColor.BLUE) {
+                                targetButton = ButtonRange.RightButton();
+                            } else {
+                                targetButton = ButtonRange.LeftButton();
+                            }
+                        } else {
+
+                        }
+                        state = States.MOVE_TO_BEACON;
                     }
-                    state = States.MOVE_TO_BEACON;
                     break;
                 case MOVE_TO_BEACON: //get closer to beacon
                     logState("[MOVE_TO_BEACON] Move closer to beacon");
