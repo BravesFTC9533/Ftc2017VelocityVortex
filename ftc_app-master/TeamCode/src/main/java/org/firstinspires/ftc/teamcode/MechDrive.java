@@ -32,9 +32,9 @@ public class MechDrive {
         if(Math.abs(v) < MIN_POWER) {
             v = 0;
         }
-        if(Math.abs(r) < MIN_POWER) {
-            r = 0;
-        }
+//        if(Math.abs(r) < MIN_POWER) {
+//            r = 0;
+//        }
 
         // invert drive!
         if(hardware.invertedDrive) {

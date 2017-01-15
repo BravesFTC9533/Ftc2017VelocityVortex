@@ -23,8 +23,8 @@ public class ButtonRange {
 
     public static ButtonRange LeftButton() {
         ButtonRange b = new ButtonRange();
-        b.min = -150;
-        b.max = -120;
+        b.min = -120;
+        b.max = -80;
         return  b;
 
     }

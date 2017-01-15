@@ -216,6 +216,23 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
     }
 
 
+    enum States {
+
+        MOVE_FROM_START,
+        FIND_BEACON,
+        GET_BEACON_LOCATION,
+        MOVE_TO_BEACON,
+        MOVE_TO_CORRECT_BUTTON,
+        FIX_ANGLE,
+        PRE_MOVE_IN,
+        PRESS_BUTTON,
+        PRE_MOVE_OUT,
+        BACK_OFF_BUTTON,
+        DONE
+    }
+
+
+
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -228,117 +245,150 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
         waitForStart();
 
-        ButtonRange targetButton = ButtonRange.RightButton();
+        ButtonRange targetButton = ButtonRange.LeftButton();
 
-        int state = 0;
+        States state = States.MOVE_FROM_START;
 
 
         VuforiaTrackableDefaultListener visibleBeacon = null;
         MMTranslation currentLocation = null;
 
+        boolean move = true;
 
+        runtime.reset();
         while (opModeIsActive()) {
 
 
             robot.dashboard.displayPrintf(10, "Compass Says X: " + Global.compass);
-            visibleBeacon = getVisibleBeacon();
 
-            if(visibleBeacon != null){
-                currentLocation = getCurrentLocation(visibleBeacon);
+            if(state != States.MOVE_FROM_START) {
+
+                visibleBeacon = getVisibleBeacon();
+
+                if (visibleBeacon != null) {
+                    currentLocation = getCurrentLocation(visibleBeacon);
+                }
+
+                if (currentLocation == null) {
+                    state = States.FIND_BEACON;
+                } else {
+                    //robot.dashboard.displayPrintf(0, "****** " + visibleBeacon.);
+                    robot.dashboard.displayPrintf(1, "Turn " + currentLocation.getAngle() + " degrees");
+                    robot.dashboard.displayPrintf(2, "X:" + currentLocation.getX());
+                    robot.dashboard.displayPrintf(3, "Z:" + currentLocation.getZ());
+                }
+
             }
 
-            if(currentLocation == null){
-                state = 0;
-            } else {
-                //robot.dashboard.displayPrintf(0, "****** " + visibleBeacon.);
-                //robot.dashboard.displayPrintf(1, "Turn " + angle + " degrees");
-                robot.dashboard.displayPrintf(2, "X:" + currentLocation.getX());
-                robot.dashboard.displayPrintf(3, "Z:" + currentLocation.getZ());
-            }
 
             switch (state){
-                case 0:
-                    logState("[0] Finding beacon");
+
+                case MOVE_FROM_START:
+                    if(runtime.seconds() < 4) {
+                        logState("[MOVE_FROM_START] moving from start");
+                        mechDrive.Drive(-0.1, -0.4, 0, true);
+                    } else {
+                        mechDrive.Stop();
+
+                        state = States.FIND_BEACON;
+                        pauseBetweenSteps();
+                    }
+                case FIND_BEACON:
+                    logState("[FIND_BEACON] Finding beacon");
                     // get visible beacon
                     //visibleBeacon = getVisibleBeacon();
                     if(visibleBeacon != null){
-                        state = 1;
+                        state = States.GET_BEACON_LOCATION;
 
-                        pauseBetweenSteps();
+                        //pauseBetweenSteps();
 
                     } else {
-                        state = 0;
+                        state = States.FIND_BEACON;
                     }
                     break;
 
-                case 1:
-                    logState("[1] Getting beacon location");
+                case GET_BEACON_LOCATION:
+                    logState("[GET_BEACON_LOCATION] Getting beacon location");
 
                     if(currentLocation!=null)
                     {
-                        state = 2;
-                        pauseBetweenSteps();
+                        state = States.MOVE_TO_BEACON;
+                        //pauseBetweenSteps();
                     } else {
-                        state = 0;
+                        state = States.FIND_BEACON;
                     }
                     break;
 
-                case 2: //get closer to beacon
-                    logState("[2] Move closer to beacon");
+                case MOVE_TO_BEACON: //get closer to beacon
+                    logState("[MOVE_TO_BEACON] Move closer to beacon");
                     //currentLocation = getCurrentLocation(visibleBeacon);
                     if(currentLocation.getZ() < -200) {
                         //robot.dashboard.displayPrintf(11, "Moving to beacon");
-                        moveToBeacon(currentLocation.getX(), currentLocation.getZ());
+                        moveToBeacon(currentLocation.getX(), currentLocation.getZ(), currentLocation.getAngle());
 
                     } else {
                         mechDrive.Stop();
-                        state = 3;
+                        state = States.FIX_ANGLE;
                         pauseBetweenSteps();
                     }
                     break;
-                case 3: //move to correct button
-                    logState("[3] move left or right to button");
+                case FIX_ANGLE:
+                    logState("[FIX_ANGLE] fixing angle");
+                    if(Math.abs(currentLocation.getAngle()) > 5) {
+                        fixAngle(currentLocation.getAngle());
+                    } else {
+                        mechDrive.Stop();
+                        state = States.MOVE_TO_CORRECT_BUTTON;
+                        pauseBetweenSteps();
+                    }
+                    break;
+                case MOVE_TO_CORRECT_BUTTON: //move to correct button
+                    logState("[MOVE_TO_CORRECT_BUTTON] move left or right to button");
                     //currentLocation = getCurrentLocation(visibleBeacon);
                     if(!targetButton.inRange(currentLocation.getX())){
                         moveToX(targetButton, currentLocation.getX(), currentLocation.getX());
                     } else {
                         mechDrive.Stop();
-                        state = 4;
+                        state = States.PRE_MOVE_IN;
                         pauseBetweenSteps();
                     }
                     break;
-                case 4: //press button begin
-                    logState("[4] begin button press");
+
+                case PRE_MOVE_IN: //press button begin
+                    logState("[PRE_MOVE_IN] begin button press");
                     runtime.reset();
-                    state = 5;
-                    pauseBetweenSteps();
+                    state = States.PRESS_BUTTON;
+                    //pauseBetweenSteps();
                     break;
-                case 5: //move into button
-                    logState("[5] move into button");
-                    if(runtime.seconds() < 1) {
-                        mechDrive.Drive(0.15, 0, 0, false);
+                case PRESS_BUTTON: //move into button
+                    logState("[PRESS_BUTTON] move into button");
+                    if(runtime.seconds() < 1.2) {
+                        mechDrive.Drive(-0.2, 0, 0, false);
                     } else {
-                        state = 6;
-                        pauseBetweenSteps();
+                        state = States.PRE_MOVE_OUT;
+
                         mechDrive.Stop();
+                        pauseBetweenSteps();
                     }
                     break;
-                case 6: //move away from button start
-                    logState("[6] begin stop button press");
+                case PRE_MOVE_OUT: //move away from button start
+                    logState("[PRE_MOVE_OUT] begin stop button press");
                     runtime.reset();
-                    state = 7;
+                    state = States.BACK_OFF_BUTTON;
                     break;
-                case 7: //move away from button
-                    logState("[7] move away from button");
+                case BACK_OFF_BUTTON: //move away from button
+                    logState("[BACK_OFF_BUTTON] move away from button");
                     if(runtime.seconds() < 1){
-                        mechDrive.Drive(-0.15, 0, 0, false);
+                        logState("[7.1] move backwards");
+                        mechDrive.Drive(0.2, 0, 0, false);
                     } else {
+                        logState("[7.2] stopping");
                         mechDrive.Stop();
                         pauseBetweenSteps();
-                        state = 8;
+                        state = States.DONE;
                     }
                     break;
-                case 8:
+                case DONE:
                     logState("[8] done");
                     //do nothing
                     break;
@@ -437,32 +487,68 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         mechDrive.Drive(h, v, r, false);
         waitFor(0.2);
         mechDrive.Stop();
+
+
+
     }
 
-    private void moveToBeacon(double x, double z)
+
+    private void fixAngle(double angle){
+        double r = 0;
+        if(Math.abs(angle) > 10) {
+            r = 0.3;
+        } else if(Math.abs((angle)) > 5) {
+            r = 0.15;
+        } else if(Math.abs((angle)) < 2.1) {
+            r = 0;
+        }
+
+
+        if(angle > 0) {
+            r = 0-r;
+        }
+
+        mechDrive.Drive(0, 0, r);
+    }
+
+    private void moveToBeacon(double x, double z, double angle)
     {
         double h=0,v=0,r=0;
 
         if (z < -610)
         {
-            h = -0.2;
+            h = -0.3;
         }
         else if (z < -300)
         {
-            h = -0.15;
+            h = -0.2;
         }
         else
         {
-            h = -0.12;
+            h = -0.16;
         }
 
 
         if (x > 70) {
-            v = 0.12;
+            v = 0.15;
         } else if (x < -70) {
-            v = -0.12;
+            v = -0.15;
         } else {
             v = 0;
+        }
+
+        if(Math.abs(angle) > 10) {
+            r = 0.1;
+        } else if(Math.abs((angle)) > 5) {
+            r = 0.05;
+        } else if(Math.abs((angle)) < 2.1) {
+
+            r = 0;
+        }
+
+
+        if(angle > 0) {
+            r = 0-r;
         }
 
         mechDrive.Drive(h, v, r, false);
@@ -494,7 +580,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
     private void pauseBetweenSteps(){
         //logPath("pausing waiting 2 seconds");
-        waitFor(2);
+        waitFor(1);
     }
 
 
@@ -518,6 +604,13 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         }
         public double getZ() {
             return  z;
+        }
+
+        public double getAngle() {
+
+            double angle = Math.toDegrees(Math.atan2(z, x)) + 90;
+            return angle;
+
         }
 
         public MMTranslation(VectorF translation){
