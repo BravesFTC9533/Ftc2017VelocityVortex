@@ -93,6 +93,11 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
     }
 
 
+    enum TeamColor {
+        BLUE,
+        RED
+    }
+
     enum States {
 
         MOVE_FROM_START,
@@ -105,6 +110,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         PRESS_BUTTON,
         PRE_MOVE_OUT,
         BACK_OFF_BUTTON,
+        GET_BEACON_COLOR,
         DONE
     }
 
@@ -219,6 +225,9 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
                     }
                     break;
 
+                case GET_BEACON_COLOR:
+
+                    break;
                 case MOVE_TO_BEACON: //get closer to beacon
                     logState("[MOVE_TO_BEACON] Move closer to beacon");
                     //currentLocation = getCurrentLocation(visibleBeacon);
@@ -230,11 +239,13 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
                         mechDrive.Stop();
                         state = States.FIX_ANGLE;
                         pauseBetweenSteps();
+                        runtime.reset();
                     }
                     break;
                 case FIX_ANGLE:
                     logState("[FIX_ANGLE] fixing angle");
-                    if(Math.abs(currentLocation.getAngle()) > 5) {
+
+                    if(Math.abs(currentLocation.getAngle()) > 5 && runtime.seconds() < 2) {
                         fixAngle(currentLocation.getAngle());
                     } else {
                         mechDrive.Stop();
