@@ -16,6 +16,11 @@ public class ButtonRange {
         return max;
     }
 
+    public boolean inRange(double x) {
+        return x >= min && x <= max;
+    }
+
+
     public static ButtonRange LeftButton() {
         ButtonRange b = new ButtonRange();
         b.min = -150;
