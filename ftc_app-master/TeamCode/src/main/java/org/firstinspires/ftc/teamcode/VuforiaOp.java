@@ -27,6 +27,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
 import org.firstinspires.ftc.teamcode.Util.ButtonRange;
 import org.firstinspires.ftc.teamcode.Util.VortexUtils;
+import org.opencv.android.OpenCVLoader;
 
 import static org.firstinspires.ftc.teamcode.Util.VortexUtils.getImageFromFrame;
 
@@ -124,7 +125,12 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
         try {
             color = VortexUtils.waitForBeaconConfig(getImageFromFrame(vuforia.getFrameQueue().take(), PIXEL_FORMAT.RGB565), listener, vuforia.getCameraCalibration(), 5000);
-        } catch (InterruptedException e){}
+        } catch (InterruptedException e) {
+        }
+        catch(Throwable e) {
+            robot.dashboard.displayText(0, e.getMessage().toString());
+        }
+
 
         if (color == VortexUtils.BEACON_BLUE_RED)
         {
@@ -143,6 +149,14 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
     public void runOpMode() throws InterruptedException {
 
         super.runOpMode();
+
+        if (!OpenCVLoader.initDebug()) {
+            //Logger.d("Internal OpenCV library not found. Using OpenCV Manager for initialization");
+            //OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_1_0, this, null);
+        } else {
+            //Logger.d("OpenCV library found inside package. Using it!");
+            //mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+        }
 
         initVuforia();
 
@@ -563,6 +577,9 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
             z = translation.get(2);
         }
     }
+
+
+
 
 }
 

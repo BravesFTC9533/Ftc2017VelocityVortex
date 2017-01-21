@@ -91,6 +91,16 @@ public class Minion9533_Mech extends MMOpMode_Linear {
         }
     }
 
+    private void handleLift() {
+        if(gamepad2.y) {
+            robot.LiftLift();
+        } else if(gamepad2.x) {
+            robot.DropLift();
+        } else {
+            robot.StopLift();
+        }
+    }
+
 
     double shooterAvg = 0;
     double lastTime = 0;
@@ -281,6 +291,7 @@ public class Minion9533_Mech extends MMOpMode_Linear {
             handleIntake();
             handleElevator();
             handleShooter();
+            handleLift();
             //handleShooterSpeed();
 
             //robot.DriveRobot(-gamepad1.left_stick_y, -gamepad1.right_stick_y);

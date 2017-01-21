@@ -50,6 +50,7 @@ public class Hardware9533
     public DcMotor intake = null;
 
     public DcMotor shooterMotor = null;
+    public DcMotor liftMotor = null;
 
 
     public HiTechnicNxtGyroSensor gyro = null;
@@ -108,6 +109,9 @@ public class Hardware9533
 
         shooterMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        liftMotor = hwMap.dcMotor.get("liftMotor");
+        liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
 
         // Set all motors to zero power
         leftMotor.setPower(0);
@@ -119,6 +123,7 @@ public class Hardware9533
         elevator.setPower(0);
 
         shooterMotor.setPower(0);
+        liftMotor.setPower(0);
         //shooterRight.setPower(0);
 
         // Set all motors to run without encoders.
@@ -139,6 +144,7 @@ public class Hardware9533
 
 
         shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
         //shooterRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -184,6 +190,15 @@ public class Hardware9533
     }
 
 
+    public void LiftLift(){
+        this.liftMotor.setPower(1);
+    }
+    public void DropLift(){
+        this.liftMotor.setPower(-0.05);
+    }
+    public  void StopLift() {
+        this.liftMotor.setPower(0);
+    }
 
     public void StopAllMotors() {
         leftMotor.setPower(0);
@@ -193,6 +208,7 @@ public class Hardware9533
 
         shooterMotor.setPower(0);
         elevator.setPower(0);
+        liftMotor.setPower(0);
     }
 
 
