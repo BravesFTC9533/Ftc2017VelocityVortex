@@ -97,7 +97,7 @@ class NewTele implements Runnable
     }
 }
 
-@Autonomous(name="(USE THIS) Autobot", group="Pushbot")
+@Autonomous(name="old Autobot", group="Pushbot")
 public class Minion9533_AutoBot extends MMOpMode_Linear {
 
 
@@ -225,12 +225,9 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
 
 
 
-
-        robot.shooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        prepShooter(targetRPM);
 
 
-        robot.shooterMotor.setMaxSpeed( (targetRPM * 28) / 60);
 
         //gyro = new MinionsGyro(robot, "gyro");
         //gyro.calibrateGyro();

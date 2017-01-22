@@ -41,4 +41,12 @@ public class ButtonRange {
         return  b;
     }
 
+    public static ButtonRange Unknown() {
+        ButtonRange b = new ButtonRange();
+        b.min = 30;
+        b.max = 70;
+        b.name = "Unknown";
+        return  b;
+    }
+
 }

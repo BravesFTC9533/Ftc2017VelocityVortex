@@ -76,7 +76,7 @@ public class VortexUtils {
 
         int config = NOT_VISIBLE;
         long beginTime = System.currentTimeMillis();
-        while (config == NOT_VISIBLE && System.currentTimeMillis() - beginTime < timeOut && Global.opModeActive) {
+        while (config == NOT_VISIBLE && System.currentTimeMillis() - beginTime < timeOut) {
             config = getBeaconConfig(img, beacon, camCal);
             //RC.l.idle();
         }//while

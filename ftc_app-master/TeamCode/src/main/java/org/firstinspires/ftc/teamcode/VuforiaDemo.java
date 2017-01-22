@@ -6,6 +6,7 @@ package org.firstinspires.ftc.teamcode;
 import android.graphics.Path;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.vuforia.HINT;
 import com.vuforia.Image;
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Autonomous(name="Vuforia Demo")
+@Disabled
 public class VuforiaDemo extends LinearOpMode {
 
 
