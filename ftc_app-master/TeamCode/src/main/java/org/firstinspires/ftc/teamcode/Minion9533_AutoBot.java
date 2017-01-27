@@ -257,7 +257,7 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
        // MediaPlayer mediaPlayer = MediaPlayer.create(Global.context, com.qualcomm.ftcrobotcontroller.R.raw.lowrider);
         //mediaPlayer.start();
 
-        waitFor(0.1+delayStartTime);
+        /*waitFor(0.1+delayStartTime);
         robot.dashboard.displayText(0, "Moving Forward half block");
         goStraight("Initial Move", initialMoveTime);
         pauseBetweenSteps();
@@ -304,7 +304,7 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
 
 
 
-        mechDrive.Stop();
+        mechDrive.Stop();*/
 
     }
 

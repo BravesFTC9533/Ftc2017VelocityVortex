@@ -103,7 +103,7 @@ public class AutoTurnTest extends MMOpMode_Linear {
         {
 
 
-            switch (step) {
+           /* switch (step) {
                 case 0:
                     goStraight("1st Move", Global.dist1Time);
                     step = 1;
@@ -132,7 +132,7 @@ public class AutoTurnTest extends MMOpMode_Linear {
             robot.dashboard.displayPrintf(2, "Step: " + step);
             robot.dashboard.displayPrintf(10, "Compass Says: " + Global.compass); //225
 
-            robot.waitForTick(10);
+            robot.waitForTick(10);*/
 
         }
     }

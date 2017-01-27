@@ -1,71 +1,57 @@
 package org.firstinspires.ftc.teamcode;
 
-/**
- * Created by Kerfuffle on 11/19/2016.
- */
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import static org.firstinspires.ftc.robotcontroller.Util.Global.*;
+import static org.firstinspires.ftc.teamcode.VuforiaOp.*;
 
-@TeleOp (name = "(MENU) AutoConfig", group = "Menu")
-@Disabled
-public class AutoConfig extends LinearOpMode {
+/**
+ * Created by Kerfuffle on 1/26/2017.
+ */
 
+@TeleOp(name = "AutoBot Config", group = "Menu")
+public class AutoBotConfig extends LinearOpMode {
 
-    @Override
-    public void runOpMode() {
-/*
-        menu.setGamepad(gamepad1);
-        menu.setTelemetry(telemetry);
-
-        waitForStart();
-
-        while (opModeIsActive()) {
-
+    public void runOpMode()
+    {
+        while (opModeIsActive())
+        {
             menu.displayMenu();
-
-            pushBallTime = Double.parseDouble(menu.getCurrentChoiceOf("PushBall Time"));
-            initialMoveTime = Double.parseDouble(menu.getCurrentChoiceOf("Initial Move Time"));
 
             switch (menu.getCurrentChoiceOf("Team")) {
                 case "RED":
-                    team = RED;
-                    //set red team
+                    teamColor = TeamColor.RED;
                     break;
                 case "BLUE":
-                    team = BLUE;
-                    //set blue team
+                    teamColor = TeamColor.BLUE;
                     break;
             }
 
             switch (menu.getCurrentChoiceOf("Proximity")) {
                 case "NEAR":
-                    //initialMoveTime = 0.8;
-                    //pushBallTime = 3;
+
                     break;
                 case "FAR":
-                    //initialMoveTime = 1.2 ;
-                    //pushBallTime = 4;
+
                     break;
             }
 
             switch (menu.getCurrentChoiceOf("Shoot?")) {
                 case "YES":
-                    shoot = true;
+
                     break;
                 case "NO":
-                    shoot = false;
+
                     break;
             }
 
             switch (menu.getCurrentChoiceOf("Push de CapBall?")) {
                 case "YES":
-                    capBall = true;
+
                     break;
                 case "NO":
-                    capBall = false;
+
                     break;
             }
 
@@ -81,17 +67,13 @@ public class AutoConfig extends LinearOpMode {
 
             switch (menu.getCurrentChoiceOf("Delay Start?")) {
                 case "YES":
-                    delayStartTime = 15;
+
                     break;
                 case "NO":
-                    delayStartTime = 0;
+
                     break;
             }
-        }*/
-
-
-        //lastMenuConfig = menu.getOptionsConfig();
-        //menu.clearOptions();
-
+        }
     }
+
 }

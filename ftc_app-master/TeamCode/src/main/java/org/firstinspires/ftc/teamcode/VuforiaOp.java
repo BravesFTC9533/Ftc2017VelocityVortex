@@ -72,7 +72,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
     VuforiaTrackables beacons;
 
-    TeamColor teamColor = TeamColor.RED;
+    public static TeamColor teamColor = TeamColor.RED;
 
     private void initVuforia() {
 
@@ -534,7 +534,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
                 Drive(moveSpeed, 0, 0);
                 do {
                     idle();
-                } while (opModeIsActive() && runtime.seconds() < 1);
+                } while (opModeIsActive() && runtime.seconds() < 3);
                 Stop();
 
             }

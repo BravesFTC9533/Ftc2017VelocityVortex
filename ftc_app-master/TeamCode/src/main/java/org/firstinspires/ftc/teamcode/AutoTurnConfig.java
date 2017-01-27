@@ -15,7 +15,7 @@ public class AutoTurnConfig extends LinearOpMode {
 
     public void runOpMode()
     {
-        turn.setGamepad(gamepad1);
+        /*turn.setGamepad(gamepad1);
         turn.setTelemetry(telemetry);
 
         waitForStart();
@@ -27,7 +27,7 @@ public class AutoTurnConfig extends LinearOpMode {
             dist1Time = Double.parseDouble(turn.getCurrentChoiceOf("Dist1"));
             dist2Time = Double.parseDouble(turn.getCurrentChoiceOf("Dist2"));
             turnDeg = Double.parseDouble(turn.getCurrentChoiceOf("Degrees"));
-        }
+        }*/
     }
 
 }
