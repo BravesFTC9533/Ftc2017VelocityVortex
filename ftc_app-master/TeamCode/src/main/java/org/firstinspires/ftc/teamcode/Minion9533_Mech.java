@@ -286,12 +286,12 @@ public class Minion9533_Mech extends MMOpMode_Linear {
                 robot.dashboard.displayPrintf(2, "Normal");
             }
 
-
-            if(gamepad1.start) {
-                mechDrive.Drive(0, 0, -0.1, false);
-            } else {
-                mechDrive.Stop();
-            }
+//
+//            if(gamepad1.start) {
+//                mechDrive.Drive(0, 0, -0.1, false);
+//            } else {
+//                mechDrive.Stop();
+//            }
 
             handleIntake();
             handleElevator();
@@ -300,7 +300,7 @@ public class Minion9533_Mech extends MMOpMode_Linear {
             //handleShooterSpeed();
 
             //robot.DriveRobot(-gamepad1.left_stick_y, -gamepad1.right_stick_y);
-            //mechDrive.Drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x);
+            mechDrive.Drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x);
 
 
             // Pause for metronome tick.  40 mS each cycle = update 25 times a second.
