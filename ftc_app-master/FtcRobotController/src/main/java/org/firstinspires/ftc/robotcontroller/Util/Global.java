@@ -15,6 +15,8 @@ public class Global {
     public static FtcSimpleMenu menu = new FtcSimpleMenu("Autonomous Menu");
     //public static FtcSimpleMenu turn = new FtcSimpleMenu("Autonomous Turn");
 
+    public static FtcSimpleMenu tests = new FtcSimpleMenu("Tests");
+
     public static float compass;
     //public static boolean opModeActive = false;
 
@@ -39,12 +41,17 @@ public class Global {
     {
         menu.addOption("Team", new String[]{"RED", "BLUE"});
         menu.addOption("Proximity", new String[]{"NEAR", "FAR"});
-        //menu.addOption("Initial Move Time", 30.0, 0.0, 0.1);
-        //menu.addOption("PushBall Time", 30.0, 0.0, 0.1);
-        menu.addOption("Shoot", new String[]{"YES", "NO"});
-        menu.addOption("Push CapBall", new String[]{"YES", "NO"});
-        menu.addOption("Park", new String[]{"YES", "NO"});
-        menu.addOption("Delay Start", 30, 0, 0.1);
+        menu.addOption("Beacons", 2, 0, 1, 2);
+//        menu.addOption("Initial Move Time", 30.0, 0.0, 0.1);
+//        menu.addOption("PushBall Time", 30.0, 0.0, 0.1);
+//        menu.addOption("Shoot", new String[]{"YES", "NO"});
+//        menu.addOption("Push CapBall", new String[]{"YES", "NO"});
+//        menu.addOption("Park", new String[]{"YES", "NO"});
+//        menu.addOption("Delay Start", 30, 0, 0.1);
+
+
+        tests.addOption("Shoot Power", 1, 0, 0.1, 1);
+        tests.addOption("Elevator Down Power", 1, 0, 0.05, 0.1);
 
         /*turn.addOption("Dist1", 10, 0, 0.5);
         turn.addOption("Degrees", 360, 0, 5);

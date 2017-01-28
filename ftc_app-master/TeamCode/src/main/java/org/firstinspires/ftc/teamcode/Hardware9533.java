@@ -33,6 +33,8 @@ import static java.lang.Math.abs;
  */
 public class Hardware9533
 {
+    public static double liftDropPower = 0.1;
+
 
     public final static double ACCEL_RATE = 0.2;
 
@@ -191,10 +193,10 @@ public class Hardware9533
 
 
     public void LiftLift(){
-        this.liftMotor.setPower(1);
+        this.liftMotor.setPower(-1);
     }
     public void DropLift(){
-        this.liftMotor.setPower(-0.05);
+        this.liftMotor.setPower(liftDropPower);
     }
     public  void StopLift() {
         this.liftMotor.setPower(0);

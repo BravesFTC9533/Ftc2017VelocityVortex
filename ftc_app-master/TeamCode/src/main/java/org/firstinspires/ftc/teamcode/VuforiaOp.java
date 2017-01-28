@@ -37,6 +37,9 @@ import static org.firstinspires.ftc.teamcode.Util.VortexUtils.getImageFromFrame;
 //@Autonomous(name="Concept: Vuforia Navigation", group =sensorManager = (SensorManager) Activity.getSystemService(SENSOR_SERVICE);"Concept")
 public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
+    public static double beaconStepBack = 2;
+    public static int numBeacons = 2;
+
 
     double timePerRotationClockwiseMS = 10.3 * 1000.0;
     double timePerRotationCounterClockwiseMS = 12.3 * 1000.0;
@@ -47,6 +50,11 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
     enum TeamColor {
         BLUE,
         RED
+    }
+
+    enum Proximity
+    {
+        NEAR, FAR
     }
 
     enum States {
@@ -73,6 +81,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
     VuforiaTrackables beacons;
 
     public static TeamColor teamColor = TeamColor.RED;
+    public static Proximity proximity = Proximity.NEAR;
 
     private void initVuforia() {
 
@@ -103,6 +112,19 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
                 return beacon;
             }
 
+        }
+        return null;
+    }
+
+    private VuforiaTrackableDefaultListener getBeacon(String name)
+    {
+        for (VuforiaTrackable b : beacons)
+        {
+            VuforiaTrackableDefaultListener beacon = (VuforiaTrackableDefaultListener) b.getListener();
+            if (b.getName().equalsIgnoreCase(name) && beacon.isVisible())
+            {
+                return beacon;
+            }
         }
         return null;
     }
@@ -165,9 +187,9 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
 
 
-    private ButtonRange getTargetButton(){
+    private ButtonRange getTargetButton(VuforiaTrackableDefaultListener visibleBeacon){
 
-        VuforiaTrackableDefaultListener visibleBeacon = getVisibleBeacon();
+        //VuforiaTrackableDefaultListener visibleBeacon = getVisibleBeacon();
         ButtonRange targetButton = null;
         int mycolor = getBeaconColor(visibleBeacon);
 
@@ -233,14 +255,14 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
     }
 
 
-    private void fixAngles(){
+    private void fixAngles(VuforiaTrackableDefaultListener visibleBeacon){
         logState("[SQUARE UP TO WALL]");
-        VuforiaTrackableDefaultListener visibleBeacon = null;
+        //VuforiaTrackableDefaultListener visibleBeacon = null;
         MMTranslation angles = null;
         double angleToWall = 0;
 
 
-        visibleBeacon = getVisibleBeacon();
+        //visibleBeacon = getVisibleBeacon();
         if(visibleBeacon == null){
             //uh oh
             logState("Unable to locate beacon");
@@ -261,17 +283,17 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
     }
 
 
-    private void moveToBeacon() {
+    private void moveToBeacon(VuforiaTrackableDefaultListener visibleBeacon) {
         logState("[MOVE_TO_BEACON] Move closer to beacon");
 
-        VuforiaTrackableDefaultListener visibleBeacon = null;
+        //VuforiaTrackableDefaultListener visibleBeacon = null;
         MMTranslation angles;
         MMTranslation currentLocation = null;
         double angleToWall;
 
         runtime.reset();
         do {
-            visibleBeacon = getVisibleBeacon();
+            //visibleBeacon = getVisibleBeacon();
             if(visibleBeacon == null){
                 Stop();
                 logState("Unable to find beacon");
@@ -284,10 +306,10 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         } while(opModeIsActive() && currentLocation.getZ() < -300 && runtime.seconds() < 10);
     }
 
-    private void centerOnBeacon() {
+    private void centerOnBeacon(VuforiaTrackableDefaultListener visibleBeacon) {
         logState("[Center On Beacon] Centering on beacon");
 
-        VuforiaTrackableDefaultListener visibleBeacon = null;
+        //VuforiaTrackableDefaultListener visibleBeacon = null;
 //        MMTranslation angles;
         MMTranslation currentLocation = null;
 //        MMTranslation nav = null;
@@ -296,7 +318,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         runtime.reset();
 
         do {
-            visibleBeacon = getVisibleBeacon();
+            //visibleBeacon = getVisibleBeacon();
             if(visibleBeacon == null){
                 mechDrive.Stop();
                 logState("Unable to find beacon");
@@ -390,7 +412,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
 
 
-    private void moveOffWall() {
+    private VuforiaTrackableDefaultListener moveOffWall() {
         VuforiaTrackableDefaultListener visibleBeacon = null;
 
         runtime.reset();
@@ -409,10 +431,20 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         runtime.reset();
         Drive(0, -0.2, 0);
         do {
-            visibleBeacon = getVisibleBeacon();
-        } while(opModeIsActive() && runtime.seconds() < 1 && visibleBeacon == null);
+        } while(opModeIsActive() && runtime.seconds() < 3);
 
         Stop();
+
+        do {
+            if (teamColor == TeamColor.RED)
+            {
+                visibleBeacon = getBeacon("tools");//getVisibleBeacon();
+            }
+            else if (teamColor == TeamColor.BLUE)
+            {
+                visibleBeacon = getBeacon("legos");
+            }
+        }while (opModeIsActive() && runtime.seconds() < 5 && visibleBeacon == null);
 
         pauseBetweenSteps();
 
@@ -430,9 +462,28 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
 
         pauseBetweenSteps();
+
+        return visibleBeacon;
     }
 
-    private void runBeaconPressManuever (){
+    private void moveBackToSecondBeacon()
+    {
+        runtime.reset();
+        Drive(0.2, 0, 0);
+        do {
+        } while(opModeIsActive() && runtime.seconds() < 1.2);
+
+        runtime.reset();
+        Drive(0, 0.2, 0);
+        do {
+        } while(opModeIsActive() && runtime.seconds() < 2.6);
+
+        Stop();
+
+        pauseBetweenSteps();
+    }
+
+    private void runBeaconPressManuever (VuforiaTrackableDefaultListener visibleBeacon){
 
         ButtonRange targetButton = ButtonRange.Unknown();
 
@@ -449,8 +500,8 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         robot.dashboard.displayText(15, "Fix angle");
         //fix angle
         if(fixAngle1) {
-            fixAngles();
-            fixAngles();
+            fixAngles(visibleBeacon);
+            fixAngles(visibleBeacon);
             Stop();
             pauseBetweenSteps();
         }
@@ -458,15 +509,18 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
         robot.dashboard.displayText(15, "Center on beacon");
         if(centerOnBeacon) {
-            centerOnBeacon();
+            centerOnBeacon(visibleBeacon);
             Stop();
             pauseBetweenSteps();
         }
 
         robot.dashboard.displayText(15, "Get beacon configuration");
+
+        targetButton = null;
+
         //get beacon configuration
         if(getBeaconConfiguration) {
-            targetButton = getTargetButton();
+            targetButton = getTargetButton(visibleBeacon);
             if(targetButton == null){
                 robot.dashboard.displayText(10, "UNABLE TO FIND TEAM COLOR");
             }
@@ -480,7 +534,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         robot.dashboard.displayText(15, "Move towards beacon");
         //move towards beacon
         if(moveToBeacon) {
-            moveToBeacon();
+            moveToBeacon(visibleBeacon);
             Stop();
             pauseBetweenSteps();
         }
@@ -488,9 +542,9 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         robot.dashboard.displayText(15, "Fix angle");
         //fix angle
         if(fixAngle2) {
-            fixAngles();
+            fixAngles(visibleBeacon);
 
-            fixAngles();
+            fixAngles(visibleBeacon);
             Stop();
             pauseBetweenSteps();
         }
@@ -534,7 +588,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
                 Drive(moveSpeed, 0, 0);
                 do {
                     idle();
-                } while (opModeIsActive() && runtime.seconds() < 3);
+                } while (opModeIsActive() && runtime.seconds() < beaconStepBack);
                 Stop();
 
             }
@@ -579,8 +633,9 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
         super.runOpMode();
 
+        robot.dashboard.displayText(0, "WAAAAAIITT!!!!!  for it to say ready");
 
-        teamColor = TeamColor.RED;
+        //teamColor = TeamColor.RED;
 
 
 
@@ -599,13 +654,63 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         robot.dashboard.displayText(0, "Autonomous mode ready, waiting for start...");
         waitForStart();
 
+        robot.dashboard.displayText(3, "Color: " + teamColor);
 
-        runAuto();
+        if (proximity == Proximity.FAR)
+        {
+            if (numBeacons == 0)
+            {
+
+            }
+            else if (numBeacons == 1)
+            {
+
+            }
+            else if (numBeacons == 2)
+            {
+
+            }
+        }
+        if (proximity == Proximity.NEAR)
+        {
+            if (numBeacons == 0)
+            {
+                runNearWithoutBeacons();
+            }
+            else if (numBeacons == 1)
+            {
+
+            }
+            else if (numBeacons == 2)
+            {
+                runNearWithBothBeacons();
+            }
+        }
+    }
+
+    /**
+     * Goes for:
+     *
+     * Shoots
+     * Push Capball
+     * park in center
+     *
+     */
+    private void runNearWithoutBeacons()
+    {
 
     }
 
-    private void runAuto() throws InterruptedException {
-
+    /**
+     * Goes for:
+     *
+     * Tools Beacon
+     * Gears Beacon
+     * Turn and Shoot
+     *
+     * (Park on ramp?)
+     */
+    private void runNearWithBothBeacons() throws InterruptedException {
 
 
         //VuforiaTrackableDefaultListener visibleBeacon = null;
@@ -620,15 +725,15 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
 
         robot.dashboard.displayText(15, "Move off wall");
-        // move off wall to first beacon
+        VuforiaTrackableDefaultListener farBeacon = null;
         if(moveOffWall) {
 
-            moveOffWall();
+            farBeacon = moveOffWall();      //returns the beacon that is farthest
             Stop();
         }
 
         if(runBeaconManuever) {
-            runBeaconPressManuever();
+            runBeaconPressManuever(farBeacon);
             Stop();
         }
 
@@ -647,15 +752,30 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         //move to 2nd beacon
         if(press2ndbeacon) {
 
+            waitFor(10); /*******Pause to move beacon over to other side manually******/
+
+            moveBackToSecondBeacon();
+
+            waitFor(1);
+
+            // gears then tools
+
             VuforiaTrackableDefaultListener visibleBeacon = null;
             runtime.reset();
             do {
-                visibleBeacon = getVisibleBeacon();
+                if (teamColor == TeamColor.RED)
+                {
+                    visibleBeacon = getBeacon("gears");//getVisibleBeacon();
+                }
+                else if (teamColor == TeamColor.BLUE)
+                {
+                    visibleBeacon = getBeacon("wheels");
+                }
 
             }while(opModeIsActive() && runtime.seconds() < 5 && visibleBeacon == null);
 
 
-            runBeaconPressManuever();
+            runBeaconPressManuever(visibleBeacon);
         }
 
 

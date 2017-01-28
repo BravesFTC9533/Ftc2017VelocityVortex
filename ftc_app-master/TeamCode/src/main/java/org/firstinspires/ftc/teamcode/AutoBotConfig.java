@@ -10,14 +10,21 @@ import static org.firstinspires.ftc.teamcode.VuforiaOp.*;
  * Created by Kerfuffle on 1/26/2017.
  */
 
-@TeleOp(name = "AutoBot Config", group = "Menu")
+@TeleOp(name = "(MENU) AutoBot Config", group = "Menu")
 public class AutoBotConfig extends LinearOpMode {
 
     public void runOpMode()
     {
+        menu.setGamepad(gamepad1);
+        menu.setTelemetry(telemetry);
+
+        waitForStart();
+
         while (opModeIsActive())
         {
             menu.displayMenu();
+
+            numBeacons = (int) (Double.parseDouble(menu.getCurrentChoiceOf("Beacons")));
 
             switch (menu.getCurrentChoiceOf("Team")) {
                 case "RED":
@@ -30,14 +37,14 @@ public class AutoBotConfig extends LinearOpMode {
 
             switch (menu.getCurrentChoiceOf("Proximity")) {
                 case "NEAR":
-
+                    proximity = Proximity.NEAR;
                     break;
                 case "FAR":
-
+                    proximity = Proximity.FAR;
                     break;
             }
 
-            switch (menu.getCurrentChoiceOf("Shoot?")) {
+            switch (menu.getCurrentChoiceOf("Shoot")) {
                 case "YES":
 
                     break;
@@ -46,7 +53,7 @@ public class AutoBotConfig extends LinearOpMode {
                     break;
             }
 
-            switch (menu.getCurrentChoiceOf("Push de CapBall?")) {
+            switch (menu.getCurrentChoiceOf("Push CapBall")) {
                 case "YES":
 
                     break;
@@ -57,15 +64,6 @@ public class AutoBotConfig extends LinearOpMode {
 
             switch (menu.getCurrentChoiceOf("Park"))           //not really used?
             {
-                case "YES":
-
-                    break;
-                case "NO":
-
-                    break;
-            }
-
-            switch (menu.getCurrentChoiceOf("Delay Start?")) {
                 case "YES":
 
                     break;

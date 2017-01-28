@@ -37,6 +37,9 @@ public class Minion9533_Mech extends MMOpMode_Linear {
     /* Declare OpMode members. */
     //Hardware9533   robot           = new Hardware9533();              // Use a K9'shardware
 
+    public static double shootPower = 1;
+
+
     private static final boolean USE_GYRO = false;
     private static final int tickInterval = 20;
 
@@ -49,7 +52,7 @@ public class Minion9533_Mech extends MMOpMode_Linear {
     private HalDashboard dashboard;
 
 
-    private double shooterPower = 1;
+    //private double shooterPower = 1;
     static final double SHOOTER_POWER_INCREMENT  = 0.02;
     static int targetRPM = 2400;
     static final int targetIncrement = 25;
@@ -158,7 +161,7 @@ public class Minion9533_Mech extends MMOpMode_Linear {
 
             if(currentPower == 0) {
                 currentPower = 0.4;
-            } else if(currentPower < 1) {
+            } else if(currentPower < shootPower) {
                 currentPower += 0.005;
             }
 
