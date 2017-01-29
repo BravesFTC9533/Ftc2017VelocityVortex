@@ -282,7 +282,15 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
             return;
 
         }
+
+
         angles = anglesFromTarget(visibleBeacon);
+
+        if (angles == null)
+        {
+            return;
+        }
+
         angleToWall = (Math.toDegrees(angles.getX()) + 270) % 360;
         double angle = angleToWall - 90;
         logState("[SQUARE UP TO WALL] Angle: %f", angle);
@@ -445,10 +453,10 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         logState("[MOVE_FROM_START] move over in front of beacon");
         //pauseBetweenSteps();
         //move more
-        /*runtime.reset();
+        runtime.reset();
         Drive(0, -0.9, 0);
         do {
-        } while(opModeIsActive() && runtime.seconds() < 1.8);*/
+        } while(opModeIsActive() && runtime.seconds() < 0.6);
 
         Stop();
 
@@ -459,7 +467,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
             }
             else if (teamColor == TeamColor.BLUE)
             {
-                visibleBeacon = getBeacon("legos");
+                visibleBeacon = getBeacon("wheels");
             }
         }while (opModeIsActive() && runtime.seconds() < 5 && visibleBeacon == null);
 
@@ -865,15 +873,28 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
             Stop();
 
 
-            if (lastTarget.getName().equals("Left Button"))
-            {
+            double firstToSecond = 1.5;
 
+            if (teamColor == TeamColor.BLUE)
+            {
+                if (lastTarget.getName().equals("Right Button"))
+                {
+                    firstToSecond += 0.4;
+                }
             }
+            if (teamColor == TeamColor.RED)
+            {
+                if (lastTarget.getName().equals("Left Button"))
+                {
+                    firstToSecond += 0.4;
+                }
+            }
+
 
             runtime.reset();
             Drive(0, -0.9, 0);
             do {
-            } while(opModeIsActive() && runtime.seconds() < 1.5);
+            } while(opModeIsActive() && runtime.seconds() < firstToSecond);
 
             /*Drive(0.9, 0, 0);
             do {
@@ -904,7 +925,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
                 }
                 else if (teamColor == TeamColor.BLUE)
                 {
-                    visibleBeacon = getBeacon("wheels");
+                    visibleBeacon = getBeacon("legos");
                 }
 
             }while(opModeIsActive() && runtime.seconds() < 5 && visibleBeacon == null);
@@ -929,25 +950,51 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
             moveBackToShoot();
 
-            if (lastTarget.getName().equals("Left Button")) {
-                turn(-50);
-
-                prepShooter();
-
-                shootBalls();
-
-                //turn(100);
-            }
-            else if (lastTarget.getName().equals("Right Button"))
+            if (teamColor == TeamColor.BLUE)
             {
-                turn(-50);
+                if (lastTarget.getName().equals("Left Button")) {
+                    turn(-140);
 
-                prepShooter();
+                    prepShooter();
 
-                shootBalls();
+                    shootBalls();
 
-                //turn(95);
+                    //turn(100);
+                }
+                else if (lastTarget.getName().equals("Right Button"))
+                {
+                    turn(-50);
+
+                    prepShooter();
+
+                    shootBalls();
+
+                    //turn(95);
+                }
             }
+            else if (teamColor == TeamColor.RED)
+            {
+                if (lastTarget.getName().equals("Left Button")) {
+                    turn(-50);
+
+                    prepShooter();
+
+                    shootBalls();
+
+                    //turn(100);
+                }
+                else if (lastTarget.getName().equals("Right Button"))
+                {
+                    turn(-50);
+
+                    prepShooter();
+
+                    shootBalls();
+
+                    //turn(95);
+                }
+            }
+
 
 
 
@@ -960,7 +1007,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
             runtime.reset();
             Drive(-0.9, 0, 0);
             do {
-            } while(opModeIsActive() && runtime.seconds() < 1);
+            } while(opModeIsActive() && runtime.seconds() < 2);
             Stop();
         }
 
@@ -1012,6 +1059,12 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
     public MMTranslation anglesFromTarget(VuforiaTrackableDefaultListener image) {
         try {
+
+            if (image == null)
+            {
+                return null;
+            }
+
             float [] data = image.getRawPose().getData();
 
             float [] [] rotation = {{data[0], data[1]}, {data[4], data[5], data[6]}, {data[8], data[9], data[10]}};

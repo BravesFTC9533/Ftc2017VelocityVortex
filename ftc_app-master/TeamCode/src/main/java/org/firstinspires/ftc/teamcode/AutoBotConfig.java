@@ -24,7 +24,7 @@ public class AutoBotConfig extends LinearOpMode {
         {
             menu.displayMenu();
 
-            numBeacons = (int) (Double.parseDouble(menu.getCurrentChoiceOf("Beacons")));
+            //numBeacons = (int) (Double.parseDouble(menu.getCurrentChoiceOf("Beacons")));
 
             switch (menu.getCurrentChoiceOf("Team")) {
                 case "RED":
@@ -35,42 +35,42 @@ public class AutoBotConfig extends LinearOpMode {
                     break;
             }
 
-            switch (menu.getCurrentChoiceOf("Proximity")) {
-                case "NEAR":
-                    proximity = Proximity.NEAR;
-                    break;
-                case "FAR":
-                    proximity = Proximity.FAR;
-                    break;
-            }
 
-            switch (menu.getCurrentChoiceOf("Shoot")) {
-                case "YES":
-
-                    break;
-                case "NO":
-
-                    break;
-            }
-
-            switch (menu.getCurrentChoiceOf("Push CapBall")) {
-                case "YES":
-
-                    break;
-                case "NO":
-
-                    break;
-            }
-
-            switch (menu.getCurrentChoiceOf("Park"))           //not really used?
-            {
-                case "YES":
-
-                    break;
-                case "NO":
-
-                    break;
-            }
+//            switch (menu.getCurrentChoiceOf("Proximity")) {
+//                case "NEAR":
+//                    proximity = Proximity.NEAR;
+//                    break;
+//                case "FAR":
+//                    proximity = Proximity.FAR;
+//                    break;
+//            }
+//            switch (menu.getCurrentChoiceOf("Shoot")) {
+//                case "YES":
+//
+//                    break;
+//                case "NO":
+//
+//                    break;
+//            }
+//
+//            switch (menu.getCurrentChoiceOf("Push CapBall")) {
+//                case "YES":
+//
+//                    break;
+//                case "NO":
+//
+//                    break;
+//            }
+//
+//            switch (menu.getCurrentChoiceOf("Park"))           //not really used?
+//            {
+//                case "YES":
+//
+//                    break;
+//                case "NO":
+//
+//                    break;
+//            }
         }
     }
 

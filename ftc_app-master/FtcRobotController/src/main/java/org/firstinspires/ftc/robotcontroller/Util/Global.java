@@ -40,8 +40,8 @@ public class Global {
     public static void init()
     {
         menu.addOption("Team", new String[]{"RED", "BLUE"});
-        menu.addOption("Proximity", new String[]{"NEAR", "FAR"});
-        menu.addOption("Beacons", 2, 0, 1, 2);
+        //menu.addOption("Proximity", new String[]{"NEAR", "FAR"});
+        //menu.addOption("Beacons", 2, 0, 1, 2);
 //        menu.addOption("Initial Move Time", 30.0, 0.0, 0.1);
 //        menu.addOption("PushBall Time", 30.0, 0.0, 0.1);
 //        menu.addOption("Shoot", new String[]{"YES", "NO"});
