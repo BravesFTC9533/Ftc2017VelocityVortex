@@ -6,6 +6,7 @@ import com.qualcomm.hardware.hitechnic.HiTechnicNxtGyroSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
@@ -54,6 +55,8 @@ public class Hardware9533
     public DcMotor shooterMotor = null;
     public DcMotor liftMotor = null;
 
+    public Servo leftHold = null;
+    public Servo rightHold = null;
 
     public HiTechnicNxtGyroSensor gyro = null;
 
@@ -94,6 +97,9 @@ public class Hardware9533
         rightMotor  = hwMap.dcMotor.get("right");
         backLeftMotor = hwMap.dcMotor.get("backLeft");
         backRightMotor = hwMap.dcMotor.get("backRight");
+
+        leftHold = hwMap.servo.get("leftHold");
+        rightHold= hwMap.servo.get("rightHold");
 
 
         leftMotor.setDirection(DcMotorSimple.Direction.REVERSE);

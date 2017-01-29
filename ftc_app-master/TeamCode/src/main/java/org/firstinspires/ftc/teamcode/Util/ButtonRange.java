@@ -35,8 +35,8 @@ public class ButtonRange {
     }
     public static ButtonRange RightButton(){
         ButtonRange b = new ButtonRange();
-        b.min = 30;
-        b.max = 70;
+        b.min = 25;
+        b.max = 60;
         b.name = "Right Button";
         return  b;
     }

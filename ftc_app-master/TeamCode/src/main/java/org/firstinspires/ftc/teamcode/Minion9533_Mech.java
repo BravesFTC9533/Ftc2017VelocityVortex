@@ -153,6 +153,16 @@ public class Minion9533_Mech extends MMOpMode_Linear {
 
 
 
+    private void handleLiftDrop()
+    {
+        if (gamepad2.dpad_up && gamepad2.b)
+        {
+            robot.rightHold.setPosition(150);
+            robot.leftHold.setPosition(0);
+        }
+    }
+
+
     double currentPower = 0;
     private void handleShooter() {
 
@@ -259,6 +269,10 @@ public class Minion9533_Mech extends MMOpMode_Linear {
 
         rollingAverage = new RollingAvg(50);
         while (opModeIsActive()) {
+
+            handleLiftDrop();
+
+
 
             //robot.dashboard.displayPrintf(0, "Compass Says Z: " + Global.compass);
 

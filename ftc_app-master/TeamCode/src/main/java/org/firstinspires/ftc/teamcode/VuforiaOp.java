@@ -8,7 +8,9 @@ import android.widget.Button;
 
 import com.qualcomm.ftcrobotcontroller.R;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 import com.vuforia.HINT;
 import com.vuforia.Image;
 import com.vuforia.PIXEL_FORMAT;
@@ -41,8 +43,8 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
     public static int numBeacons = 2;
 
 
-    double timePerRotationClockwiseMS = 10.3 * 1000.0;
-    double timePerRotationCounterClockwiseMS = 12.3 * 1000.0;
+    double timePerRotationClockwiseMS = 4 * 1000.0;
+    double timePerRotationCounterClockwiseMS = 4.1 * 1000.0;
 
 
     static int targetRPM = 2400;
@@ -89,8 +91,9 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         parameters.vuforiaLicenseKey = "AeWceoD/////AAAAGWvk7AQGLUiTsyU4mSW7gfldjSCDQHX76lt9iPO5D8zaboG428rdS9WN0+AFpAlc/g4McLRAQIb5+ijFCPJJkLc+ynXYdhljdI2k9R4KL8t3MYk/tbmQ75st9VI7//2vNkp0JHV6oy4HXltxVFcEbtBYeTBJ9CFbMW+0cMNhLBPwHV7RYeNPZRgxf27J0oO8VoHOlj70OYdNYos5wvDM+ZbfWrOad/cpo4qbAw5iB95T5I9D2/KRf1HQHygtDl8/OtDFlOfqK6v2PTvnEbNnW1aW3vPglGXknX+rm0k8b0S7GFJkgl7SLq/HFNl0VEIVJGVQe9wt9PB6bJuxOMMxN4asy4rW5PRRBqasSM7OLl4W";
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
         this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
-        Vuforia.setFrameFormat(PIXEL_FORMAT.RGB565, true);
         vuforia.setFrameQueueCapacity(1);
+        Vuforia.setFrameFormat(PIXEL_FORMAT.RGB565, true);
+
 
         Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS, 4);
 
@@ -149,7 +152,15 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         try {
             Image img = getImageFromFrame(vuforia.getFrameQueue().take(), PIXEL_FORMAT.RGB565);
 
-            color = VortexUtils.waitForBeaconConfig(img, listener, vuforia.getCameraCalibration(), 1000);
+            runtime.reset();
+
+            do {
+                color = VortexUtils.getBeaconConfig(img, listener, vuforia.getCameraCalibration());
+            }
+            while (opModeIsActive() && runtime.seconds() < 5 && color == -1);
+
+
+
         } catch (InterruptedException e) {
         }
         catch(Throwable e) {
@@ -175,9 +186,9 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         else {
             robot.dashboard.displayPrintf(15, "Unable to determine config: %d", color);
             pauseBetweenSteps();
-            pauseBetweenSteps();
-            pauseBetweenSteps();
-            pauseBetweenSteps();
+            //pauseBetweenSteps();
+            //pauseBetweenSteps();
+            //pauseBetweenSteps();
 
         }
 
@@ -185,12 +196,12 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
     }
 
 
-
+    ButtonRange lastTarget = ButtonRange.Unknown();
 
     private ButtonRange getTargetButton(VuforiaTrackableDefaultListener visibleBeacon){
 
         //VuforiaTrackableDefaultListener visibleBeacon = getVisibleBeacon();
-        ButtonRange targetButton = null;
+        ButtonRange targetButton;
         int mycolor = getBeaconColor(visibleBeacon);
 
         if(mycolor == -1) {
@@ -219,6 +230,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
                 return ButtonRange.Unknown();
             }
+            lastTarget = targetButton;
             return  targetButton;
         }
 
@@ -238,7 +250,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
 
         robot.dashboard.displayPrintf(15, "Time for turn: %f", timeForTurn);
-        double rotationSpeed = 0.1;
+        double rotationSpeed = 0.3;
 
 
         if(angle < 0) {
@@ -275,7 +287,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         double angle = angleToWall - 90;
         logState("[SQUARE UP TO WALL] Angle: %f", angle);
 
-        if(Math.abs(angle) > 2) {
+        if(Math.abs(angle) > 4) {
             turn(angle);
         }
 
@@ -291,6 +303,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         MMTranslation currentLocation = null;
         double angleToWall;
 
+        angles = anglesFromTarget(visibleBeacon);
         runtime.reset();
         do {
             //visibleBeacon = getVisibleBeacon();
@@ -300,7 +313,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
                 return;
             }
             currentLocation = getCurrentLocation(visibleBeacon);
-            angles = anglesFromTarget(visibleBeacon);
+
             angleToWall = (Math.toDegrees(angles.getX()) + 270) % 360;
             moveToBeacon(currentLocation.getX(), currentLocation.getZ(), angleToWall - 90);
         } while(opModeIsActive() && currentLocation.getZ() < -300 && runtime.seconds() < 10);
@@ -333,7 +346,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
             double x = currentLocation.getX();
             double moveSpeed = 0.15;
 
-            if(Math.abs(x) >= 20) {
+            if(Math.abs(x) >= 20 && opModeIsActive()) {
                 if(x < 0) {
                     moveSpeed *= -1;
                 }
@@ -350,7 +363,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
 
         double offset = 0;
-        double moveSpeed = 0.125;
+        double moveSpeed = 0.25;
         if(targetButton.getName() == "Left Button") {
              offset = 1;
         } else {
@@ -360,7 +373,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         Drive(0, moveSpeed * offset, 0);
         runtime.reset();
 
-        while(opModeIsActive() && runtime.seconds() < 0.4) {}
+        while(opModeIsActive() && runtime.seconds() < 0.3) {}
 
         Stop();
     }
@@ -406,7 +419,11 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
             r = 0-r;
         }
 
-        Drive(h, v, r);
+        if (opModeIsActive())
+        {
+            Drive(h, v, r);
+        }
+
 
     }
 
@@ -416,29 +433,29 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         VuforiaTrackableDefaultListener visibleBeacon = null;
 
         runtime.reset();
-        Drive(-0.4, -0.4, 0);
+        Drive(-0.9, -0.9, 0);
         do {
             //visibleBeacon = getVisibleBeacon();
             logState("[MOVE_FROM_START] moving from start [%f]", runtime.seconds());
 
-        } while (opModeIsActive() && runtime.seconds() < 2.5);
+        } while (opModeIsActive() && runtime.seconds() < 2.9);
         Stop();
 
 
         logState("[MOVE_FROM_START] move over in front of beacon");
         //pauseBetweenSteps();
         //move more
-        runtime.reset();
-        Drive(0, -0.2, 0);
+        /*runtime.reset();
+        Drive(0, -0.9, 0);
         do {
-        } while(opModeIsActive() && runtime.seconds() < 3);
+        } while(opModeIsActive() && runtime.seconds() < 1.8);*/
 
         Stop();
 
         do {
             if (teamColor == TeamColor.RED)
             {
-                visibleBeacon = getBeacon("tools");//getVisibleBeacon();
+                visibleBeacon = getBeacon("gears"); //getVisibleBeacon();
             }
             else if (teamColor == TeamColor.BLUE)
             {
@@ -446,20 +463,20 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
             }
         }while (opModeIsActive() && runtime.seconds() < 5 && visibleBeacon == null);
 
-        pauseBetweenSteps();
+        //pauseBetweenSteps();
 
-        if(visibleBeacon != null){
+        /*if(visibleBeacon != null){
             //move back a bit?
             runtime.reset();
-            Drive(0, 0.1, 0);
-            while(opModeIsActive() && runtime.seconds() < 0.7) {
+            Drive(0, 0.2, 0);
+            while(opModeIsActive() && runtime.seconds() < 0.6) {
 
             }
 
             Stop();
-        }
+        }*/
 
-
+        Stop();
 
         pauseBetweenSteps();
 
@@ -468,15 +485,15 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
     private void moveBackToSecondBeacon()
     {
-        runtime.reset();
-        Drive(0.2, 0, 0);
+        /*runtime.reset();
+        Drive(0.4, 0, 0);
         do {
-        } while(opModeIsActive() && runtime.seconds() < 1.2);
+        } while(opModeIsActive() && runtime.seconds() < 1.1);*/
 
         runtime.reset();
-        Drive(0, 0.2, 0);
+        Drive(0, 0.9, 0);
         do {
-        } while(opModeIsActive() && runtime.seconds() < 2.6);
+        } while(opModeIsActive() && runtime.seconds() < 1.73);
 
         Stop();
 
@@ -485,7 +502,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
     private void runBeaconPressManuever (VuforiaTrackableDefaultListener visibleBeacon){
 
-        ButtonRange targetButton = ButtonRange.Unknown();
+        ButtonRange targetButton = null;//ButtonRange.Unknown();
 
 
         boolean fixAngle1 = true;
@@ -501,7 +518,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         //fix angle
         if(fixAngle1) {
             fixAngles(visibleBeacon);
-            fixAngles(visibleBeacon);
+            //fixAngles(visibleBeacon);
             Stop();
             pauseBetweenSteps();
         }
@@ -516,12 +533,15 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
         robot.dashboard.displayText(15, "Get beacon configuration");
 
-        targetButton = null;
+        //targetButton = null;
+
+        Stop();
+        waitFor(1);
 
         //get beacon configuration
         if(getBeaconConfiguration) {
             targetButton = getTargetButton(visibleBeacon);
-            if(targetButton == null){
+            if(targetButton == null || targetButton == ButtonRange.Unknown()){
                 robot.dashboard.displayText(10, "UNABLE TO FIND TEAM COLOR");
             }
             pauseBetweenSteps();
@@ -544,7 +564,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         if(fixAngle2) {
             fixAngles(visibleBeacon);
 
-            fixAngles(visibleBeacon);
+            //fixAngles(visibleBeacon);
             Stop();
             pauseBetweenSteps();
         }
@@ -573,22 +593,55 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
                 //move in
                 runtime.reset();
-                double moveSpeed = 0.2;
+                double moveSpeed = 0.4;
                 Drive(0 - moveSpeed, 0, 0);
                 do {
                     idle();
-                } while (opModeIsActive() && runtime.seconds() < 2);
+                } while (opModeIsActive() && runtime.seconds() < 0.7);
 
                 Stop();
                 pauseBetweenSteps();
 
 
+
+                int mycolor = getBeaconColor(visibleBeacon);
+
+                if (mycolor == -1)
+                {
+                    // move on
+                }
+                else if (mycolor == VortexUtils.BEACON_ALL_BLUE)
+                {
+                    if (teamColor == TeamColor.BLUE)
+                    {
+                        // do nothing
+                    }
+                    else if (teamColor == TeamColor.RED)
+                    {
+                        runBeaconPressManuever(visibleBeacon);
+                    }
+                }
+                else        // all red
+                {
+                    if (teamColor == TeamColor.BLUE)
+                    {
+                        runBeaconPressManuever(visibleBeacon);
+                    }
+                    else if (teamColor == TeamColor.RED)
+                    {
+                        //do nothing
+                    }
+                }
+
+
+
+
                 //move out
-                runtime.reset();
-                Drive(moveSpeed, 0, 0);
+                /*runtime.reset();
+                Drive(0.6, 0, 0);
                 do {
                     idle();
-                } while (opModeIsActive() && runtime.seconds() < beaconStepBack);
+                } while (opModeIsActive() && runtime.seconds() < 0.7);*/
                 Stop();
 
             }
@@ -598,6 +651,26 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
     private void shootBalls() {
 
+        double power = 0.4;
+        while(power < 1 && opModeIsActive()){
+
+            power += 0.005;
+            power = Range.clip(power, 0, 1);
+            robot.shooterMotor.setPower(power);
+
+            if(power == 1) {
+                break;
+            }
+            robot.dashboard.displayPrintf(2, "Waiting for shooter power: %2.5f", power);
+            waitFor(0.02);
+        }
+
+        if (!opModeIsActive())
+        {
+            return;
+        }
+
+        waitFor(0.1);
 
         robot.dashboard.displayText(3, "Turning on elevator");
         robot.ElevatorLiftBalls();
@@ -606,7 +679,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         robot.dashboard.displayText(4, "Stopping elevator. let wheels spin back up");
         robot.ElevatorStop();
         robot.dashboard.displayText(4, "Waiting for 1 second");
-        waitFor(4);
+        waitFor(1);
 
         robot.dashboard.displayText(4, "Turning on elevator");
         robot.ElevatorLiftBalls();
@@ -617,16 +690,47 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         robot.shooterMotor.setPower(0);
         robot.ElevatorStop();
 
+        robot.StopAllMotors();
 
     }
 
-    private void prepShooter() {
+    public void prepShooter () {
+        robot.shooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
+        robot.shooterMotor.setMaxSpeed( (2200 * 28) / 60);
 
     }
 
 
+    private void moveBackToShoot()
+    {
+        runtime.reset();
+        Drive(0.9, 0, 0);
+        do {
+        } while(opModeIsActive() && runtime.seconds() < .4);
+
+        Stop();
+    }
+
+    private void moveFwdToPark()
+    {
+        runtime.reset();
+        Drive(0, 0.9, 0);
+        do {
+        } while(opModeIsActive() && runtime.seconds() < 0.4);
+        Stop();
+    }
+
+
+    private void moveBackAndFixAngle( VuforiaTrackableDefaultListener visibleBeacon)
+    {
+
+
+        fixAngles(visibleBeacon);
+        fixAngles(visibleBeacon);
+    }
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -654,38 +758,49 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         robot.dashboard.displayText(0, "Autonomous mode ready, waiting for start...");
         waitForStart();
 
+//        runtime.reset();
+//        while(opModeIsActive() && runtime.seconds() < 6) {
+//
+//        }
+       // waitFor(3);
+
         robot.dashboard.displayText(3, "Color: " + teamColor);
 
-        if (proximity == Proximity.FAR)
+        if (opModeIsActive())
         {
-            if (numBeacons == 0)
+            if (proximity == Proximity.FAR)
             {
+                if (numBeacons == 0)
+                {
 
+                }
+                else if (numBeacons == 1)
+                {
+
+                }
+                else if (numBeacons == 2)
+                {
+
+                }
             }
-            else if (numBeacons == 1)
+            if (proximity == Proximity.NEAR)
             {
+                if (numBeacons == 0)
+                {
+                    runNearWithoutBeacons();
+                }
+                else if (numBeacons == 1)
+                {
 
-            }
-            else if (numBeacons == 2)
-            {
-
+                }
+                else if (numBeacons == 2)
+                {
+                    runNearWithBothBeacons();
+                }
             }
         }
-        if (proximity == Proximity.NEAR)
-        {
-            if (numBeacons == 0)
-            {
-                runNearWithoutBeacons();
-            }
-            else if (numBeacons == 1)
-            {
 
-            }
-            else if (numBeacons == 2)
-            {
-                runNearWithBothBeacons();
-            }
-        }
+
     }
 
     /**
@@ -710,7 +825,12 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
      *
      * (Park on ramp?)
      */
+
+
+
     private void runNearWithBothBeacons() throws InterruptedException {
+
+
 
 
         //VuforiaTrackableDefaultListener visibleBeacon = null;
@@ -720,7 +840,9 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         boolean runBeaconManuever = true;
 
         boolean press2ndbeacon = true;
-        boolean shootBalls = false;
+
+        boolean shootBalls = true;
+        boolean park = false;
 
 
 
@@ -732,19 +854,32 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
             Stop();
         }
 
-        if(runBeaconManuever) {
+        if(runBeaconManuever && farBeacon!= null) {
             runBeaconPressManuever(farBeacon);
+
+            //runtime.reset();
+
+            Drive(0.9, 0, 0);
+            do {
+            } while(opModeIsActive() && runtime.seconds() < .8);
             Stop();
-        }
 
-        if(shootBalls) {
 
-            //rotate bot around
-            turn(-90.0);
+            if (lastTarget.getName().equals("Left Button"))
+            {
 
-            shootBalls();
+            }
 
-            turn(90);
+            runtime.reset();
+            Drive(0, -0.9, 0);
+            do {
+            } while(opModeIsActive() && runtime.seconds() < 1.5);
+
+            /*Drive(0.9, 0, 0);
+            do {
+            } while(opModeIsActive() && runtime.seconds() < 0.7);*/
+
+            Stop();
         }
 
 
@@ -752,11 +887,11 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         //move to 2nd beacon
         if(press2ndbeacon) {
 
-            waitFor(10); /*******Pause to move beacon over to other side manually******/
+            //waitFor(10); /*******Pause to move beacon over to other side manually******/
 
-            moveBackToSecondBeacon();
+            //moveBackToSecondBeacon();
 
-            waitFor(1);
+            //waitFor(1);
 
             // gears then tools
 
@@ -765,7 +900,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
             do {
                 if (teamColor == TeamColor.RED)
                 {
-                    visibleBeacon = getBeacon("gears");//getVisibleBeacon();
+                    visibleBeacon = getBeacon("tools");//getVisibleBeacon();
                 }
                 else if (teamColor == TeamColor.BLUE)
                 {
@@ -774,9 +909,61 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
             }while(opModeIsActive() && runtime.seconds() < 5 && visibleBeacon == null);
 
+            //waitFor(1);
 
-            runBeaconPressManuever(visibleBeacon);
+
+            if (visibleBeacon != null)
+            {
+               // moveBackAndFixAngle(visibleBeacon);
+
+                runBeaconPressManuever(visibleBeacon);
+            }
+
+
+            pauseBetweenSteps();
+
         }
+
+
+        if(shootBalls) {
+
+            moveBackToShoot();
+
+            if (lastTarget.getName().equals("Left Button")) {
+                turn(-50);
+
+                prepShooter();
+
+                shootBalls();
+
+                //turn(100);
+            }
+            else if (lastTarget.getName().equals("Right Button"))
+            {
+                turn(-50);
+
+                prepShooter();
+
+                shootBalls();
+
+                //turn(95);
+            }
+
+
+
+            moveFwdToPark();
+        }
+
+
+        if (park)
+        {
+            runtime.reset();
+            Drive(-0.9, 0, 0);
+            do {
+            } while(opModeIsActive() && runtime.seconds() < 1);
+            Stop();
+        }
+
 
 
 
@@ -824,12 +1011,20 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
     }
 
     public MMTranslation anglesFromTarget(VuforiaTrackableDefaultListener image) {
-        float [] data = image.getRawPose().getData();
-        float [] [] rotation = {{data[0], data[1]}, {data[4], data[5], data[6]}, {data[8], data[9], data[10]}};
-        double thetaX = Math.atan2(rotation[2][1], rotation[2][2]);
-        double thetaY = Math.atan2(-rotation[2][0], Math.sqrt(rotation[2][1] * rotation[2][1] + rotation[2][2] * rotation[2][2]));
-        double thetaZ = Math.atan2(rotation[1][0], rotation[0][0]);
-        return new MMTranslation( new VectorF((float)thetaX, (float)thetaY, (float)thetaZ)) ;
+        try {
+            float [] data = image.getRawPose().getData();
+
+            float [] [] rotation = {{data[0], data[1]}, {data[4], data[5], data[6]}, {data[8], data[9], data[10]}};
+            double thetaX = Math.atan2(rotation[2][1], rotation[2][2]);
+            double thetaY = Math.atan2(-rotation[2][0], Math.sqrt(rotation[2][1] * rotation[2][1] + rotation[2][2] * rotation[2][2]));
+            double thetaZ = Math.atan2(rotation[1][0], rotation[0][0]);
+            return new MMTranslation( new VectorF((float)thetaX, (float)thetaY, (float)thetaZ)) ;
+        }
+        catch (NullPointerException e)
+        {
+            return null;
+        }
+
     }
 
 

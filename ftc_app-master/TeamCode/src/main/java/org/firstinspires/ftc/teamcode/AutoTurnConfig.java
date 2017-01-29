@@ -10,7 +10,7 @@ import static org.firstinspires.ftc.robotcontroller.Util.Global.*;
  * Created by Kerfuffle on 1/14/2017.
  */
 
-@TeleOp(name = "(MENU) AutoTurnConfig", group = "Menu")
+
 public class AutoTurnConfig extends LinearOpMode {
 
     public void runOpMode()

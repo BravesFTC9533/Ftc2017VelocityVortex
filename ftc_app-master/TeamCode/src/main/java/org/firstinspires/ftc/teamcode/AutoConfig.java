@@ -9,8 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import static org.firstinspires.ftc.robotcontroller.Util.Global.*;
 
-@TeleOp (name = "(MENU) AutoConfig", group = "Menu")
-@Disabled
+
 public class AutoConfig extends LinearOpMode {
 
 
