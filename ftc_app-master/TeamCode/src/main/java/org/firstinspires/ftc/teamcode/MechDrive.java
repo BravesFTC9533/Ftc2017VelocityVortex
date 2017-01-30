@@ -1,6 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.Gamepad;
+
 import org.firstinspires.ftc.teamcode.Util.Helpers;
+
+import hallib.HalDashboard;
 
 /**
  * Created by User on 01/14/2017.
@@ -10,6 +14,8 @@ public class MechDrive {
 
     Hardware9533 hardware;
     private static double MIN_POWER = 0.1;
+    private Gamepad gamepad;
+    private HalDashboard hal;
 
     public MechDrive(Hardware9533 hardware) {
         this.hardware = hardware;
@@ -21,10 +27,31 @@ public class MechDrive {
         Drive(h, v, r, true);
     }
 
+    public void setGamepad(Gamepad gamepad)
+    {
+        this.gamepad = gamepad;
+    }
+    public void setHalBoard(HalDashboard hal)
+    {
+        this.hal = hal;
+    }
+
     /***********************************************************************************************/
     public void Drive(double h, double v, double r, boolean scalePower)
     {
-
+        if (gamepad != null)
+        {
+            if (gamepad.left_trigger > 0.8)
+            {
+                MIN_POWER = 0;
+                hal.displayText(3, "Im triggered");
+            }
+            else
+            {
+                MIN_POWER = 0.1;
+                hal.displayText(3, "");
+            }
+        }
 
         if(Math.abs(h) < MIN_POWER) {
             h = 0;

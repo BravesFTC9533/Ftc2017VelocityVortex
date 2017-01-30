@@ -54,7 +54,7 @@ public class Minion9533_Mech extends MMOpMode_Linear {
 
     //private double shooterPower = 1;
     static final double SHOOTER_POWER_INCREMENT  = 0.02;
-    static int targetRPM = 2400;
+    static int targetRPM = 2200;
     static final int targetIncrement = 25;
 
     private boolean currentButtonState = false;
@@ -230,7 +230,8 @@ public class Minion9533_Mech extends MMOpMode_Linear {
 
         super.runOpMode();
 
-
+        mechDrive.setGamepad(gamepad1);
+        mechDrive.setHalBoard(robot.dashboard);
 
         if(USE_GYRO) {
             gyro = new MinionsGyro(robot, "gyro");

@@ -10,7 +10,7 @@ import static org.firstinspires.ftc.teamcode.VuforiaOp.*;
  * Created by Kerfuffle on 1/26/2017.
  */
 
-@TeleOp(name = "(MENU) AutoBot Config", group = "Menu")
+//@TeleOp(name = "(MENU) AutoBot Config", group = "Menu")
 public class AutoBotConfig extends LinearOpMode {
 
     public void runOpMode()

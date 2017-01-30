@@ -97,7 +97,7 @@ class NewTele implements Runnable
     }
 }
 
-@Autonomous(name="old Autobot", group="Pushbot")
+@Autonomous(name="******* (USE ME) old Autobot", group="Pushbot")
 public class Minion9533_AutoBot extends MMOpMode_Linear {
 
 
@@ -114,7 +114,7 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
     static final double     FORWARD_SPEED = 0.4;
     static final double     TURN_SPEED    = 0.6;
 
-    static int targetRPM = 2400;
+    static int targetRPM = 2100;
 
     static final double DEGREES_PER_SECOND = 108;
 
@@ -257,7 +257,7 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
        // MediaPlayer mediaPlayer = MediaPlayer.create(Global.context, com.qualcomm.ftcrobotcontroller.R.raw.lowrider);
         //mediaPlayer.start();
 
-        /*waitFor(0.1+delayStartTime);
+        waitFor(0.1+delayStartTime);
         robot.dashboard.displayText(0, "Moving Forward half block");
         goStraight("Initial Move", initialMoveTime);
         pauseBetweenSteps();
@@ -270,7 +270,7 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
             double power = 0.4;
             while(power < 1){
 
-                power += 0.005;
+                power += 0.003;
                 power = Range.clip(power, 0, 1);
                 robot.shooterMotor.setPower(power);
 
@@ -292,19 +292,23 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
         {
             goStraight("Push Ball", pushBallTime);
 
-            if (team == RED)
+            if (proximity == NEAR)
             {
-                turnLeft("Unstuck spin -red", 360, 1);
+                if (team == RED)
+                {
+                    turnLeft("Unstuck spin -red", 360, 1);
+                }
+                else if (team == BLUE)
+                {
+                    turnRight("Unstuck spin -blue", 360, 1);
+                }
             }
-            else if (team == BLUE)
-            {
-                turnRight("Unstuck spin -blue", 360, 1);
-            }
+
         }
 
 
 
-        mechDrive.Stop();*/
+        mechDrive.Stop();
 
     }
 

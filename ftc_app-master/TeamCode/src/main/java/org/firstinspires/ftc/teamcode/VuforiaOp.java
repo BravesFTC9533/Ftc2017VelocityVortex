@@ -35,7 +35,7 @@ import org.opencv.android.OpenCVLoader;
 
 import static org.firstinspires.ftc.teamcode.Util.VortexUtils.getImageFromFrame;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "NEW AUTOBOTS (USE ME FOR REAL)", group = "vuf")
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "DONT USE ME", group = "vuf")
 //@Autonomous(name="Concept: Vuforia Navigation", group =sensorManager = (SensorManager) Activity.getSystemService(SENSOR_SERVICE);"Concept")
 public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
@@ -551,6 +551,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
             targetButton = getTargetButton(visibleBeacon);
             if(targetButton == null || targetButton == ButtonRange.Unknown()){
                 robot.dashboard.displayText(10, "UNABLE TO FIND TEAM COLOR");
+                return;
             }
             pauseBetweenSteps();
         }
@@ -612,7 +613,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
 
 
-                int mycolor = getBeaconColor(visibleBeacon);
+                /*int mycolor = getBeaconColor(visibleBeacon);
 
                 if (mycolor == -1)
                 {
@@ -639,7 +640,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
                     {
                         //do nothing
                     }
-                }
+                }*/
 
 
 
@@ -867,6 +868,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
             //runtime.reset();
 
+            //back out from wall
             Drive(0.9, 0, 0);
             do {
             } while(opModeIsActive() && runtime.seconds() < .8);
