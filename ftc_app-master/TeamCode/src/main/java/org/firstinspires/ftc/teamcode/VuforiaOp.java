@@ -4,7 +4,9 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Looper;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.qualcomm.ftcrobotcontroller.R;
 
@@ -749,8 +751,6 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         robot.dashboard.displayText(0, "WAAAAAIITT!!!!!  for it to say ready");
 
         //teamColor = TeamColor.RED;
-
-
 
         if (!OpenCVLoader.initDebug()) {
             logState("Unable to initialize opencv");

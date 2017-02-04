@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Util;
 import android.graphics.Bitmap;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.vuforia.CameraCalibration;
 import com.vuforia.Image;
@@ -23,6 +24,14 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 
+//import java.awt.image.BufferedImage;
+//import java.awt.image.DataBufferByte;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 
 /**
@@ -84,6 +93,7 @@ public class VortexUtils {
         return config;
     }
 
+    public static int count = 0;
     public static int getBeaconConfig(Image img, VuforiaTrackableDefaultListener beacon, CameraCalibration camCal) {
 
         OpenGLMatrix pose = beacon.getRawPose();
@@ -127,6 +137,73 @@ public class VortexUtils {
 
             //filtering out non-beacon-blue colours in HSV colour space
             Imgproc.cvtColor(cropped, cropped, Imgproc.COLOR_RGB2HSV_FULL);
+
+
+
+
+            /*try
+            {
+                FileOutputStream out = new FileOutputStream(new File("/storage/emulated/0/", "poop.txt"));
+                out.write((new String("ppoooop")).getBytes());
+                out.close();
+            } catch (FileNotFoundException e){}
+            catch (IOException e){}
+*/
+
+
+
+            try
+            {
+                FileOutputStream fos = new FileOutputStream(new File("/storage/emulated/0/", "picher.png"));
+
+                //bm.compress(Bitmap.CompressFormat.PNG, 90, fos);
+                if (bm.compress(Bitmap.CompressFormat.PNG, 100, fos))
+                {
+
+                }
+                else
+                {
+
+                }
+                fos.close();
+            }catch (IOException e)
+            {}
+
+           /* Bitmap pic = OCVUtils.matToBitmap(cropped);
+            FileOutputStream out = null;
+            try
+            {
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                if (pic.compress(Bitmap.CompressFormat.PNG, 100, stream))
+                {
+                    Toast.makeText(Global.context, "DID UT", Toast.LENGTH_LONG);
+                }
+                else
+                {
+                    Toast.makeText(Global.context, "NAHBRAh", Toast.LENGTH_LONG);
+                }
+                byte[] byteArray = stream.toByteArray();
+
+                out = new FileOutputStream(new File("/storage/emulated/0/", "pic.png"));
+                out.write(byteArray);
+                out.flush();
+                out.close();
+                count++;
+            }
+            catch(FileNotFoundException e){}
+            catch (IOException e){}
+
+*/
+
+
+
+
+
+
+
+
+
+
 
             //get filtered mask
             //if pixel is within acceptable blue-beacon-colour range, it's changed to white.

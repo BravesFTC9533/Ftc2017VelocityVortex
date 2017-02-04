@@ -98,6 +98,9 @@ import org.firstinspires.ftc.robotcore.internal.AppUtil;
 import org.firstinspires.inspection.RcInspectionActivity;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -206,12 +209,26 @@ public class FtcRobotControllerActivity extends Activity implements SensorEventL
 
   private SensorManager sensorManager;
 
+  public void writePic()
+  {
+    try
+    {
+      FileOutputStream out = new FileOutputStream(new File("/storage/emulated/0/", "poop.txt"));
+      out.write((new String("ppoooop")).getBytes());
+      out.close();
+    } catch (FileNotFoundException e){}
+    catch (IOException e){}
+
+
+  }
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     RobotLog.writeLogcatToDisk();
     RobotLog.vv(TAG, "onCreate()");
 
+    //writePic();
 
     Global.init();   /****** Our stuff that needs to be initialized when the app starts*/
     Global.context = this;
