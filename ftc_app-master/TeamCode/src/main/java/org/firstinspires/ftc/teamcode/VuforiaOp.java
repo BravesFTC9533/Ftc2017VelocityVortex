@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Bitmap;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -13,9 +15,13 @@ import com.qualcomm.ftcrobotcontroller.R;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+import com.vuforia.CameraCalibration;
 import com.vuforia.HINT;
 import com.vuforia.Image;
+import com.vuforia.Matrix34F;
 import com.vuforia.PIXEL_FORMAT;
+import com.vuforia.Tool;
+import com.vuforia.Vec3F;
 import com.vuforia.Vuforia;
 
 import org.firstinspires.ftc.robotcontroller.Util.Global;
@@ -32,9 +38,23 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
  */
 
 import org.firstinspires.ftc.teamcode.Util.ButtonRange;
+import org.firstinspires.ftc.teamcode.Util.OCVUtils;
 import org.firstinspires.ftc.teamcode.Util.VortexUtils;
 import org.opencv.android.OpenCVLoader;
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
+import org.opencv.core.Mat;
+import org.opencv.core.Rect;
+import org.opencv.imgproc.Imgproc;
+import org.opencv.imgproc.Moments;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Arrays;
+
+import static org.firstinspires.ftc.teamcode.Util.VortexUtils.BEACON_BLUE_HIGH;
+import static org.firstinspires.ftc.teamcode.Util.VortexUtils.BEACON_BLUE_LOW;
 import static org.firstinspires.ftc.teamcode.Util.VortexUtils.getImageFromFrame;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "DONT USE ME", group = "vuf")
@@ -157,7 +177,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
             runtime.reset();
 
             do {
-                color = VortexUtils.getBeaconConfig(img, listener, vuforia.getCameraCalibration());
+                color = getBeaconConfig(img, listener, vuforia.getCameraCalibration()); //TODO
             }
             while (opModeIsActive() && runtime.seconds() < 5 && color == -1);
 
@@ -326,7 +346,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
             angleToWall = (Math.toDegrees(angles.getX()) + 270) % 360;
             moveToBeacon(currentLocation.getX(), currentLocation.getZ(), angleToWall - 90);
-        } while(opModeIsActive() && currentLocation.getZ() < -300 && runtime.seconds() < 10);
+        } while(opModeIsActive() && currentLocation.getZ() < -400 && runtime.seconds() < 10);
     }
 
     private void centerOnBeacon(VuforiaTrackableDefaultListener visibleBeacon) {
@@ -369,11 +389,44 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
     }
 
-    private void moveToCorrectButton(ButtonRange targetButton) {
+    private void moveToCorrectButton(ButtonRange targetButton, VuforiaTrackableDefaultListener visibleBeacon) {
 
 
-        double offset = 0;
-        double moveSpeed = 0.25;
+        MMTranslation currentLocation = null;
+        boolean done = false;
+        do {
+
+            //visibleBeacon = getVisibleBeacon();
+            if(visibleBeacon == null){
+                Stop();
+                logState("Unable to find beacon");
+                return;
+            }
+            currentLocation = getCurrentLocation(visibleBeacon);
+
+            if (currentLocation.getX() < targetButton.getMin())
+            {
+                Drive(0, -0.12, 0);
+                //move to the right
+            }
+            else if (currentLocation.getX() > targetButton.getMax())
+            {
+                //move left
+                Drive(0, 0.12, 0);
+            }
+            else
+            {
+                done = true;
+            }
+
+            //angleToWall = (Math.toDegrees(angles.getX()) + 270) % 360;
+
+        } while(opModeIsActive() && !done && runtime.seconds() < 5);
+        Stop();
+        pauseBetweenSteps();
+
+        /*double offset = 0;
+        double moveSpeed = 0.15;
         if(targetButton.getName() == "Left Button") {
              offset = 1;
         } else {
@@ -385,7 +438,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
         while(opModeIsActive() && runtime.seconds() < 0.3) {}
 
-        Stop();
+        Stop();*/
     }
 
 
@@ -395,21 +448,22 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
         // slow movement into beacon as we get closer
         if (z < -650) {
-            h = -0.4;
-        } else if (z < -600) {
             h = -0.35;
+        } else if (z < -600) {
+            h = -0.3;
         } else {
             h = -0.25;
         }
 
         //fix side to side movement
-        if(Math.abs(x) > 100) {
+
+        /*if(Math.abs(x) > 100) {
             v = 0.15;
         } else if(Math.abs(x) > 50) {
             v = 0.1;
         } else if(Math.abs(x) < 25){
             v = 0.0;
-        }
+        }*/
 
         if(x < 0) {
             v = 0-v;
@@ -448,7 +502,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
             //visibleBeacon = getVisibleBeacon();
             logState("[MOVE_FROM_START] moving from start [%f]", runtime.seconds());
 
-        } while (opModeIsActive() && runtime.seconds() < 2.9);
+        } while (opModeIsActive() && runtime.seconds() < 2);
         Stop();
 
 
@@ -458,7 +512,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         runtime.reset();
         Drive(0, -0.9, 0);
         do {
-        } while(opModeIsActive() && runtime.seconds() < 0.6);
+        } while(opModeIsActive() && runtime.seconds() < 1);
 
         Stop();
 
@@ -510,17 +564,22 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         pauseBetweenSteps();
     }
 
+    public void tempLog(String str)
+    {
+        robot.dashboard.displayPrintf(4, str);
+    }
+
     private void runBeaconPressManuever (VuforiaTrackableDefaultListener visibleBeacon){
 
         ButtonRange targetButton = null;//ButtonRange.Unknown();
 
 
         boolean fixAngle1 = true;
-        boolean centerOnBeacon = false;
-        boolean moveToBeacon = true;
+        boolean centerCorrectButton = true;
+        boolean moveToBeacon = false;
         boolean fixAngle2 = true;
         boolean getBeaconConfiguration = true;
-        boolean moveToButton = true;
+        boolean moveToButton = false;
         boolean pressButton = true;
 
 
@@ -534,12 +593,12 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         }
 
 
-        robot.dashboard.displayText(15, "Center on beacon");
+        /*robot.dashboard.displayText(15, "Center on beacon");
         if(centerOnBeacon) {
             centerOnBeacon(visibleBeacon);
             Stop();
             pauseBetweenSteps();
-        }
+        }*/
 
         robot.dashboard.displayText(15, "Get beacon configuration");
 
@@ -561,8 +620,47 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         robot.dashboard.displayText(13, "Beacon Config: " + targetButton.getName());
 
 
+        // Get in front of correct Button
+        if (centerCorrectButton)
+        {
+            MMTranslation currentLocation = null;
+            boolean done = false;
+            do {
 
-        robot.dashboard.displayText(15, "Move towards beacon");
+                //visibleBeacon = getVisibleBeacon();
+                if(visibleBeacon == null){
+                    Stop();
+                    logState("Unable to find beacon");
+                    return;
+                }
+                currentLocation = getCurrentLocation(visibleBeacon);
+
+                if (currentLocation.getX() < targetButton.getMin())
+                {
+                    Drive(0, -0.12, 0);
+                    //move to the right
+                }
+                else if (currentLocation.getX() > targetButton.getMax())
+                {
+                    //move left
+                    Drive(0, 0.12, 0);
+                }
+                else
+                {
+                    done = true;
+                }
+
+                //angleToWall = (Math.toDegrees(angles.getX()) + 270) % 360;
+
+            } while(opModeIsActive() && !done && runtime.seconds() < 10);
+            Stop();
+            pauseBetweenSteps();
+        }
+
+
+
+
+       robot.dashboard.displayText(15, "Move towards beacon");
         //move towards beacon
         if(moveToBeacon) {
             moveToBeacon(visibleBeacon);
@@ -591,7 +689,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
             robot.dashboard.displayText(15, "Move to correct button");
             //move to correct side
             if (moveToButton) {
-                moveToCorrectButton(targetButton);
+                moveToCorrectButton(targetButton, visibleBeacon);
                 Stop();
                 pauseBetweenSteps();
 
@@ -607,8 +705,8 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
                 double moveSpeed = 0.4;
                 Drive(0 - moveSpeed, 0, 0);
                 do {
-                    idle();
-                } while (opModeIsActive() && runtime.seconds() < 0.7);
+                    //idle();
+                } while (opModeIsActive() && runtime.seconds() < 2);
 
                 Stop();
                 pauseBetweenSteps();
@@ -748,7 +846,9 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
         super.runOpMode();
 
-        robot.dashboard.displayText(0, "WAAAAAIITT!!!!!  for it to say ready");
+        robot.dashboard.displayText(0, "*****WAAAAAIITT!!!!!  for it to say ready");
+        //robot.dashboard.displayText(1, "WAAAAAIITT!!!!!  for it to say ready");
+        //robot.dashboard.displayText(2, "WAAAAAIITT!!!!!  for it to say ready");
 
         //teamColor = TeamColor.RED;
 
@@ -764,7 +864,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
         initVuforia();
 
-        robot.dashboard.displayText(0, "Autonomous mode ready, waiting for start...");
+        robot.dashboard.displayText(0, "Autonomous mode READY, waiting for start...");
         waitForStart();
 
 //        runtime.reset();
@@ -774,6 +874,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
        // waitFor(3);
 
         robot.dashboard.displayText(3, "Color: " + teamColor);
+
 
         if (opModeIsActive())
         {
@@ -848,9 +949,9 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         boolean moveOffWall = true;
         boolean runBeaconManuever = true;
 
-        boolean press2ndbeacon = true;
+        boolean press2ndbeacon = false;
 
-        boolean shootBalls = true;
+        boolean shootBalls = false;
         boolean park = false;
 
 
@@ -873,6 +974,15 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
             do {
             } while(opModeIsActive() && runtime.seconds() < .8);
             Stop();
+
+
+
+        }
+
+
+
+        //move to 2nd beacon
+        if(press2ndbeacon) {
 
 
             double firstToSecond = 1.5;
@@ -903,12 +1013,6 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
             } while(opModeIsActive() && runtime.seconds() < 0.7);*/
 
             Stop();
-        }
-
-
-
-        //move to 2nd beacon
-        if(press2ndbeacon) {
 
             //waitFor(10); /*******Pause to move beacon over to other side manually******/
 
@@ -1125,6 +1229,167 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
     }
 
 
+
+
+    public int getBeaconConfig(Image img, VuforiaTrackableDefaultListener beacon, CameraCalibration camCal) {
+
+        OpenGLMatrix pose = beacon.getRawPose();
+
+        if (pose != null && img != null && img.getPixels() != null) {
+
+            Matrix34F rawPose = new Matrix34F();
+            float[] poseData = Arrays.copyOfRange(pose.transposed().getData(), 0, 12);
+
+            rawPose.setData(poseData);
+
+            //calculating pixel coordinates of beacon corners
+            float[][] corners = new float[4][2];
+
+            corners[0] = Tool.projectPoint(camCal, rawPose, new Vec3F(-127, 276, 0)).getData(); //upper left of beacon
+            corners[1] = Tool.projectPoint(camCal, rawPose, new Vec3F(127, 276, 0)).getData(); //upper right of beacon
+            corners[2] = Tool.projectPoint(camCal, rawPose, new Vec3F(127, 92, 0)).getData(); //lower right of beacon
+            corners[3] = Tool.projectPoint(camCal, rawPose, new Vec3F(-127, 92, 0)).getData(); //lower left of beacon
+
+            //getting camera image...
+            Bitmap bm = Bitmap.createBitmap(img.getWidth(), img.getHeight(), Bitmap.Config.RGB_565);
+            bm.copyPixelsFromBuffer(img.getPixels());
+
+            //turning the corner pixel coordinates into a proper bounding box
+            Mat crop = OCVUtils.bitmapToMat(bm, CvType.CV_8UC3);
+            float x = Math.min(Math.min(corners[1][0], corners[3][0]), Math.min(corners[0][0], corners[2][0]));
+            float y = Math.min(Math.min(corners[1][1], corners[3][1]), Math.min(corners[0][1], corners[2][1]));
+            float width = Math.max(Math.abs(corners[0][0] - corners[2][0]), Math.abs(corners[1][0] - corners[3][0]));
+            float height = Math.max(Math.abs(corners[0][1] - corners[2][1]), Math.abs(corners[1][1] - corners[3][1]));
+
+
+            //make sure our bounding box doesn't go outside of the image
+            //OpenCV doesn't like that...
+            x = Math.max(x, 0);
+            y = Math.max(y, 0);
+            width = (x + width > crop.cols())? crop.cols() - x : width;
+            height = (y + height > crop.rows())? crop.rows() - y : height;
+
+            //cropping bounding box out of camera image
+            final Mat cropped = new Mat(crop, new Rect((int) x, (int) y, (int) width, (int) height));
+
+            Bitmap pic = OCVUtils.matToBitmap(cropped);
+            //filtering out non-beacon-blue colours in HSV colour space
+            Imgproc.cvtColor(cropped, cropped, Imgproc.COLOR_RGB2HSV_FULL);
+
+
+
+
+            /*try
+            {
+                FileOutputStream out = new FileOutputStream(new File("/storage/emulated/0/", "poop.txt"));
+                out.write((new String("ppoooop")).getBytes());
+                out.close();
+            } catch (FileNotFoundException e){}
+            catch (IOException e){}
+*/
+
+            try
+            {
+                FileOutputStream fos = new FileOutputStream(new File("/storage/emulated/0/", "cropped.png"));
+
+                //bm.compress(Bitmap.CompressFormat.PNG, 90, fos);
+                if (pic.compress(Bitmap.CompressFormat.PNG, 100, fos))
+                {
+                }
+                else
+                {
+
+                }
+                fos.close();
+            }catch (IOException e)
+            {}
+
+            try
+            {
+                FileOutputStream fos = new FileOutputStream(new File("/storage/emulated/0/", "non.png"));
+
+                //bm.compress(Bitmap.CompressFormat.PNG, 90, fos);
+                if (bm.compress(Bitmap.CompressFormat.PNG, 100, fos))
+                {
+                }
+                else
+                {
+                    tempLog("didgfeds");
+                }
+                fos.close();
+            }catch (IOException e)
+            {}
+
+
+           /* Bitmap pic = OCVUtils.matToBitmap(cropped);
+            FileOutputStream out = null;
+            try
+            {
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+                if (pic.compress(Bitmap.CompressFormat.PNG, 100, stream))
+                {
+                    Toast.makeText(Global.context, "DID UT", Toast.LENGTH_LONG);
+                }
+                else
+                {
+                    Toast.makeText(Global.context, "NAHBRAh", Toast.LENGTH_LONG);
+                }
+                byte[] byteArray = stream.toByteArray();
+
+                out = new FileOutputStream(new File("/storage/emulated/0/", "pic.png"));
+                out.write(byteArray);
+                out.flush();
+                out.close();
+                count++;
+            }
+            catch(FileNotFoundException e){}
+            catch (IOException e){}
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+            //get filtered mask
+            //if pixel is within acceptable blue-beacon-colour range, it's changed to white.
+            //Otherwise, it's turned to black
+            Mat mask = new Mat();
+
+            Core.inRange(cropped, BEACON_BLUE_LOW, BEACON_BLUE_HIGH, mask);
+            Moments mmnts = Imgproc.moments(mask, true);
+
+            //calculating centroid of the resulting binary mask via image moments
+            Log.i("CentroidX", "" + ((mmnts.get_m10() / mmnts.get_m00())));
+            Log.i("CentroidY", "" + ((mmnts.get_m01() / mmnts.get_m00())));
+
+            //checking if blue either takes up the majority of the image (which means the beacon is all blue)
+            //or if there's barely any blue in the image (which means the beacon is all red or off)
+//            if (mmnts.get_m00() / mask.total() > 0.8) {
+//                return VortexUtils.BEACON_ALL_BLUE;
+//            } else if (mmnts.get_m00() / mask.total() < 0.1) {
+//                return VortexUtils.BEACON_NO_BLUE;
+//            }//elseif
+
+            //Note: for some reason, we end up with a image that is rotated 90 degrees
+            //if centroid is in the bottom half of the image, the blue beacon is on the left
+            //if the centroid is in the top half, the blue beacon is on the right
+            if ((mmnts.get_m01() / mmnts.get_m00()) < cropped.rows() / 2) {
+                return VortexUtils.BEACON_RED_BLUE;
+            } else {
+                return VortexUtils.BEACON_BLUE_RED;
+            }//else
+        }//if
+
+        return VortexUtils.NOT_VISIBLE;
+    }//getBeaconConfig
 
 
 }

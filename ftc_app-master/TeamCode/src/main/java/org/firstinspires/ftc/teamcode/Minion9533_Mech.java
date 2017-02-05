@@ -169,16 +169,16 @@ public class Minion9533_Mech extends MMOpMode_Linear {
         //currentPower = robot.shooterMotor.getPower();
         if(gamepad2.a) {
 
-            if(currentPower == 0) {
+           /* if(currentPower == 0) {
                 currentPower = 0.4;
             } else if(currentPower < shootPower) {
                 currentPower += 0.005;
             }
 
-            currentPower = Range.clip(currentPower, 0, 1);
+            currentPower = Range.clip(currentPower, 0, 1);*/
 
 
-            robot.shooterMotor.setPower(currentPower);
+            robot.shooterMotor.setPower(-1);
 
             //robot.shooterMotor.setPower(shooterPower);
             //robot.shooterRight.setPower(shooterPower);

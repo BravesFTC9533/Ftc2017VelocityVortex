@@ -34,6 +34,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
+import hallib.HalDashboard;
+
 /**
  * Created by FIXIT on 16-11-20.
  */
@@ -91,6 +93,13 @@ public class VortexUtils {
         }//while
 
         return config;
+    }
+
+    public static HalDashboard dashboard = null;
+
+    public void setDashboard(HalDashboard dashboard)
+    {
+        this.dashboard = dashboard;
     }
 
     public static int count = 0;
@@ -159,11 +168,11 @@ public class VortexUtils {
                 //bm.compress(Bitmap.CompressFormat.PNG, 90, fos);
                 if (bm.compress(Bitmap.CompressFormat.PNG, 100, fos))
                 {
-
+                    dashboard.displayText(4, "did it");
                 }
                 else
                 {
-
+                    dashboard.displayText(4, "nope");
                 }
                 fos.close();
             }catch (IOException e)
