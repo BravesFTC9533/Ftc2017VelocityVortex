@@ -346,7 +346,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
             angleToWall = (Math.toDegrees(angles.getX()) + 270) % 360;
             moveToBeacon(currentLocation.getX(), currentLocation.getZ(), angleToWall - 90);
-        } while(opModeIsActive() && currentLocation.getZ() < -400 && runtime.seconds() < 10);
+        } while(opModeIsActive() && currentLocation.getZ() < -500 && runtime.seconds() < 10);
     }
 
     private void centerOnBeacon(VuforiaTrackableDefaultListener visibleBeacon) {
@@ -457,13 +457,13 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
         //fix side to side movement
 
-        /*if(Math.abs(x) > 100) {
+        if(Math.abs(x) > 100) {
             v = 0.15;
         } else if(Math.abs(x) > 50) {
             v = 0.1;
         } else if(Math.abs(x) < 25){
             v = 0.0;
-        }*/
+        }
 
         if(x < 0) {
             v = 0-v;
@@ -512,7 +512,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         runtime.reset();
         Drive(0, -0.9, 0);
         do {
-        } while(opModeIsActive() && runtime.seconds() < 1);
+        } while(opModeIsActive() && runtime.seconds() < 0.8);
 
         Stop();
 
@@ -576,8 +576,10 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
         boolean fixAngle1 = true;
         boolean centerCorrectButton = true;
-        boolean moveToBeacon = false;
+        boolean moveToBeacon = true;
         boolean fixAngle2 = true;
+        boolean fixAngle3 = true;
+        boolean fixAngle4 = true;
         boolean getBeaconConfiguration = true;
         boolean moveToButton = false;
         boolean pressButton = true;
@@ -620,6 +622,27 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         robot.dashboard.displayText(13, "Beacon Config: " + targetButton.getName());
 
 
+
+
+
+
+
+       robot.dashboard.displayText(15, "Move towards beacon");
+        //move towards beacon
+        if(moveToBeacon) {
+            moveToBeacon(visibleBeacon);
+            Stop();
+            pauseBetweenSteps();
+        }
+
+        if(fixAngle2) {
+            fixAngles(visibleBeacon);
+
+            //fixAngles(visibleBeacon);
+            Stop();
+            pauseBetweenSteps();
+        }
+
         // Get in front of correct Button
         if (centerCorrectButton)
         {
@@ -637,13 +660,13 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
                 if (currentLocation.getX() < targetButton.getMin())
                 {
-                    Drive(0, -0.12, 0);
+                    Drive(0, -0.1, 0);
                     //move to the right
                 }
                 else if (currentLocation.getX() > targetButton.getMax())
                 {
                     //move left
-                    Drive(0, 0.12, 0);
+                    Drive(0, 0.1, 0);
                 }
                 else
                 {
@@ -657,20 +680,9 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
             pauseBetweenSteps();
         }
 
-
-
-
-       robot.dashboard.displayText(15, "Move towards beacon");
-        //move towards beacon
-        if(moveToBeacon) {
-            moveToBeacon(visibleBeacon);
-            Stop();
-            pauseBetweenSteps();
-        }
-
         robot.dashboard.displayText(15, "Fix angle");
         //fix angle
-        if(fixAngle2) {
+        if(fixAngle3) {
             fixAngles(visibleBeacon);
 
             //fixAngles(visibleBeacon);
@@ -706,53 +718,31 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
                 Drive(0 - moveSpeed, 0, 0);
                 do {
                     //idle();
-                } while (opModeIsActive() && runtime.seconds() < 2);
+                } while (opModeIsActive() && runtime.seconds() < 1.5);
 
                 Stop();
+
+
                 pauseBetweenSteps();
 
 
-
-                /*int mycolor = getBeaconColor(visibleBeacon);
-
-                if (mycolor == -1)
-                {
-                    // move on
-                }
-                else if (mycolor == VortexUtils.BEACON_ALL_BLUE)
-                {
-                    if (teamColor == TeamColor.BLUE)
-                    {
-                        // do nothing
-                    }
-                    else if (teamColor == TeamColor.RED)
-                    {
-                        runBeaconPressManuever(visibleBeacon);
-                    }
-                }
-                else        // all red
-                {
-                    if (teamColor == TeamColor.BLUE)
-                    {
-                        runBeaconPressManuever(visibleBeacon);
-                    }
-                    else if (teamColor == TeamColor.RED)
-                    {
-                        //do nothing
-                    }
-                }*/
-
-
-
-
                 //move out
-                /*runtime.reset();
-                Drive(0.6, 0, 0);
+                runtime.reset();
+                Drive(0.8, 0, 0);
                 do {
-                    idle();
-                } while (opModeIsActive() && runtime.seconds() < 0.7);*/
+                } while (opModeIsActive() && runtime.seconds() < 0.7);
                 Stop();
 
+                pauseBetweenSteps();
+
+
+                if(fixAngle4) {
+                    fixAngles(visibleBeacon);
+
+                    //fixAngles(visibleBeacon);
+                    Stop();
+                    pauseBetweenSteps();
+                }
             }
         }
     }
@@ -878,36 +868,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
         if (opModeIsActive())
         {
-            if (proximity == Proximity.FAR)
-            {
-                if (numBeacons == 0)
-                {
-
-                }
-                else if (numBeacons == 1)
-                {
-
-                }
-                else if (numBeacons == 2)
-                {
-
-                }
-            }
-            if (proximity == Proximity.NEAR)
-            {
-                if (numBeacons == 0)
-                {
-                    runNearWithoutBeacons();
-                }
-                else if (numBeacons == 1)
-                {
-
-                }
-                else if (numBeacons == 2)
-                {
-                    runNearWithBothBeacons();
-                }
-            }
+            runNearWithBothBeacons();
         }
 
 
@@ -949,9 +910,9 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         boolean moveOffWall = true;
         boolean runBeaconManuever = true;
 
-        boolean press2ndbeacon = false;
+        boolean press2ndbeacon = true;
 
-        boolean shootBalls = false;
+        boolean shootBalls = true;
         boolean park = false;
 
 
@@ -969,11 +930,6 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
             //runtime.reset();
 
-            //back out from wall
-            Drive(0.9, 0, 0);
-            do {
-            } while(opModeIsActive() && runtime.seconds() < .8);
-            Stop();
 
 
 
@@ -985,7 +941,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         if(press2ndbeacon) {
 
 
-            double firstToSecond = 1.5;
+            double firstToSecond = 1.2;
 
             if (teamColor == TeamColor.BLUE)
             {
@@ -1052,59 +1008,17 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         }
 
 
-        if(shootBalls) {
+        if (shootBalls)
+        {
 
-            moveBackToShoot();
+            runtime.reset();
+            robot.shooterMotor.setPower(-1);
+            do{}
+            while (opModeIsActive() && runtime.seconds() < 1);
 
-            if (teamColor == TeamColor.BLUE)
-            {
-                if (lastTarget.getName().equals("Left Button")) {
-                    turn(-140);
+            Stop();
 
-                    prepShooter();
-
-                    shootBalls();
-
-                    //turn(100);
-                }
-                else if (lastTarget.getName().equals("Right Button"))
-                {
-                    turn(-50);
-
-                    prepShooter();
-
-                    shootBalls();
-
-                    //turn(95);
-                }
-            }
-            else if (teamColor == TeamColor.RED)
-            {
-                if (lastTarget.getName().equals("Left Button")) {
-                    turn(-50);
-
-                    prepShooter();
-
-                    shootBalls();
-
-                    //turn(100);
-                }
-                else if (lastTarget.getName().equals("Right Button"))
-                {
-                    turn(-50);
-
-                    prepShooter();
-
-                    shootBalls();
-
-                    //turn(95);
-                }
-            }
-
-
-
-
-            moveFwdToPark();
+            pauseBetweenSteps();
         }
 
 
@@ -1288,7 +1202,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
             catch (IOException e){}
 */
 
-            try
+            /*try
             {
                 FileOutputStream fos = new FileOutputStream(new File("/storage/emulated/0/", "cropped.png"));
 
@@ -1319,35 +1233,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
                 fos.close();
             }catch (IOException e)
             {}
-
-
-           /* Bitmap pic = OCVUtils.matToBitmap(cropped);
-            FileOutputStream out = null;
-            try
-            {
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-
-                if (pic.compress(Bitmap.CompressFormat.PNG, 100, stream))
-                {
-                    Toast.makeText(Global.context, "DID UT", Toast.LENGTH_LONG);
-                }
-                else
-                {
-                    Toast.makeText(Global.context, "NAHBRAh", Toast.LENGTH_LONG);
-                }
-                byte[] byteArray = stream.toByteArray();
-
-                out = new FileOutputStream(new File("/storage/emulated/0/", "pic.png"));
-                out.write(byteArray);
-                out.flush();
-                out.close();
-                count++;
-            }
-            catch(FileNotFoundException e){}
-            catch (IOException e){}
-
 */
-
 
 
 

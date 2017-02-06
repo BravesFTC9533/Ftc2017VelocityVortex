@@ -27,16 +27,16 @@ public class ButtonRange {
 
     public static ButtonRange LeftButton() {
         ButtonRange b = new ButtonRange();
-        b.min = -100;
-        b.max = -60;
+        b.min = -105 -20;
+        b.max = -70 -20;
         b.name = "Left Button";
         return  b;
 
     }
     public static ButtonRange RightButton(){
         ButtonRange b = new ButtonRange();
-        b.min = 25;
-        b.max = 60;
+        b.min = 25 -20;
+        b.max = 60 -20;
         b.name = "Right Button";
         return  b;
     }
