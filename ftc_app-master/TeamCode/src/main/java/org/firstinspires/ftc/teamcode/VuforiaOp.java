@@ -912,7 +912,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
         boolean press2ndbeacon = true;
 
-        boolean shootBalls = true;
+        boolean shootBalls = false;
         boolean park = false;
 
 
