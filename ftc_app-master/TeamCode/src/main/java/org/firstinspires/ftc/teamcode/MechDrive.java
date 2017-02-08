@@ -13,7 +13,7 @@ import hallib.HalDashboard;
 public class MechDrive {
 
     Hardware9533 hardware;
-    private static double MIN_POWER = 0.1;
+    private static double MIN_POWER = 0.0;
     private Gamepad gamepad;
     private HalDashboard hal;
 

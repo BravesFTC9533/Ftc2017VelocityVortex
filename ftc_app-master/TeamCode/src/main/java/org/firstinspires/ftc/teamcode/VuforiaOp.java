@@ -53,6 +53,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
+import ftclib.FtcAndroidAccel;
+import trclib.TrcAccelerometer;
+import trclib.TrcSensor;
+
 import static org.firstinspires.ftc.teamcode.Util.VortexUtils.BEACON_BLUE_HIGH;
 import static org.firstinspires.ftc.teamcode.Util.VortexUtils.BEACON_BLUE_LOW;
 import static org.firstinspires.ftc.teamcode.Util.VortexUtils.getImageFromFrame;
@@ -700,12 +704,12 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
             logState("[MOVE TO CORRECT BUTTON] doing the do");
             robot.dashboard.displayText(15, "Move to correct button");
             //move to correct side
-            if (moveToButton) {
-                moveToCorrectButton(targetButton, visibleBeacon);
-                Stop();
-                pauseBetweenSteps();
-
-            }
+//            if (moveToButton) {
+//                moveToCorrectButton(targetButton, visibleBeacon);
+//                Stop();
+//                pauseBetweenSteps();
+//
+//            }
 
 
             robot.dashboard.displayText(15, "Move in to press button");
@@ -715,10 +719,10 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
                 //move in
                 runtime.reset();
                 double moveSpeed = 0.4;
-                Drive(0 - moveSpeed, 0, 0);
+                Drive(0 - moveSpeed, 0.05, 0);
                 do {
                     //idle();
-                } while (opModeIsActive() && runtime.seconds() < 1.5);
+                } while (opModeIsActive() && runtime.seconds() < 1.3);
 
                 Stop();
 
@@ -831,16 +835,16 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         fixAngles(visibleBeacon);
     }
 
+    private FtcAndroidAccel accelerometer;
     @Override
     public void runOpMode() throws InterruptedException {
 
         super.runOpMode();
 
         robot.dashboard.displayText(0, "*****WAAAAAIITT!!!!!  for it to say ready");
-        //robot.dashboard.displayText(1, "WAAAAAIITT!!!!!  for it to say ready");
-        //robot.dashboard.displayText(2, "WAAAAAIITT!!!!!  for it to say ready");
 
-        //teamColor = TeamColor.RED;
+        accelerometer = new FtcAndroidAccel("Accelerometer", null);
+        accelerometer.setEnabled(true);
 
         if (!OpenCVLoader.initDebug()) {
             logState("Unable to initialize opencv");
@@ -856,47 +860,25 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
         robot.dashboard.displayText(0, "Autonomous mode READY, waiting for start...");
         waitForStart();
+        /************************************************************************************************************************/
 
-//        runtime.reset();
-//        while(opModeIsActive() && runtime.seconds() < 6) {
-//
-//        }
-       // waitFor(3);
+        /*while (opModeIsActive())
+        {
+            TrcSensor.SensorData<Double> dataX = accelerometer.getXAcceleration();
+            TrcSensor.SensorData<Double> dataY = accelerometer.getYAcceleration();
+            TrcSensor.SensorData<Double> dataZ = accelerometer.getZAcceleration();
+            robot.dashboard.displayText(5, String.valueOf(dataX.value));
+            robot.dashboard.displayText(6, String.valueOf(dataY.value));
+            robot.dashboard.displayText(7, String.valueOf(dataZ.value));
+        }*/
 
         robot.dashboard.displayText(3, "Color: " + teamColor);
 
 
-        if (opModeIsActive())
-        {
+        if (opModeIsActive()) {
             runNearWithBothBeacons();
         }
-
-
     }
-
-    /**
-     * Goes for:
-     *
-     * Shoots
-     * Push Capball
-     * park in center
-     *
-     */
-    private void runNearWithoutBeacons()
-    {
-
-    }
-
-    /**
-     * Goes for:
-     *
-     * Tools Beacon
-     * Gears Beacon
-     * Turn and Shoot
-     *
-     * (Park on ramp?)
-     */
-
 
 
     private void runNearWithBothBeacons() throws InterruptedException {
@@ -941,7 +923,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         if(press2ndbeacon) {
 
 
-            double firstToSecond = 1.2;
+            double firstToSecond = 1.4;
 
             if (teamColor == TeamColor.BLUE)
             {

@@ -162,7 +162,7 @@ public class TestMenuOp extends MMOpMode_Linear implements FtcMenu.MenuButtons {
     allianceMenu.addChoice("Red", Alliance.RED_ALLIANCE, wallDistanceMenu);
     allianceMenu.addChoice("Blue", Alliance.BLUE_ALLIANCE, wallDistanceMenu);
 
-    FtcMenu.walkMenuTree(allianceMenu);
+    //.walkMenuTree(allianceMenu);
 
     test = (Test)testMenu.getCurrentChoiceObject();
     driveTime = driveTimeMenu.getCurrentValue();

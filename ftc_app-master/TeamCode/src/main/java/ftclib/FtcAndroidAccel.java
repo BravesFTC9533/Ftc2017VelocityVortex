@@ -57,8 +57,7 @@ public class FtcAndroidAccel extends TrcAccelerometer
     public FtcAndroidAccel(String instanceName, TrcFilter[] filters)
     {
         super(instanceName, 3,
-              ACCEL_HAS_X_AXIS | ACCEL_HAS_Y_AXIS | ACCEL_HAS_Z_AXIS | ACCEL_INTEGRATE | ACCEL_DOUBLE_INTEGRATE,
-              filters);
+              ACCEL_HAS_X_AXIS | ACCEL_HAS_Y_AXIS | ACCEL_HAS_Z_AXIS, filters);// | ACCEL_INTEGRATE | ACCEL_DOUBLE_INTEGRATE filters);
 
         if (debugEnabled)
         {

@@ -28,12 +28,15 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
+import org.firstinspires.ftc.robotcontroller.Util.Global;
+
 import java.util.Locale;
 
 import trclib.TrcDbgTrace;
 import trclib.TrcFilter;
 import trclib.TrcSensor;
 import trclib.TrcUtil;
+
 
 /**
  * This class implements an Android sensor that may have multiple axes.
@@ -99,7 +102,7 @@ public class FtcAndroidSensor extends TrcSensor implements SensorEventListener
      */
     public FtcAndroidSensor(String instanceName, int sensorType, int numAxes, TrcFilter[] filters)
     {
-        this(FtcOpMode.getInstance().hardwareMap.appContext, instanceName, sensorType, numAxes, filters);
+        this(Global.context, instanceName, sensorType, numAxes, filters);
     }   //FtcAndroidSensor
 
     /**
