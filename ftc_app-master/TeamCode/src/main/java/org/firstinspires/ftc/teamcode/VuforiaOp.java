@@ -396,7 +396,23 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
     private void moveToCorrectButton(ButtonRange targetButton, VuforiaTrackableDefaultListener visibleBeacon) {
 
 
-        MMTranslation currentLocation = null;
+        if (opModeIsActive())
+        {
+            if (targetButton.getName().equals("Left Button"))
+            {
+                Drive(0, 0.12, 0);
+            }
+            else if (targetButton.getName().equals("Right Button"))
+            {
+                Drive(0, -0.12, 0);
+            }
+            runtime.reset();
+            do{}
+            while(runtime.seconds() < 0.125);
+            Stop();
+        }
+
+        /*MMTranslation currentLocation = null;
         boolean done = false;
         do {
 
@@ -650,7 +666,25 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         // Get in front of correct Button
         if (centerCorrectButton)
         {
-            MMTranslation currentLocation = null;
+            if (opModeIsActive())
+            {
+                if (targetButton.getName().equals("Left Button"))
+                {
+                    Drive(0, 0.12, 0);
+                }
+                else if (targetButton.getName().equals("Right Button"))
+                {
+                    Drive(0, -0.12, 0);
+                }
+                runtime.reset();
+                do{}
+                while(runtime.seconds() < 0.125);
+                Stop();
+            }
+
+            check to make sure that you are centering on the beacon correctly, it seems like its not, check out the code doug had to progressively slow down
+
+           /* MMTranslation currentLocation = null;
             boolean done = false;
             do {
 
@@ -681,7 +715,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
             } while(opModeIsActive() && !done && runtime.seconds() < 10);
             Stop();
-            pauseBetweenSteps();
+            pauseBetweenSteps();*/
         }
 
         robot.dashboard.displayText(15, "Fix angle");
@@ -719,10 +753,10 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
                 //move in
                 runtime.reset();
                 double moveSpeed = 0.4;
-                Drive(0 - moveSpeed, 0.05, 0);
+                Drive(0 - moveSpeed, 0.02, 0);
                 do {
                     //idle();
-                } while (opModeIsActive() && runtime.seconds() < 1.3);
+                } while (opModeIsActive() && runtime.seconds() < 1.5);
 
                 Stop();
 
@@ -732,9 +766,9 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
                 //move out
                 runtime.reset();
-                Drive(0.8, 0, 0);
+                Drive(0.9, 0, 0);
                 do {
-                } while (opModeIsActive() && runtime.seconds() < 0.7);
+                } while (opModeIsActive() && runtime.seconds() < 0.9);
                 Stop();
 
                 pauseBetweenSteps();
@@ -900,20 +934,22 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 
 
         robot.dashboard.displayText(15, "Move off wall");
-        VuforiaTrackableDefaultListener farBeacon = null;
+        VuforiaTrackableDefaultListener nearBeacon = null;
         if(moveOffWall) {
 
-            farBeacon = moveOffWall();      //returns the beacon that is farthest
+            nearBeacon = moveOffWall();      //returns the beacon that is nearest
             Stop();
         }
 
-        if(runBeaconManuever && farBeacon!= null) {
-            runBeaconPressManuever(farBeacon);
+        if(runBeaconManuever && nearBeacon!= null) {
+            runBeaconPressManuever(nearBeacon);
 
             //runtime.reset();
 
 
-
+            fixAngles(nearBeacon);
+            Stop();
+            pauseBetweenSteps();
 
         }
 
@@ -923,20 +959,22 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         if(press2ndbeacon) {
 
 
-            double firstToSecond = 1.4;
+
+
+            double firstToSecond = 1.6;
 
             if (teamColor == TeamColor.BLUE)
             {
                 if (lastTarget.getName().equals("Right Button"))
                 {
-                    firstToSecond += 0.4;
+                    firstToSecond += 0.2;
                 }
             }
             if (teamColor == TeamColor.RED)
             {
                 if (lastTarget.getName().equals("Left Button"))
                 {
-                    firstToSecond += 0.4;
+                    firstToSecond += 0.2;
                 }
             }
 
