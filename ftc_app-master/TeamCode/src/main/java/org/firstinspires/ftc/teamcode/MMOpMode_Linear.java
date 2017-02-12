@@ -86,36 +86,36 @@ public abstract class  MMOpMode_Linear extends LinearOpMode { //extends VisionOp
 
 
     }
+//
+//    public void prepShooter (int targetRPM) {
+//        robot.shooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        robot.shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//
+//
+//        robot.shooterMotor.setMaxSpeed( (targetRPM * 28) / 60);
+//
+//    }
 
-    public void prepShooter (int targetRPM) {
-        robot.shooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+//    public void turnOnShooter (){
+//
+//        double power = 0.4;
+//        while(power < 1){
+//
+//            power += 0.005;
+//            power = Range.clip(power, 0, 1);
+//            robot.shooterMotor.setPower(power);
+//
+//            if(power == 1) {
+//                break;
+//            }
+//            robot.dashboard.displayPrintf(2, "Waiting for shooter power: %2.5f", power);
+//            waitFor(0.02);
+//        }
+//
+//    }
 
-        robot.shooterMotor.setMaxSpeed( (targetRPM * 28) / 60);
-
-    }
-
-
-    public void turnOnShooter (){
-
-        double power = 0.4;
-        while(power < 1){
-
-            power += 0.005;
-            power = Range.clip(power, 0, 1);
-            robot.shooterMotor.setPower(power);
-
-            if(power == 1) {
-                break;
-            }
-            robot.dashboard.displayPrintf(2, "Waiting for shooter power: %2.5f", power);
-            waitFor(0.02);
-        }
-
-    }
-
-    private void waitFor(double seconds){
+    protected void waitFor(double seconds){
         robot.waitForTick((long)(seconds * 1000));
     }
 

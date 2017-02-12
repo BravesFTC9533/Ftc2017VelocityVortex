@@ -68,6 +68,7 @@ public abstract class FtcOpMode extends LinearOpMode implements TrcRobot.RobotMo
 
     private TrcTaskMgr taskMgr;
 
+    protected HalDashboard dashboard;
     /**
      * Constructor: Creates an instance of the object. It calls the constructor of the LinearOpMode class and saves
      * an instance of this class.
@@ -215,7 +216,7 @@ public abstract class FtcOpMode extends LinearOpMode implements TrcRobot.RobotMo
     public void runOpMode()
     {
         final String funcName = "runOpMode";
-        HalDashboard dashboard = HalDashboard.createInstance(telemetry);
+        dashboard = HalDashboard.createInstance(telemetry);
         TrcRobot.RunMode runMode;
 
         if (debugEnabled)
@@ -281,8 +282,14 @@ public abstract class FtcOpMode extends LinearOpMode implements TrcRobot.RobotMo
             dbgTrace.traceInfo(funcName, "Running initPeriodic ...");
         }
         dashboard.displayPrintf(0, "initPeriodic starting...");
+        while(!isStarted()) {
+
+        }
         while (!opModeIsActive())
         {
+            if(this.isStopRequested()){
+                break;
+            }
             initPeriodic();
         }
         dashboard.displayPrintf(0, "initPeriodic completed!");
@@ -374,14 +381,24 @@ public abstract class FtcOpMode extends LinearOpMode implements TrcRobot.RobotMo
      */
     public synchronized void initPeriodic()
     {
-        try
-        {
-            this.wait();
+        synchronized (this) {
+            try {
+                this.wait();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
         }
-        catch (InterruptedException e)
-        {
-            Thread.currentThread().interrupt();
-        }
+
+//        try
+//        {
+//
+//            this.wait();
+//        }
+//        catch (InterruptedException e)
+//        {
+//            Thread.currentThread().interrupt();
+//        }
     }   //initPeriodic
 
     /**

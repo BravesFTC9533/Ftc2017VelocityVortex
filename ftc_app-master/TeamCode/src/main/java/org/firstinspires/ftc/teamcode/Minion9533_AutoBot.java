@@ -225,7 +225,7 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
 
 
 
-        prepShooter(targetRPM);
+        ///prepShooter(targetRPM);
 
 
 
@@ -325,7 +325,7 @@ public class Minion9533_AutoBot extends MMOpMode_Linear {
 
     }
 
-    private void waitFor(double seconds){
-        robot.waitForTick((long)(seconds * 1000));
-    }
+//    private void waitFor(double seconds){
+//        robot.waitForTick((long)(seconds * 1000));
+//    }
 }

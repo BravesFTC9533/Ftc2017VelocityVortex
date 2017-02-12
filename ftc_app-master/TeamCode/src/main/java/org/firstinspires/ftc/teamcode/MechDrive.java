@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Util.Helpers;
 
@@ -12,10 +13,18 @@ import hallib.HalDashboard;
 
 public class MechDrive {
 
-    Hardware9533 hardware;
+    private ElapsedTime runtime = new ElapsedTime();
+    private Hardware9533 hardware;
     private static double MIN_POWER = 0.0;
+
+    double timePerRotationClockwiseMS = 4 * 1000.0;
+    double timePerRotationCounterClockwiseMS = 4.1 * 1000.0;
+
+
     private Gamepad gamepad;
     private HalDashboard hal;
+
+
 
     public MechDrive(Hardware9533 hardware) {
         this.hardware = hardware;
@@ -37,8 +46,7 @@ public class MechDrive {
     }
 
     /***********************************************************************************************/
-    public void Drive(double h, double v, double r, boolean scalePower)
-    {
+    public void Drive(double h, double v, double r, boolean scalePower) {
         if (gamepad != null)
         {
             if (gamepad.left_trigger > 0.8)
@@ -123,6 +131,34 @@ public class MechDrive {
 
     }
 
+    public void Turn(int angle){
+
+        double timeForTurn = 0.0;
+
+        if(angle < 0) {
+            timeForTurn = (timePerRotationCounterClockwiseMS / 360) * Math.abs(angle);
+
+        } else {
+            timeForTurn = (timePerRotationClockwiseMS / 360) * Math.abs(angle);
+        }
+
+
+        hardware.dashboard.displayPrintf(15, "Time for turn: %f", timeForTurn);
+        double rotationSpeed = 0.3;
+
+
+        if(angle < 0) {
+            rotationSpeed *= -1;
+        }
+
+        runtime.reset();
+        Drive(0, 0, rotationSpeed);
+        while(runtime.milliseconds() < timeForTurn) {
+            hardware.dashboard.displayPrintf(14, "Runtime: %f", runtime.milliseconds());
+        }
+
+        Stop();
+    }
 
     public void Stop() {
 

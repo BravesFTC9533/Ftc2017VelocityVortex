@@ -28,6 +28,7 @@ import com.vuforia.Vuforia;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -278,6 +279,31 @@ public class FtcVuforia
         VuforiaTrackableDefaultListener listener = (VuforiaTrackableDefaultListener)target.getListener();
         return listener.isVisible();
     }   //isTargetVisible
+
+
+    public VectorF getAngles(VuforiaTrackable target ){
+        VuforiaTrackableDefaultListener listener = (VuforiaTrackableDefaultListener)target.getListener();
+
+        try {
+
+            if (listener == null)
+            {
+                return null;
+            }
+
+            float [] data = listener.getRawPose().getData();
+
+            float [] [] rotation = {{data[0], data[1]}, {data[4], data[5], data[6]}, {data[8], data[9], data[10]}};
+            double thetaX = Math.atan2(rotation[2][1], rotation[2][2]);
+            double thetaY = Math.atan2(-rotation[2][0], Math.sqrt(rotation[2][1] * rotation[2][1] + rotation[2][2] * rotation[2][2]));
+            double thetaZ = Math.atan2(rotation[1][0], rotation[0][0]);
+            return new VectorF((float)thetaX, (float)thetaY, (float)thetaZ);
+        }
+        catch (NullPointerException e)
+        {
+            return null;
+        }
+    }
 
     /**
      * This method returns the position matrix of the specified target.

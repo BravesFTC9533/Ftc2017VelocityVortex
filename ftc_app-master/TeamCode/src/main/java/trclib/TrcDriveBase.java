@@ -257,7 +257,7 @@ public class TrcDriveBase extends HalRobotDrive implements TrcTaskMgr.Task
 
         if (gyro != null)
         {
-            gyro.resetZIntegrator();
+            gyro.resetYIntegrator();
         }
 
         xPos = 0.0;
@@ -698,6 +698,13 @@ public class TrcDriveBase extends HalRobotDrive implements TrcTaskMgr.Task
 
         if (numMotors == 4)
         {
+
+//            xPos = (rrEnc - lrEnc)*xScale/2.0;
+//            yPos = (rrEnc + lrEnc)*yScale/2.0;
+//            rotPos = (lrEnc - rrEnc)*rotScale/2.0;
+//            xSpeed = (rrSpeed - lrSpeed)*xScale/2.0;
+//            ySpeed = (lrSpeed + rrSpeed)*yScale/2.0;
+
             xPos = ((lfEnc + rrEnc) - (rfEnc + lrEnc))*xScale/4.0;
             yPos = (lfEnc + lrEnc + rfEnc + rrEnc)*yScale/4.0;
             rotPos = ((lfEnc + lrEnc) - (rfEnc + rrEnc))*rotScale/4.0;
@@ -713,8 +720,8 @@ public class TrcDriveBase extends HalRobotDrive implements TrcTaskMgr.Task
 
         if (gyro != null)
         {
-            heading = (Double)gyro.getZHeading().value;
-            turnSpeed = (Double)gyro.getZRotationRate().value;
+            heading = (Double)gyro.getYHeading().value;
+            turnSpeed = (Double)gyro.getYRotationRate().value;
         }
         else
         {

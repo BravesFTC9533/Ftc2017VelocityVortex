@@ -1,4 +1,4 @@
-cd "%userprofile%\AppData\Local\Android\sdk1\platform-tools"
+cd "%userprofile%\AppData\Local\Android\sdk\platform-tools"
 
 adb disconnect
 

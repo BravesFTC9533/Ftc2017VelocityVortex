@@ -47,9 +47,9 @@ public class AutoTurnTest extends MMOpMode_Linear {
         waitFor(1);
     }
 
-    private void waitFor(double seconds){
-        robot.waitForTick((long)(seconds * 1000));
-    }
+//    private void waitFor(double seconds){
+//        robot.waitForTick((long)(seconds * 1000));
+//    }
 
     private void turn(double angle)
     {

@@ -145,8 +145,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         return null;
     }
 
-    private VuforiaTrackableDefaultListener getBeacon(String name)
-    {
+    private VuforiaTrackableDefaultListener getBeacon(String name) {
         for (VuforiaTrackable b : beacons)
         {
             VuforiaTrackableDefaultListener beacon = (VuforiaTrackableDefaultListener) b.getListener();
@@ -567,8 +566,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         return visibleBeacon;
     }
 
-    private void moveBackToSecondBeacon()
-    {
+    private void moveBackToSecondBeacon() {
         /*runtime.reset();
         Drive(0.4, 0, 0);
         do {
@@ -682,7 +680,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
                 Stop();
             }
 
-            check to make sure that you are centering on the beacon correctly, it seems like its not, check out the code doug had to progressively slow down
+           // check to make sure that you are centering on the beacon correctly, it seems like its not, check out the code doug had to progressively slow down
 
            /* MMTranslation currentLocation = null;
             boolean done = false;
@@ -841,8 +839,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
     }
 
 
-    private void moveBackToShoot()
-    {
+    private void moveBackToShoot() {
         runtime.reset();
         Drive(0.9, 0, 0);
         do {
@@ -851,8 +848,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
         Stop();
     }
 
-    private void moveFwdToPark()
-    {
+    private void moveFwdToPark() {
         runtime.reset();
         Drive(0, 0.9, 0);
         do {
@@ -861,8 +857,7 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
     }
 
 
-    private void moveBackAndFixAngle( VuforiaTrackableDefaultListener visibleBeacon)
-    {
+    private void moveBackAndFixAngle( VuforiaTrackableDefaultListener visibleBeacon) {
 
 
         fixAngles(visibleBeacon);
@@ -1082,9 +1077,9 @@ public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
     }
 
 
-    private void waitFor(double seconds){
-        robot.waitForTick((long)(seconds * 1000));
-    }
+//    private void waitFor(double seconds){
+//        robot.waitForTick((long)(seconds * 1000));
+//    }
 
 
     //this assumes the horizontal axis is the y-axis since the phone is vertical

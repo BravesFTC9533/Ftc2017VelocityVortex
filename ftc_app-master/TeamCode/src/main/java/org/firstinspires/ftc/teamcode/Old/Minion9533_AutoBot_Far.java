@@ -261,8 +261,8 @@ public class Minion9533_AutoBot_Far extends MMOpMode_Linear {
         //robot.dashboard.displayText(1, msg);
 
     }
-
-    private void waitFor(double seconds){
-        robot.waitForTick((long)(seconds * 1000));
-    }
+//
+//    private void waitFor(double seconds){
+//        robot.waitForTick((long)(seconds * 1000));
+//    }
 }

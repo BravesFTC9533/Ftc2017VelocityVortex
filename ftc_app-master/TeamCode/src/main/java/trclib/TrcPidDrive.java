@@ -214,6 +214,7 @@ public class TrcPidDrive implements TrcTaskMgr.Task
 
         if (turnPidCtrl != null)
         {
+            turnPidCtrl.reset();
             turnPidCtrl.setTarget(turnTarget);
         }
 
