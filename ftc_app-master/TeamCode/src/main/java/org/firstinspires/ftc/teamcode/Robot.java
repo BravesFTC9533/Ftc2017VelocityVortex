@@ -160,10 +160,10 @@ public class Robot implements TrcPidController.PidInput, TrcAnalogTrigger.Trigge
         rightRearWheel = new FtcDcMotor("backRight");
 
 
-//        leftFrontWheel.motor.setMaxSpeed(RobotInfo.DRIVE_MAX_SPEED);
-//        rightFrontWheel.motor.setMaxSpeed(RobotInfo.DRIVE_MAX_SPEED);
-//        leftRearWheel.motor.setMaxSpeed(RobotInfo.DRIVE_MAX_SPEED);
-//        rightRearWheel.motor.setMaxSpeed(RobotInfo.DRIVE_MAX_SPEED);
+        leftFrontWheel.motor.setMaxSpeed(RobotInfo.DRIVE_MAX_SPEED);
+        rightFrontWheel.motor.setMaxSpeed(RobotInfo.DRIVE_MAX_SPEED);
+        leftRearWheel.motor.setMaxSpeed(RobotInfo.DRIVE_MAX_SPEED);
+        rightRearWheel.motor.setMaxSpeed(RobotInfo.DRIVE_MAX_SPEED);
         leftFrontWheel.motor.setMode(RobotInfo.DRIVE_MOTOR_MODE);
         rightFrontWheel.motor.setMode(RobotInfo.DRIVE_MOTOR_MODE);
         leftRearWheel.motor.setMode(RobotInfo.DRIVE_MOTOR_MODE);
@@ -198,7 +198,7 @@ public class Robot implements TrcPidController.PidInput, TrcAnalogTrigger.Trigge
                 RobotInfo.ENCODER_Y_KP, RobotInfo.ENCODER_Y_KI, RobotInfo.ENCODER_Y_KD, RobotInfo.ENCODER_Y_KF,
                 RobotInfo.ENCODER_Y_TOLERANCE, RobotInfo.ENCODER_Y_SETTLING,
                 this);
-        encoderYPidCtrl.setOutputRange(-0.5, 0.5);
+        //encoderYPidCtrl.setOutputRange(-0.75, 0.75);
 
         gyroPidCtrl = new TrcPidController(
                 "gyroPidCtrl",
@@ -290,7 +290,7 @@ public class Robot implements TrcPidController.PidInput, TrcAnalogTrigger.Trigge
         //
         // Since our gyro is analog, we need to enable its integrator.
         //
-        gyro.setEnabled(true);
+        gyro.setEnabled(false);
         //
         // Reset all X, Y and heading values.
         //

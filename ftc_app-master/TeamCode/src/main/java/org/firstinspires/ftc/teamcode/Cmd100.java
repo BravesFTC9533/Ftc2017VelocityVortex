@@ -136,7 +136,8 @@ public class Cmd100 implements TrcRobot.RobotCommand {
                     robot.targetHeading = alliance == AltRyanOpFtcAuto.Alliance.RED_ALLIANCE ? 45 : -45;
 
 
-                    robot.gyroPidCtrl.reset();
+                    robot.driveBase.resetPosition();
+                    robot.gyro.setEnabled(true);
                     //nextState =
                     gotoState = State.MOVE_TO_NEAR_BEACON;
                     //robot.gyroPidCtrl.setNoOscillation(true);
@@ -146,6 +147,7 @@ public class Cmd100 implements TrcRobot.RobotCommand {
                     break;
 
                 case MOVE_TO_NEAR_BEACON:
+                    robot.gyro.setEnabled(false);
                     gotoState = State.FIND_NEAR_TARGET_PAUSE;
                     robot.encoderYPidCtrl.setNoOscillation(true);
                     robot.encoderXPidCtrl.setNoOscillation(true);

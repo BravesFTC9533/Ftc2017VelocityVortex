@@ -43,6 +43,7 @@ class CmdPidDrive implements TrcRobot.RobotCommand
         timer = new TrcTimer(moduleName);
         sm = new TrcStateMachine<>(moduleName);
         sm.start(State.DO_DELAY);
+
     }   //CmdPidDrive
 
     //
@@ -69,6 +70,8 @@ class CmdPidDrive implements TrcRobot.RobotCommand
                     //
                     // Do delay if any.
                     //
+                    robot.driveBase.resetPosition();
+
                     if (delay == 0.0)
                     {
                         sm.setState(State.DO_PID_DRIVE);

@@ -11,9 +11,18 @@ class RobotInfo
     static final float MM_PER_INCH                      = 25.4f;
 
     static final int DRIVE_MAX_SPEED                    = 4000;     //encoder counts per second
-    static final DcMotor.RunMode DRIVE_MOTOR_MODE       = DcMotor.RunMode.RUN_WITHOUT_ENCODER;
-    //static final DcMotor.RunMode DRIVE_MOTOR_MODE       = DcMotor.RunMode.RUN_USING_ENCODER;
+    //static final DcMotor.RunMode DRIVE_MOTOR_MODE       = DcMotor.RunMode.RUN_WITHOUT_ENCODER;
+    static final DcMotor.RunMode DRIVE_MOTOR_MODE       = DcMotor.RunMode.RUN_USING_ENCODER;
     static final double TURN_POWER_LIMIT                = 0.5;
+
+    static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
+    static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
+    static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
+    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+            (WHEEL_DIAMETER_INCHES * 3.1415);
+    static final double     DRIVE_SPEED             = 0.6;
+    static final double     TURN_SPEED              = 0.5;
+
 
     //
     // INCHES_PER_COUNT: 0.0132166817227156
@@ -37,13 +46,13 @@ class RobotInfo
     // 12/22/2016: 0.046, 0.0, 0.0046 (No speed control)
     // 01/09/2017: 0.02, 0.0, 0.0022 [< 8] 0.045, 0.0, 0.001 (No speed control)
     //
-    static final double ENCODER_Y_KP                    = 0.02;
+    static final double ENCODER_Y_KP                    = 0.020;
     static final double ENCODER_Y_KI                    = 0.0;
     static final double ENCODER_Y_KD                    = 0.0022;
     static final double ENCODER_Y_KF                    = 0.0;
     static final double ENCODER_Y_TOLERANCE             = 2.0;
     static final double ENCODER_Y_SETTLING              = 0.2;
-    static final double ENCODER_Y_INCHES_PER_COUNT      = 0.01667;
+    static final double ENCODER_Y_INCHES_PER_COUNT      = 1/COUNTS_PER_INCH;
 
     static final double SMALL_Y_THRESHOLD               = 8.0;
     static final double ENCODER_SMALL_Y_KP              = 0.045;
