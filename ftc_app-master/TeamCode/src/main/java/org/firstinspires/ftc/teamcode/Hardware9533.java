@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.hardware.Sensor;
 import android.view.animation.RotateAnimation;
 
 import com.qualcomm.hardware.hitechnic.HiTechnicNxtGyroSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -58,6 +60,8 @@ public class Hardware9533
     public Servo leftHold = null;
     public Servo rightHold = null;
 
+    public OpticalDistanceSensor ods = null;
+
     public HiTechnicNxtGyroSensor gyro = null;
 
     public HalDashboard dashboard;
@@ -91,6 +95,7 @@ public class Hardware9533
         // Define gyro
         //gyro = (HiTechnicNxtGyroSensor)hwMap.gyroSensor.get("gyro");
 
+        //ods = hwMap.opticalDistanceSensor.get("ods");
 
         // Define and Initialize Motors
         leftMotor   = hwMap.dcMotor.get("left");
@@ -100,6 +105,8 @@ public class Hardware9533
 
         leftHold = hwMap.servo.get("leftHold");
         rightHold= hwMap.servo.get("rightHold");
+
+
 
 
         leftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
