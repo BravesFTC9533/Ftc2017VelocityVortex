@@ -22,9 +22,28 @@ public class TestODS extends MMOpMode_Linear {
     {
         super.runOpMode();
 
+        robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.backLeftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.backRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.backLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.backRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         waitForStart();
 
-        driveTo(36, 0.4, 0.4, 0);
+        if (opModeIsActive())
+        {
+            // initial diagonal off wall
+            driveTo(67, -0.4, -0.4, 0);
+
+            //move to right a lil
+            driveTo(16, 0, -0.9, 0);
+
+        }
+
 
         /*while (opModeIsActive())
         {
@@ -36,49 +55,80 @@ public class TestODS extends MMOpMode_Linear {
 
     private void driveTo(double dist, double h, double v, double r)
     {
-        int backLeftTarget = robot.backLeftMotor.getCurrentPosition() + (int)(dist*COUNTS_PER_INCH);
-        int frontLeftTarget = robot.leftMotor.getCurrentPosition() + (int)(dist*COUNTS_PER_INCH);
-        int backRightTarget = robot.backRightMotor.getCurrentPosition() + (int)(dist*COUNTS_PER_INCH);
-        int frontRightTarget = robot.rightMotor.getCurrentPosition() + (int)(dist*COUNTS_PER_INCH);
-
-        robot.leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.backLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        robot.backRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        h = Helpers.clipMotorPower(h);
-        v = Helpers.clipMotorPower(v);
-        r = Helpers.clipMotorPower(r);
-
-        // add vectors
-        double frontLeft =  v-h+r;
-        double frontRight = v+h-r;
-        double backRight =  v-h-r;
-        double backLeft =   v+h+r;
-
-        // since adding vectors can go over 1, figure out max to scale other wheels
-        double max = Math.max(
-                Math.abs(backLeft),
-                Math.max(
-                        Math.abs(backRight),
-                        Math.max(
-                                Math.abs(frontLeft), Math.abs(frontRight)
-                        )
-                )
-        );
-
-        // only need to scale power if max > 1
-        if(max > 1){
-            frontLeft = Helpers.scalePower(frontLeft, max);
-            frontRight = Helpers.scalePower(frontRight, max);
-            backLeft = Helpers.scalePower(backLeft, max);
-            backRight = Helpers.scalePower(backRight, max);
+        if (h != 0 && v == 0 && r == 0)
+        {
+            //dist+=5;
         }
 
-        robot.leftMotor.setPower(frontLeft);
-        robot.rightMotor.setPower(frontRight);
-        robot.backRightMotor.setPower(backRight);
-        robot.backLeftMotor.setPower(backLeft);
+        if (opModeIsActive())
+        {
+            int backLeftTarget = robot.backLeftMotor.getCurrentPosition() + (int)(dist*COUNTS_PER_INCH);
+            int frontLeftTarget = robot.leftMotor.getCurrentPosition() + (int)(dist*COUNTS_PER_INCH);
+            int backRightTarget = robot.backRightMotor.getCurrentPosition() + (int)(dist*COUNTS_PER_INCH);
+            int frontRightTarget = robot.rightMotor.getCurrentPosition() + (int)(dist*COUNTS_PER_INCH);
+
+
+
+           /* robot.backLeftMotor.setTargetPosition(backLeftTarget);
+            robot.backRightMotor.setTargetPosition(backRightTarget);
+            robot.leftMotor.setTargetPosition(frontLeftTarget);
+            robot.rightMotor.setTargetPosition(frontRightTarget);
+
+            robot.leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.backLeftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            robot.backRightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);*/
+
+
+
+            mechDrive.Drive(h, v, r, false);
+            do{
+                robot.dashboard.displayText(2, "backLeft: " + robot.backLeftMotor.getCurrentPosition() + " target: " + backLeftTarget);
+                robot.dashboard.displayText(3, "backRight: " + robot.backRightMotor.getCurrentPosition() + " target: " + backRightTarget);
+                robot.dashboard.displayText(4, "frontLeft: " + robot.rightMotor.getCurrentPosition() + " target: " + frontLeftTarget);
+                robot.dashboard.displayText(5, "frontRight: " + robot.leftMotor.getCurrentPosition() + " target: " + frontRightTarget);
+
+                /*if ((Math.abs(robot.backLeftMotor.getCurrentPosition()) >= backLeftTarget))
+                {
+                    robot.backLeftMotor.setPower(0);
+                }
+                if ((Math.abs(robot.backRightMotor.getCurrentPosition()) >= backRightTarget))
+                {
+                    robot.backRightMotor.setPower(0);
+                }
+                if ((Math.abs(robot.rightMotor.getCurrentPosition()) >= frontRightTarget))
+                {
+                    robot.rightMotor.setPower(0);
+                }
+                if ((Math.abs(robot.leftMotor.getCurrentPosition()) >= frontLeftTarget))
+                {
+                    robot.leftMotor.setPower(0);
+                }*/
+            }
+            while ((Math.abs(robot.backLeftMotor.getCurrentPosition()) < backLeftTarget) && (Math.abs(robot.backRightMotor.getCurrentPosition()) < backRightTarget) && (Math.abs(robot.rightMotor.getCurrentPosition()) < frontRightTarget) && (Math.abs(robot.leftMotor.getCurrentPosition()) < frontLeftTarget));
+            mechDrive.Stop();
+
+
+
+            /*while (robot.backLeftMotor.isBusy())
+            {
+                robot.dashboard.displayText(2, "backLeft: " + robot.backLeftMotor.getCurrentPosition());
+                robot.dashboard.displayText(3, "backRight: " + robot.backRightMotor.getCurrentPosition());
+                robot.dashboard.displayText(4, "frontLeft: " + robot.rightMotor.getCurrentPosition());
+                robot.dashboard.displayText(5, "frontRight: " + robot.leftMotor.getCurrentPosition());
+                robot.dashboard.displayText(0, "should be moving");
+            }*/
+
+
+
+            robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.backLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.backRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
+        }
+
     }
 
 }
