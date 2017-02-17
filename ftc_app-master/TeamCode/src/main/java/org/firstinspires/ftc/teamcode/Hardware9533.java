@@ -103,8 +103,8 @@ public class Hardware9533
         backLeftMotor = hwMap.dcMotor.get("backLeft");
         backRightMotor = hwMap.dcMotor.get("backRight");
 
-        leftHold = hwMap.servo.get("leftHold");
-        rightHold= hwMap.servo.get("rightHold");
+        //leftHold = hwMap.servo.get("leftHold");
+        //rightHold= hwMap.servo.get("rightHold");
 
 
 

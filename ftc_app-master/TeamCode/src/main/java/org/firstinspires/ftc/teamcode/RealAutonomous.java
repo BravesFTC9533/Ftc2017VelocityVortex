@@ -1,11 +1,21 @@
 package org.firstinspires.ftc.teamcode;
 
 import android.graphics.Bitmap;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.os.Looper;
 import android.util.Log;
+import android.widget.Button;
+import android.widget.Toast;
+
+import com.qualcomm.ftcrobotcontroller.R;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 import com.vuforia.CameraCalibration;
 import com.vuforia.HINT;
 import com.vuforia.Image;
@@ -15,6 +25,7 @@ import com.vuforia.Tool;
 import com.vuforia.Vec3F;
 import com.vuforia.Vuforia;
 
+import org.firstinspires.ftc.robotcontroller.Util.Global;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
@@ -22,10 +33,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+
 import org.firstinspires.ftc.teamcode.Util.ButtonRange;
-import org.firstinspires.ftc.teamcode.Util.Helpers;
 import org.firstinspires.ftc.teamcode.Util.OCVUtils;
 import org.firstinspires.ftc.teamcode.Util.VortexUtils;
+import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -33,7 +45,14 @@ import org.opencv.core.Rect;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
+
+import ftclib.FtcAndroidAccel;
+import trclib.TrcAccelerometer;
+import trclib.TrcSensor;
 
 import static org.firstinspires.ftc.teamcode.Util.VortexUtils.BEACON_BLUE_HIGH;
 import static org.firstinspires.ftc.teamcode.Util.VortexUtils.BEACON_BLUE_LOW;
@@ -65,9 +84,9 @@ public class RealAutonomous extends MMOpMode_Linear {
         RED
     }
 
-    public void initVuforia()
-    {
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(com.qualcomm.ftcrobotcontroller.R.id.cameraMonitorViewId);
+    private void initVuforia() {
+
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
         parameters.vuforiaLicenseKey = "AeWceoD/////AAAAGWvk7AQGLUiTsyU4mSW7gfldjSCDQHX76lt9iPO5D8zaboG428rdS9WN0+AFpAlc/g4McLRAQIb5+ijFCPJJkLc+ynXYdhljdI2k9R4KL8t3MYk/tbmQ75st9VI7//2vNkp0JHV6oy4HXltxVFcEbtBYeTBJ9CFbMW+0cMNhLBPwHV7RYeNPZRgxf27J0oO8VoHOlj70OYdNYos5wvDM+ZbfWrOad/cpo4qbAw5iB95T5I9D2/KRf1HQHygtDl8/OtDFlOfqK6v2PTvnEbNnW1aW3vPglGXknX+rm0k8b0S7GFJkgl7SLq/HFNl0VEIVJGVQe9wt9PB6bJuxOMMxN4asy4rW5PRRBqasSM7OLl4W";
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
         this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
@@ -167,6 +186,63 @@ public class RealAutonomous extends MMOpMode_Linear {
             //filtering out non-beacon-blue colours in HSV colour space
             Imgproc.cvtColor(cropped, cropped, Imgproc.COLOR_RGB2HSV_FULL);
 
+
+
+
+            /*try
+            {
+                FileOutputStream out = new FileOutputStream(new File("/storage/emulated/0/", "poop.txt"));
+                out.write((new String("ppoooop")).getBytes());
+                out.close();
+            } catch (FileNotFoundException e){}
+            catch (IOException e){}
+*/
+
+            /*try
+            {
+                FileOutputStream fos = new FileOutputStream(new File("/storage/emulated/0/", "cropped.png"));
+
+                //bm.compress(Bitmap.CompressFormat.PNG, 90, fos);
+                if (pic.compress(Bitmap.CompressFormat.PNG, 100, fos))
+                {
+                }
+                else
+                {
+
+                }
+                fos.close();
+            }catch (IOException e)
+            {}
+
+            try
+            {
+                FileOutputStream fos = new FileOutputStream(new File("/storage/emulated/0/", "non.png"));
+
+                //bm.compress(Bitmap.CompressFormat.PNG, 90, fos);
+                if (bm.compress(Bitmap.CompressFormat.PNG, 100, fos))
+                {
+                }
+                else
+                {
+                    tempLog("didgfeds");
+                }
+                fos.close();
+            }catch (IOException e)
+            {}
+*/
+
+
+
+
+
+
+
+
+
+
+            //get filtered mask
+            //if pixel is within acceptable blue-beacon-colour range, it's changed to white.
+            //Otherwise, it's turned to black
             Mat mask = new Mat();
 
             Core.inRange(cropped, BEACON_BLUE_LOW, BEACON_BLUE_HIGH, mask);
@@ -176,6 +252,17 @@ public class RealAutonomous extends MMOpMode_Linear {
             Log.i("CentroidX", "" + ((mmnts.get_m10() / mmnts.get_m00())));
             Log.i("CentroidY", "" + ((mmnts.get_m01() / mmnts.get_m00())));
 
+            //checking if blue either takes up the majority of the image (which means the beacon is all blue)
+            //or if there's barely any blue in the image (which means the beacon is all red or off)
+//            if (mmnts.get_m00() / mask.total() > 0.8) {
+//                return VortexUtils.BEACON_ALL_BLUE;
+//            } else if (mmnts.get_m00() / mask.total() < 0.1) {
+//                return VortexUtils.BEACON_NO_BLUE;
+//            }//elseif
+
+            //Note: for some reason, we end up with a image that is rotated 90 degrees
+            //if centroid is in the bottom half of the image, the blue beacon is on the left
+            //if the centroid is in the top half, the blue beacon is on the right
             if ((mmnts.get_m01() / mmnts.get_m00()) < cropped.rows() / 2) {
                 return VortexUtils.BEACON_RED_BLUE;
             } else {
@@ -184,8 +271,7 @@ public class RealAutonomous extends MMOpMode_Linear {
         }//if
 
         return VortexUtils.NOT_VISIBLE;
-    }
-
+    }//getBeaconConfig
     class MMTranslation{
 
         private double x;
@@ -248,18 +334,26 @@ public class RealAutonomous extends MMOpMode_Linear {
 
     private void driveTo(double dist, double h, double v, double r)
     {
-        if (h != 0 && v == 0 && r == 0)
+        while (robot.backLeftMotor.getCurrentPosition() != 0)
         {
-            //dist+=5;
+            robot.backLeftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.backRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
+
+
+            robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.backLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.backRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         if (opModeIsActive())
         {
-            int backLeftTarget = robot.backLeftMotor.getCurrentPosition() + (int)(dist*COUNTS_PER_INCH);
-            int frontLeftTarget = robot.leftMotor.getCurrentPosition() + (int)(dist*COUNTS_PER_INCH);
-            int backRightTarget = robot.backRightMotor.getCurrentPosition() + (int)(dist*COUNTS_PER_INCH);
-            int frontRightTarget = robot.rightMotor.getCurrentPosition() + (int)(dist*COUNTS_PER_INCH);
-
+            int backLeftTarget = Math.abs(robot.backLeftMotor.getCurrentPosition()) + (int)(dist*COUNTS_PER_INCH);          //-4000 , 1000   or    4000 , 7000      using abs limits direction
+            int frontLeftTarget = Math.abs(robot.leftMotor.getCurrentPosition()) + (int)(dist*COUNTS_PER_INCH);
+            int backRightTarget = Math.abs(robot.backRightMotor.getCurrentPosition()) + (int)(dist*COUNTS_PER_INCH);
+            int frontRightTarget = Math.abs(robot.rightMotor.getCurrentPosition()) + (int)(dist*COUNTS_PER_INCH);
 
             mechDrive.Drive(h, v, r, false);
             do{
@@ -271,16 +365,6 @@ public class RealAutonomous extends MMOpMode_Linear {
             }
             while ((Math.abs(robot.backLeftMotor.getCurrentPosition()) < backLeftTarget) && (Math.abs(robot.backRightMotor.getCurrentPosition()) < backRightTarget) && (Math.abs(robot.rightMotor.getCurrentPosition()) < frontRightTarget) && (Math.abs(robot.leftMotor.getCurrentPosition()) < frontLeftTarget));
             mechDrive.Stop();
-
-            robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            robot.backLeftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            robot.backRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-            robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.backLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.backRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
 
     }
@@ -477,7 +561,7 @@ public class RealAutonomous extends MMOpMode_Linear {
 
             angleToWall = (Math.toDegrees(angles.getX()) + 270) % 360;
             moveToBeacon(currentLocation.getX(), currentLocation.getZ(), angleToWall - 90);
-        } while(opModeIsActive() && currentLocation.getZ() < -500 && runtime.seconds() < 10);
+        } while(opModeIsActive() && runtime.seconds() < 10 && (currentLocation.getX() > 50 || currentLocation.getX() < -50 || currentLocation.getZ() < -500));
     }
 
     private void moveToBeacon(double x, double z, double angle) {
@@ -487,24 +571,32 @@ public class RealAutonomous extends MMOpMode_Linear {
         // slow movement into beacon as we get closer
         if (z < -650) {
             h = -0.35;
-        } else if (z < -600) {
+        } else if (z < -500) {
             h = -0.3;
         } else {
-            h = -0.25;
+            h = 0;
         }
 
         //fix side to side movement
 
-        if(Math.abs(x) > 100) {
+        if(x > 100 || x < -100)
+        {
             v = 0.15;
-        } else if(Math.abs(x) > 50) {
+        }
+        else if(x > 50 || x < -50)
+        {
             v = 0.1;
-        } else if(Math.abs(x) < 25){
+        }
+        else if(x < 25 && x > -25)
+        {
             v = 0.0;
         }
 
+        robot.dashboard.displayText(10, ""+x);
+
+
         if(x < 0) {
-            v = 0-v;
+            v *= -1;
         }
 
 
@@ -535,12 +627,14 @@ public class RealAutonomous extends MMOpMode_Linear {
         if (opModeIsActive())
         {
             fixAngles(visibleBeacon);
-            Stop();
-            waitFor(1);
+
         }
 
+        Stop();
+        waitFor(1);
+
         targetButton = getTargetButton(visibleBeacon);
-        if(targetButton == null || targetButton == ButtonRange.Unknown()){
+        if(targetButton == null || targetButton.getName().equals(ButtonRange.Unknown().getName())){
             robot.dashboard.displayText(10, "UNABLE TO FIND TEAM COLOR");
             return;
         }
@@ -562,19 +656,22 @@ public class RealAutonomous extends MMOpMode_Linear {
             fixAngles(visibleBeacon);
             Stop();
             waitFor(0.1);
-
-            robot.dashboard.displayText(6, "here");
         }
 
         if (opModeIsActive())
         {
             if (targetButton.getName().equals("Left Button"))
             {
-                driveTo(4.13386, 0, 0.12, 0);
+                driveTo(3.5, 0, 0.25, 0);
+                //waitFor(3000);
             }
             else if (targetButton.getName().equals("Right Button"))
             {
-                driveTo(1.1811, 0, -0.12, 0);
+                driveTo(2, 0, -0.25, 0);
+            }
+            else
+            {
+
             }
             Stop();
         }
@@ -584,6 +681,22 @@ public class RealAutonomous extends MMOpMode_Linear {
             fixAngles(visibleBeacon);
             Stop();
             waitFor(0.1);
+        }
+        if (opModeIsActive())
+        {
+            //move in to press button
+            driveTo(19, -0.2, 0, 0);
+
+            //move out away from button
+            driveTo(19, 0.2, 0, 0);
+        }
+
+        waitFor(0.2);
+
+        if (opModeIsActive())
+        {
+            fixAngles(visibleBeacon);
+
         }
 
     }
@@ -634,7 +747,45 @@ public class RealAutonomous extends MMOpMode_Linear {
     }
     private void Beacon2()
     {
+        VuforiaTrackableDefaultListener visibleBeacon = null;
 
+        int dist = 48;
+
+        if (teamColor == TeamColor.BLUE)
+        {
+            if (lastTarget.getName().equals("Left Button"))
+            {
+                dist -= 3;
+            }
+        }
+        else if (teamColor == TeamColor.RED)
+        {
+            if (lastTarget.getName().equals("Right Button"))
+            {
+                dist -= 3;
+            }
+        }
+
+
+        driveTo(dist, 0, -0.9, 0);
+
+        runtime.reset();
+        do {
+            if (teamColor == TeamColor.RED)
+            {
+                visibleBeacon = getBeacon("tools");//getVisibleBeacon();
+            }
+            else if (teamColor == TeamColor.BLUE)
+            {
+                visibleBeacon = getBeacon("legos");
+            }
+
+        }while(opModeIsActive() && runtime.seconds() < 5 && visibleBeacon == null);
+
+        if (opModeIsActive())
+        {
+            goForBeacon(visibleBeacon);
+        }
     }
     private void Shoot()
     {
@@ -651,12 +802,33 @@ public class RealAutonomous extends MMOpMode_Linear {
         super.runOpMode();
         robot.dashboard.displayText(0, "*****WAAAAAIITT!!!!!  for it to say ready");
         initVuforia();
+
+        if (!OpenCVLoader.initDebug()) {
+            logState("Unable to initialize opencv");
+            waitFor(0.25);
+            //Logger.d("Internal OpenCV library not found. Using OpenCV Manager for initialization");
+            //OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_1_0, this, null);
+        } else {
+            //Logger.d("OpenCV library found inside package. Using it!");
+            //mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+        }
+
+        robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.backLeftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.backRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.backLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.backRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
         robot.dashboard.displayText(0, "Autonomous mode READY, waiting for start...");
         waitForStart();
 
         boolean DriveOffWall = true,
                 Beacon1 = true,
-                Beacon2 = false,
+                Beacon2 = true,
                 Shoot = false,
                 Park = false;
 
