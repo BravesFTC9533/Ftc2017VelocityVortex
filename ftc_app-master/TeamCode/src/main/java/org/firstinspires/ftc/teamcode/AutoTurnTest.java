@@ -32,7 +32,7 @@ public class AutoTurnTest extends MMOpMode_Linear {
 
         runtime.reset();
         while(opModeIsActive() && runtime.seconds() < time) {
-            dashboard.displayPrintf(1, "Straight: %2.5f S Elapsed: %s", runtime.seconds(), robot.leftMotor.getCurrentPosition());
+            dashboard.displayPrintf(1, "Straight: %2.5f S Elapsed: %s", runtime.seconds(), robot.leftMotor.getPosition());
 
             //robot.DriveRobot(FORWARD_SPEED, FORWARD_SPEED);
             mechDrive.Drive(0.4, 0, 0);

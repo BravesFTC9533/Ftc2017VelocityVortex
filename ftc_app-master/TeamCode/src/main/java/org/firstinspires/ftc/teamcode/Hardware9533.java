@@ -46,6 +46,11 @@ public class Hardware9533
     public boolean invertedDrive = false;
 
     /* Public OpMode members. */
+//    public DcMotor  leftMotor   = null;
+//    public DcMotor  rightMotor  = null;
+//    public DcMotor  backLeftMotor = null;
+//    public DcMotor  backRightMotor = null;
+
     public FtcDcMotor  leftMotor   = null;
     public FtcDcMotor  rightMotor  = null;
     public FtcDcMotor  backLeftMotor = null;
