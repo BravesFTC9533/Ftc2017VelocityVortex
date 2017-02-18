@@ -46,10 +46,10 @@ public class Hardware9533
     public boolean invertedDrive = false;
 
     /* Public OpMode members. */
-    public DcMotor  leftMotor   = null;
-    public DcMotor  rightMotor  = null;
-    public DcMotor  backLeftMotor = null;
-    public DcMotor  backRightMotor = null;
+    public FtcDcMotor  leftMotor   = null;
+    public FtcDcMotor  rightMotor  = null;
+    public FtcDcMotor  backLeftMotor = null;
+    public FtcDcMotor  backRightMotor = null;
 
     public DcMotor elevator = null;
     public DcMotor intake = null;
@@ -98,19 +98,20 @@ public class Hardware9533
         //ods = hwMap.opticalDistanceSensor.get("ods");
 
         // Define and Initialize Motors
-        leftMotor   = hwMap.dcMotor.get("left");
-        rightMotor  = hwMap.dcMotor.get("right");
-        backLeftMotor = hwMap.dcMotor.get("backLeft");
-        backRightMotor = hwMap.dcMotor.get("backRight");
+        leftMotor   = new FtcDcMotor(hwMap, "left");
+        rightMotor  = new FtcDcMotor(hwMap, "right");
+        backLeftMotor = new FtcDcMotor(hwMap, "backLeft");
+        backRightMotor = new FtcDcMotor(hwMap, "backRight");
 
         //leftHold = hwMap.servo.get("leftHold");
         //rightHold= hwMap.servo.get("rightHold");
 
 
 
+        leftMotor.setInverted(true);
+        backLeftMotor.setInverted(true);
 
-        leftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        backLeftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
 
         intake = hwMap.dcMotor.get("ballGrabber");
         intake.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -143,15 +144,21 @@ public class Hardware9533
 
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
-        leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        backLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        backRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        backLeftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//        backRightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+//
+//        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        backLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        backRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        leftMotor.setBrakeModeEnabled(true);
+        rightMotor.setBrakeModeEnabled(true);
+        backLeftMotor.setBrakeModeEnabled(true);
+        backRightMotor.setBrakeModeEnabled(true);
+
 
         intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         elevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

@@ -6,45 +6,41 @@ package org.firstinspires.ftc.teamcode.Util;
 
 public class ButtonRange {
 
-    private int min;
-    private int max;
+    private double offset_inchset;
 
     private String name;
-    public int getMin(){
-        return  min;
+    public double getOffset(){
+        return offset_inchset;
     }
-    public int getMax() {
-        return max;
-    }
+
 
 
     public String getName() { return  name; }
 
-    public boolean inRange(double x) {
-        return x >= min && x <= max;
-    }
+
 
 
     public static ButtonRange LeftButton() {
         ButtonRange b = new ButtonRange();
-        b.min = -105 -20;
-        b.max = -70 -20;
+        b.offset_inchset = -3.5;
+//        b.min = -105 -20;
+//        b.max = -70 -20;
         b.name = "Left Button";
         return  b;
 
     }
     public static ButtonRange RightButton(){
         ButtonRange b = new ButtonRange();
-        b.min = 25 - 10;
-        b.max = 60 -10;
+        b.offset_inchset = 2;
+//        b.min = 25 - 10;
+//        b.max = 60 -10;
         b.name = "Right Button";
         return  b;
     }
 
     public static ButtonRange Unknown() {
         ButtonRange b = new ButtonRange();
-        b.min = 30;
-        b.max = 70;
+       b.offset_inchset = 0;
         b.name = "Unknown";
         return  b;
     }

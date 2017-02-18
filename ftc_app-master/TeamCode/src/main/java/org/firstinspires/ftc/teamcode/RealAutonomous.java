@@ -71,6 +71,7 @@ public class RealAutonomous extends MMOpMode_Linear {
     public static TeamColor teamColor = TeamColor.RED;
     public static int STRAFE = 0, FORWARD = 1;
 
+    static final float      MM_PER_INCH             = 25.4f;
     static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
     static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
     static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
@@ -78,6 +79,15 @@ public class RealAutonomous extends MMOpMode_Linear {
             (WHEEL_DIAMETER_INCHES * 3.1415);
     double timePerRotationClockwiseMS = 4 * 1000.0;
     double timePerRotationCounterClockwiseMS = 4.1 * 1000.0;
+
+
+
+    int leftFrontPosition = 0;
+    int leftBackPosition = 0;
+    int rightFrontPosition = 0;
+    int rightBackPosition = 0;
+
+
 
     enum TeamColor {
         BLUE,
@@ -324,46 +334,75 @@ public class RealAutonomous extends MMOpMode_Linear {
         robot.dashboard.displayPrintf(11, msg, args);
     }
 
-    private void driveFor(double secs, double h, double v, double r)
-    {
+    private void driveFor(double secs, double h, double v, double r) {
         runtime.reset();
         Drive(h, v, r);
         do {
         } while(opModeIsActive() && runtime.seconds() < secs);
     }
 
-    private void driveTo(double dist, double h, double v, double r)
-    {
-        while (robot.backLeftMotor.getCurrentPosition() != 0)
-        {
-            robot.backLeftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            robot.backRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    private void driveTo(double dist, double h, double v, double r) {
+
+        //21 5/8
+        //21 1/2
+        //21 1/8
+
+
+        if(Math.abs(h) > 0 && v == 0) {
+            dist *= 1.11;
         }
 
+        robot.backLeftMotor.resetPosition();
+        robot.backRightMotor.resetPosition();
+        robot.leftMotor.resetPosition();
+        robot.rightMotor.resetPosition();
 
-            robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.backLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.backRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        leftBackPosition = robot.backLeftMotor.getPosition();
+//        leftFrontPosition = robot.leftMotor.getCurrentPosition();
+//        rightBackPosition = robot.backRightMotor.getCurrentPosition();
+//        rightFrontPosition = robot.rightMotor.getCurrentPosition();
+
+
+
+//        while (robot.backLeftMotor.getCurrentPosition() != 0 && robot)
+//        {
+//            robot.backLeftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//            robot.backRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//            robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//            robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        }
+
+//        robot.leftMotor.setMaxSpeed(4000);
+//        robot.rightMotor.setMaxSpeed(4000);
+//        robot.backLeftMotor.setMaxSpeed(4000);
+//        robot.backRightMotor.setMaxSpeed(4000);
+//
+//        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        robot.backLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        robot.backRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         if (opModeIsActive())
         {
-            int backLeftTarget = Math.abs(robot.backLeftMotor.getCurrentPosition()) + (int)(dist*COUNTS_PER_INCH);          //-4000 , 1000   or    4000 , 7000      using abs limits direction
-            int frontLeftTarget = Math.abs(robot.leftMotor.getCurrentPosition()) + (int)(dist*COUNTS_PER_INCH);
-            int backRightTarget = Math.abs(robot.backRightMotor.getCurrentPosition()) + (int)(dist*COUNTS_PER_INCH);
-            int frontRightTarget = Math.abs(robot.rightMotor.getCurrentPosition()) + (int)(dist*COUNTS_PER_INCH);
+//            int backLeftTarget = Math.abs(robot.backLeftMotor.getCurrentPosition()) + (int)(dist*COUNTS_PER_INCH);          //-4000 , 1000   or    4000 , 7000      using abs limits direction
+//            int frontLeftTarget = Math.abs(robot.leftMotor.getCurrentPosition()) + (int)(dist*COUNTS_PER_INCH);
+//            int backRightTarget = Math.abs(robot.backRightMotor.getCurrentPosition()) + (int)(dist*COUNTS_PER_INCH);
+//            int frontRightTarget = Math.abs(robot.rightMotor.getCurrentPosition()) + (int)(dist*COUNTS_PER_INCH);
 
+            int target = (int)(dist*COUNTS_PER_INCH);
             mechDrive.Drive(h, v, r, false);
             do{
-                robot.dashboard.displayText(2, "backLeft: " + robot.backLeftMotor.getCurrentPosition() + " target: " + backLeftTarget);
-                robot.dashboard.displayText(3, "backRight: " + robot.backRightMotor.getCurrentPosition() + " target: " + backRightTarget);
-                robot.dashboard.displayText(4, "frontLeft: " + robot.rightMotor.getCurrentPosition() + " target: " + frontLeftTarget);
-                robot.dashboard.displayText(5, "frontRight: " + robot.leftMotor.getCurrentPosition() + " target: " + frontRightTarget);
+                robot.dashboard.displayText(2, "backLeft: " + robot.backLeftMotor.getPosition() + " target: " + target);
+                robot.dashboard.displayText(3, "backRight: " + robot.backRightMotor.getPosition() + " target: " + target);
+                robot.dashboard.displayText(4, "frontLeft: " + robot.rightMotor.getPosition() + " target: " + target);
+                robot.dashboard.displayText(5, "frontRight: " + robot.leftMotor.getPosition() + " target: " + target);
 
             }
-            while ((Math.abs(robot.backLeftMotor.getCurrentPosition()) < backLeftTarget) && (Math.abs(robot.backRightMotor.getCurrentPosition()) < backRightTarget) && (Math.abs(robot.rightMotor.getCurrentPosition()) < frontRightTarget) && (Math.abs(robot.leftMotor.getCurrentPosition()) < frontLeftTarget));
+            while ( opModeIsActive()
+                    && (Math.abs(robot.backLeftMotor.getPosition()) < target)
+                    && (Math.abs(robot.backRightMotor.getPosition()) < target)
+                    && (Math.abs(robot.rightMotor.getPosition()) < target)
+                    && (Math.abs(robot.leftMotor.getPosition()) < target));
             mechDrive.Stop();
         }
 
@@ -561,7 +600,11 @@ public class RealAutonomous extends MMOpMode_Linear {
 
             angleToWall = (Math.toDegrees(angles.getX()) + 270) % 360;
             moveToBeacon(currentLocation.getX(), currentLocation.getZ(), angleToWall - 90);
-        } while(opModeIsActive() && runtime.seconds() < 10 && (currentLocation.getX() > 50 || currentLocation.getX() < -50 || currentLocation.getZ() < -500));
+        } while(opModeIsActive()
+                && runtime.seconds() < 10
+//                && ((currentLocation.getX() > 50 || currentLocation.getX() < -50)
+                && currentLocation.getZ() < -(8*MM_PER_INCH));
+
     }
 
     private void moveToBeacon(double x, double z, double angle) {
@@ -571,10 +614,10 @@ public class RealAutonomous extends MMOpMode_Linear {
         // slow movement into beacon as we get closer
         if (z < -650) {
             h = -0.35;
-        } else if (z < -500) {
+        } else if (z < -600) {
             h = -0.3;
         } else {
-            h = 0;
+            h = -0.2;
         }
 
         //fix side to side movement
@@ -620,8 +663,7 @@ public class RealAutonomous extends MMOpMode_Linear {
 
     }
 
-    private void goForBeacon(VuforiaTrackableDefaultListener visibleBeacon)
-    {
+    private void goForBeacon(VuforiaTrackableDefaultListener visibleBeacon) {
         ButtonRange targetButton = null;
 
         if (opModeIsActive())
@@ -643,7 +685,7 @@ public class RealAutonomous extends MMOpMode_Linear {
 
         if (opModeIsActive())
         {
-            moveToBeacon(visibleBeacon);
+            moveToBeacon(visibleBeacon); //move in closer
             Stop();
             waitFor(0.1);
         }
@@ -662,12 +704,12 @@ public class RealAutonomous extends MMOpMode_Linear {
         {
             if (targetButton.getName().equals("Left Button"))
             {
-                driveTo(3.5, 0, 0.25, 0);
+                driveTo(Math.abs(targetButton.getOffset()), 0, 0.25, 0);
                 //waitFor(3000);
             }
             else if (targetButton.getName().equals("Right Button"))
             {
-                driveTo(2, 0, -0.25, 0);
+                driveTo(Math.abs(targetButton.getOffset()), 0, -0.25, 0);
             }
             else
             {
@@ -682,13 +724,17 @@ public class RealAutonomous extends MMOpMode_Linear {
             Stop();
             waitFor(0.1);
         }
+
+        MMTranslation currentLocation = getCurrentLocation(visibleBeacon);
+        double inches = Math.abs(currentLocation.getZ() / MM_PER_INCH);
+
         if (opModeIsActive())
         {
             //move in to press button
-            driveTo(19, -0.2, 0, 0);
+            driveTo(inches, -0.2, 0, 0);
 
             //move out away from button
-            driveTo(19, 0.2, 0, 0);
+            driveTo(23, 0.6, 0, 0);
         }
 
         waitFor(0.2);
@@ -710,13 +756,11 @@ public class RealAutonomous extends MMOpMode_Linear {
 
 
 
-    private void DriveOffWall()
-    {
+    private void DriveOffWall() {
         driveTo(67, -0.9, -0.9, 0);
         waitFor(0.1);
     }
-    private void Beacon1()
-    {
+    private void Beacon1() {
         VuforiaTrackableDefaultListener visibleBeacon = null;
 
         // move over to right a lil
@@ -745,26 +789,36 @@ public class RealAutonomous extends MMOpMode_Linear {
 
 
     }
-    private void Beacon2()
-    {
+    private void Beacon2(boolean didBeacon1) {
         VuforiaTrackableDefaultListener visibleBeacon = null;
 
-        int dist = 48;
+        double dist = 48;
 
-        if (teamColor == TeamColor.BLUE)
-        {
-            if (lastTarget.getName().equals("Left Button"))
-            {
-                dist -= 3;
-            }
+        if(didBeacon1) {
+
         }
-        else if (teamColor == TeamColor.RED)
-        {
-            if (lastTarget.getName().equals("Right Button"))
-            {
-                dist -= 3;
-            }
+
+        if(teamColor == TeamColor.RED) {
+            dist = (dist - lastTarget.getOffset());
+        } else {
+            dist = (dist + lastTarget.getOffset());
         }
+
+
+//        if (teamColor == TeamColor.BLUE)
+//        {
+//            if (lastTarget.getName().equals("Left Button"))
+//            {
+//                dist -= 3;
+//            }
+//        }
+//        else if (teamColor == TeamColor.RED)
+//        {
+//            if (lastTarget.getName().equals("Right Button"))
+//            {
+//                dist -= 3;
+//            }
+//        }
 
 
         driveTo(dist, 0, -0.9, 0);
@@ -787,77 +841,73 @@ public class RealAutonomous extends MMOpMode_Linear {
             goForBeacon(visibleBeacon);
         }
     }
-    private void Shoot()
-    {
+    private void Shoot() {
 
     }
-    private void Park()
-    {
+    private void Park() {
 
     }
 
 
-    public void runOpMode() throws InterruptedException
-    {
+    public void runOpMode() throws InterruptedException {
         super.runOpMode();
         robot.dashboard.displayText(0, "*****WAAAAAIITT!!!!!  for it to say ready");
-        initVuforia();
+        boolean driveOffWall = true,
+                beacon1 = true,
+                beacon2 = true,
+                shoot = false,
+                park = false,
+                test=false;
 
-        if (!OpenCVLoader.initDebug()) {
-            logState("Unable to initialize opencv");
-            waitFor(0.25);
-            //Logger.d("Internal OpenCV library not found. Using OpenCV Manager for initialization");
-            //OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_1_0, this, null);
-        } else {
-            //Logger.d("OpenCV library found inside package. Using it!");
-            //mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+        if(!test) {
+            initVuforia();
+
+            if (!OpenCVLoader.initDebug()) {
+                logState("Unable to initialize opencv");
+                waitFor(0.25);
+                //Logger.d("Internal OpenCV library not found. Using OpenCV Manager for initialization");
+                //OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_1_0, this, null);
+            } else {
+                //Logger.d("OpenCV library found inside package. Using it!");
+                //mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
+            }
         }
 
-        robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.backLeftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.backRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.backLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        robot.backRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         robot.dashboard.displayText(0, "Autonomous mode READY, waiting for start...");
         waitForStart();
 
-        boolean DriveOffWall = true,
-                Beacon1 = true,
-                Beacon2 = true,
-                Shoot = false,
-                Park = false;
+
 
         if (opModeIsActive())
         {
-            if (DriveOffWall)
+            if (driveOffWall)
             {
                 logState("[DriveOffWall]");
                 DriveOffWall();
             }
-            if (Beacon1)
+            if (beacon1)
             {
                 logState("[Beacon 1]");
                 Beacon1();
             }
-            if (Beacon2)
+            if (beacon2)
             {
                 logState("[Beacon 2]");
-                Beacon2();
+                Beacon2(beacon1);
             }
-            if (Shoot)
+            if (shoot)
             {
                 logState("[Shoot]");
                 Shoot();
             }
-            if (Park)
+            if (park)
             {
                 logState("[Park]");
                 Park();
+            }
+            if(test){
+                driveTo(24, 0.3, 0, 0);
             }
         }
     }
