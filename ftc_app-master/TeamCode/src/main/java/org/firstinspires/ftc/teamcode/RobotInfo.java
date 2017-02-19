@@ -24,6 +24,19 @@ class RobotInfo
     static final double     TURN_SPEED              = 0.5;
 
 
+    //counts per inch
+    //114.59493872353971032946044883018
+
+    //inches per count
+    //0.008726388889 - y
+    //0.007817390046 - x
+
+
+    //0.01667
+
+
+    //(1440 * IpC) / 3.1415 == wheel diameter
+
     //
     // INCHES_PER_COUNT: 0.0132166817227156
     // 12/06/2016: 0.2, 0.0, 0.0 [< 8] 0.2, 0.0, 0.0 (No speed control)
@@ -52,7 +65,7 @@ class RobotInfo
     static final double ENCODER_Y_KF                    = 0.0;
     static final double ENCODER_Y_TOLERANCE             = 2.0;
     static final double ENCODER_Y_SETTLING              = 0.2;
-    static final double ENCODER_Y_INCHES_PER_COUNT      = 1/COUNTS_PER_INCH;
+    static final double ENCODER_Y_INCHES_PER_COUNT      = 1/COUNTS_PER_INCH; //0.01667
 
     static final double SMALL_Y_THRESHOLD               = 8.0;
     static final double ENCODER_SMALL_Y_KP              = 0.045;

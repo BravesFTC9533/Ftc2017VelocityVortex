@@ -14,6 +14,7 @@ import com.qualcomm.ftcrobotcontroller.R;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Engagable;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import com.vuforia.CameraCalibration;
@@ -81,6 +82,9 @@ public class RealAutonomous extends MMOpMode_Linear {
     double timePerRotationCounterClockwiseMS = 4.1 * 1000.0;
 
 
+    //inches per count
+    double ENCODER_Y_INCHES_PER_COUNT = 0.008726388889;
+    double ENCODER_X_INCHES_PER_COUNT = 0.008180989581; // 0.007817390046;
 
     int leftFrontPosition = 0;
     int leftBackPosition = 0;
@@ -363,8 +367,16 @@ public class RealAutonomous extends MMOpMode_Linear {
 
         if (opModeIsActive())
         {
+            int target = 0;
 
-            int target = (int)(dist*COUNTS_PER_INCH);
+            if(v != 0 && h == 0) {
+                target = (int)(dist / ENCODER_Y_INCHES_PER_COUNT);
+            } else if(h != 0 && v == 0) {
+                target = (int)(dist / ENCODER_X_INCHES_PER_COUNT);
+            } else {
+                target = (int)(dist*COUNTS_PER_INCH);
+            }
+
             boolean closeToTarget = false;
             //mechDrive.Drive(h, v, r, false);
             //scaleDrive(target, h, v);
@@ -399,9 +411,9 @@ public class RealAutonomous extends MMOpMode_Linear {
 
     }
 
-    private double getScalePower(double target, double pos) {
+    private double getScalePower(double target, double pos, double power) {
         double percent = 0.0 ;
-        double max = 4000;
+        double max = power;
 
         if(pos > 0) {
             percent = pos / target;
@@ -417,7 +429,7 @@ public class RealAutonomous extends MMOpMode_Linear {
             newVal = max * 0.75;
         }
 
-        robot.dashboard.displayPrintf(9,  "Max speed: %f", newVal);
+        robot.dashboard.displayPrintf(9,  "Max power: %f", newVal);
         robot.dashboard.displayPrintf(10, "pos      : %f", pos);
         robot.dashboard.displayPrintf(11, "target   : %f", target);
         robot.dashboard.displayPrintf(12, "percent  : %f", percent);
@@ -430,19 +442,19 @@ public class RealAutonomous extends MMOpMode_Linear {
 
     private void scaleDriveV(int target, double v){
         double pos = Math.abs(robot.leftMotor.getPosition());
-        double scalePower = getScalePower(target, pos);
+        double scalePower = getScalePower(target, pos, v);
 
-        robot.setMaxSpeed((int)scalePower);
+        //robot.setMaxSpeed((int)scalePower);
 
-        mechDrive.Drive(0, v, 0, false);
+        mechDrive.Drive(0, scalePower, 0, false);
 
     }
 
     private void scaleDriveH(int target, double h){
         double pos = Math.abs(robot.leftMotor.getPosition());
-        double scalePower = getScalePower(target, pos);
-        robot.setMaxSpeed((int)scalePower);
-        mechDrive.Drive(h, 0, 0, false);
+        double scalePower = getScalePower(target, pos, h);
+        //robot.setMaxSpeed((int)scalePower);
+        mechDrive.Drive(scalePower, 0, 0, false);
     }
 
     public MMTranslation anglesFromTarget(VuforiaTrackableDefaultListener image) {
@@ -749,31 +761,8 @@ public class RealAutonomous extends MMOpMode_Linear {
             waitFor(0.1);
         }
 
-//        if (opModeIsActive())
-//        {
-//            if (targetButton.getName().equals("Left Button"))
-//            {
-//                driveTo(Math.abs(targetButton.getOffset()), 0, 0.25, 0);
-//
-//            }
-//            else if (targetButton.getName().equals("Right Button"))
-//            {
-//                driveTo(Math.abs(targetButton.getOffset()), 0, -0.25, 0);
-//            }
-//            else
-//            {
-//
-//            }
-//            Stop();
-//        }
 
-//        if (opModeIsActive())
-//        {
-//            fixAngles(visibleBeacon);
-//            Stop();
-//            waitFor(0.1);
-//        }
-
+        //calculate how far away in inches from image
         MMTranslation currentLocation = getCurrentLocation(visibleBeacon);
         double inches = Math.abs(currentLocation.getZ() / MM_PER_INCH) - 5;
 
