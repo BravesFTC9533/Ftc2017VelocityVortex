@@ -89,6 +89,10 @@ public class RealAutonomous extends MMOpMode_Linear {
     double timePerRotationCounterClockwiseMS = 4.1 * 1000.0;
 
 
+    //vuforia pause
+    static final double VUFORIA_PAUSE_TO_FIND_COLOR = 1.0;
+    static final double VUFORIA_PAUSE_TO_CENTER = 0.5;
+
     //inches per count
     double ENCODER_Y_INCHES_PER_COUNT = 0.008726388889;
     double ENCODER_X_INCHES_PER_COUNT = 0.007953739871; //0.008180989581; // 0.007817390046;
@@ -824,7 +828,7 @@ public class RealAutonomous extends MMOpMode_Linear {
         //Stop();
 
 
-        waitFor(1);
+        waitFor(VUFORIA_PAUSE_TO_FIND_COLOR);
         //pauseBetweenSteps();
 
         targetButton = getTargetButton(visibleBeacon);
@@ -836,11 +840,10 @@ public class RealAutonomous extends MMOpMode_Linear {
 
         robot.dashboard.displayText(13, "Beacon Config: " + targetButton.getName());
         MMTranslation currentLocation = getCurrentLocation(visibleBeacon);
-
-
         centerOnBeacon(currentLocation);
 
 
+        waitFor(VUFORIA_PAUSE_TO_CENTER);
 //        if (opModeIsActive())
 //        {
 //            logState("Moving in closer to beacon");
@@ -857,48 +860,37 @@ public class RealAutonomous extends MMOpMode_Linear {
             logState("Fixing angle..");
             fixAngles(visibleBeacon);
             Stop();
-            waitFor(0.3);
+            waitFor(VUFORIA_PAUSE_TO_CENTER);
         }
 
 
         //calculate how far away in inches from image
         currentLocation = getCurrentLocation(visibleBeacon);
-        double inches = Math.abs(currentLocation.getZ() / MM_PER_INCH) - 4.3;
+        double inches = Math.abs(currentLocation.getZ() / MM_PER_INCH) - 4;
 
 
-        pauseBetweenSteps();
+        //pauseBetweenSteps();
 
         if (opModeIsActive())
         {
             logState("Driving into beacon %f inches", inches);
             //move in to press button
             driveTo(inches / 2, -0.4, 0, 0);
-            pauseBetweenSteps();
-
+            //pauseBetweenSteps();
+            waitFor(VUFORIA_PAUSE_TO_CENTER);
 
             fixAngles(visibleBeacon);
 
-            waitFor(0.3);
+            waitFor(VUFORIA_PAUSE_TO_CENTER);
 
             currentLocation = getCurrentLocation(visibleBeacon);
 
             centerOnBeacon(currentLocation);
-            waitFor(0.3);
-//            if(Math.abs(currentLocation.getX() + 20) > 10) {
-//
-//                //we need to move!
-//                inches = Math.abs(currentLocation.getX() + 20) / MM_PER_INCH;
-//
-//                logState("[Center on beacon] NEED TO CORRECT x: %f, inches: %f", currentLocation.getX(), inches);
-//
-//                //waitFor();
-//
-//                double power = (currentLocation.getX() + 20) > 0 ? 0.3 : -0.3;
-//                driveTo(inches, 0, power, 0);
-//                pauseBetweenSteps();
-//            }
+            waitFor(VUFORIA_PAUSE_TO_CENTER);
+
 
             fixAngles(visibleBeacon);
+
 
             currentLocation = getCurrentLocation(visibleBeacon);
 
@@ -921,6 +913,7 @@ public class RealAutonomous extends MMOpMode_Linear {
 
             //pauseBetweenSteps();
 
+            waitFor(VUFORIA_PAUSE_TO_CENTER);
             fixAngles(visibleBeacon);
 
             pauseBetweenSteps();
@@ -931,11 +924,6 @@ public class RealAutonomous extends MMOpMode_Linear {
 
         pauseBetweenSteps();
 
-        if (opModeIsActive())
-        {
-            fixAngles(visibleBeacon);
-
-        }
 
     }
 
@@ -962,19 +950,20 @@ public class RealAutonomous extends MMOpMode_Linear {
 
     private void pauseBetweenSteps(){
         //logPath("pausing waiting 2 seconds");
-        waitFor(0.1);
+        waitFor(0.2);
     }
 
     private void DriveOffWall() {
-        driveTo(67, -0.5, -0.5, 0);
-        waitFor(0.1);
+        double length = teamColor == TeamColor.BLUE ? 60 : 67;
 
-        // move over a lil
-        double length = teamColor == TeamColor.RED ? 17 : 19;
-        driveTo(length, 0, -0.9, 0);
+
+        driveTo(length, -0.5, -0.5, 0);
+        waitFor(0.1);
+        length = teamColor == TeamColor.RED ? 17 : 21;
+        driveTo(length, 0, -0.7, 0);
         Stop();
 
-        waitFor(0.5);
+        waitFor(1);
 
     }
 
