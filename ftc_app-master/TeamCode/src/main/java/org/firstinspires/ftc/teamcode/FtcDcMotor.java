@@ -70,9 +70,12 @@ public class FtcDcMotor
         this.instanceName = instanceName;
 
         motor = hardwareMap.dcMotor.get(instanceName);
-        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        motor.setMaxSpeed(2000);
+//        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        while(motor.isBusy()) {
+//
+//        }
+//        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        motor.setMaxSpeed(4000);
 
         zeroEncoderValue = motor.getCurrentPosition();
         prevEncPos = zeroEncoderValue;

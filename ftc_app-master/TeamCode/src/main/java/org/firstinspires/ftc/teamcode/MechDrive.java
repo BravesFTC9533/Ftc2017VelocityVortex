@@ -131,7 +131,7 @@ public class MechDrive {
 
     }
 
-    public void Turn(int angle){
+    public void Turn(double angle){
 
         double timeForTurn = 0.0;
 
@@ -152,6 +152,7 @@ public class MechDrive {
         }
 
         runtime.reset();
+
         Drive(0, 0, rotationSpeed);
         while(runtime.milliseconds() < timeForTurn) {
             hardware.dashboard.displayPrintf(14, "Runtime: %f", runtime.milliseconds());

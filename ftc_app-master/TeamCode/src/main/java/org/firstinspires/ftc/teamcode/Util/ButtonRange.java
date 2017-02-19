@@ -22,7 +22,8 @@ public class ButtonRange {
 
     public static ButtonRange LeftButton() {
         ButtonRange b = new ButtonRange();
-        b.offset_inchset = -3.5;
+        //b.offset_inchset = -3.5;
+        b.offset_inchset = 0;
 //        b.min = -105 -20;
 //        b.max = -70 -20;
         b.name = "Left Button";
@@ -31,7 +32,8 @@ public class ButtonRange {
     }
     public static ButtonRange RightButton(){
         ButtonRange b = new ButtonRange();
-        b.offset_inchset = 2;
+        //b.offset_inchset = 2;
+        b.offset_inchset = 0;
 //        b.min = 25 - 10;
 //        b.max = 60 -10;
         b.name = "Right Button";
