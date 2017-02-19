@@ -37,14 +37,11 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
+import android.content.res.Resources;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
-import android.media.MediaPlayer;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -59,7 +56,6 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.firstinspires.ftc.robotcontroller.Util.Global;
 import com.google.blocks.ftcrobotcontroller.BlocksActivity;
 import com.google.blocks.ftcrobotcontroller.ProgrammingModeActivity;
 import com.google.blocks.ftcrobotcontroller.ProgrammingModeControllerImpl;
@@ -98,13 +94,10 @@ import org.firstinspires.ftc.robotcore.internal.AppUtil;
 import org.firstinspires.inspection.RcInspectionActivity;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class FtcRobotControllerActivity extends Activity implements SensorEventListener {
+public class FtcRobotControllerActivity extends Activity {
 
   public static final String TAG = "RCActivity";
 
@@ -200,39 +193,11 @@ public class FtcRobotControllerActivity extends Activity implements SensorEventL
     }
   }
 
-
-  public void onSensorChanged(SensorEvent event)
-  {
-    Global.compass = Math.round(event.values[0]);
-  }
-  public void onAccuracyChanged(Sensor sensor, int accurracy){}
-
-  private SensorManager sensorManager;
-
-  public void writePic()
-  {
-    try
-    {
-      FileOutputStream out = new FileOutputStream(new File("/storage/emulated/0/", "poop.txt"));
-      out.write((new String("ppoooop")).getBytes());
-      out.close();
-    } catch (FileNotFoundException e){}
-    catch (IOException e){}
-
-
-  }
-
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     RobotLog.writeLogcatToDisk();
     RobotLog.vv(TAG, "onCreate()");
-
-    //writePic();
-
-    Global.init();   /****** Our stuff that needs to be initialized when the app starts*/
-    Global.context = this;
-    sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
     receivedUsbAttachmentNotifications = new ConcurrentLinkedQueue<UsbDevice>();
     eventLoop = null;
@@ -242,7 +207,6 @@ public class FtcRobotControllerActivity extends Activity implements SensorEventL
     context = this;
     utility = new Utility(this);
     appUtil.setThisApp(new PeerAppRobotController(context));
-
 
     entireScreenLayout = (LinearLayout) findViewById(R.id.entire_screen);
     buttonMenu = (ImageButton) findViewById(R.id.menu_buttons);
@@ -264,8 +228,6 @@ public class FtcRobotControllerActivity extends Activity implements SensorEventL
       configFile.markClean();
       cfgFileMgr.setActiveConfig(false, configFile);
     }
-
-
 
     textDeviceName = (TextView) findViewById(R.id.textDeviceName);
     textNetworkConnectionStatus = (TextView) findViewById(R.id.textNetworkConnectionStatus);
@@ -295,9 +257,8 @@ public class FtcRobotControllerActivity extends Activity implements SensorEventL
 
     wifiLock.acquire();
     callback.networkConnectionUpdate(WifiDirectAssistant.Event.DISCONNECTED);
+    readNetworkType(NETWORK_TYPE_FILENAME);
     bindToService();
-
-
   }
 
   protected UpdateUI createUpdateUI() {
@@ -337,9 +298,6 @@ public class FtcRobotControllerActivity extends Activity implements SensorEventL
   protected void onResume() {
     super.onResume();
     RobotLog.vv(TAG, "onResume()");
-    readNetworkType(NETWORK_TYPE_FILENAME);
-
-    sensorManager.registerListener(this, sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), SensorManager.SENSOR_DELAY_GAME);
   }
 
   @Override
@@ -349,8 +307,6 @@ public class FtcRobotControllerActivity extends Activity implements SensorEventL
     if (programmingModeController.isActive()) {
       programmingModeController.stopProgrammingMode();
     }
-
-    sensorManager.unregisterListener(this);
   }
 
   @Override
@@ -407,6 +363,12 @@ public class FtcRobotControllerActivity extends Activity implements SensorEventL
     String fileContents = readFile(networkTypeFile);
     networkType = NetworkConnectionFactory.getTypeFromString(fileContents);
     programmingModeController.setCurrentNetworkType(networkType);
+
+    // update the preferences
+    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+    SharedPreferences.Editor editor = preferences.edit();
+    editor.putString(NetworkConnectionFactory.NETWORK_CONNECTION_TYPE, networkType.toString());
+    editor.commit();
   }
 
   private String readFile(File file) {
@@ -534,7 +496,13 @@ public class FtcRobotControllerActivity extends Activity implements SensorEventL
     HardwareFactory factory;
     RobotConfigFile file = cfgFileMgr.getActiveConfigAndUpdateUI();
     HardwareFactory hardwareFactory = new HardwareFactory(context);
-    hardwareFactory.setXmlPullParser(file.getXml());
+    try {
+      hardwareFactory.setXmlPullParser(file.getXml());
+    } catch (Resources.NotFoundException e) {
+      file = RobotConfigFile.noConfig(cfgFileMgr);
+      hardwareFactory.setXmlPullParser(file.getXml());
+      cfgFileMgr.setActiveConfigAndUpdateUI(false, file);
+    }
     factory = hardwareFactory;
 
     eventLoop = new FtcEventLoop(factory, createOpModeRegister(), callback, this, programmingModeController);

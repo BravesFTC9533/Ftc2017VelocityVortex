@@ -1053,9 +1053,9 @@ public class RealAutonomous extends MMOpMode_Linear {
     public void runOpMode() throws InterruptedException {
         super.runOpMode();
         robot.dashboard.displayText(0, "*****WAAAAAIITT!!!!!  for it to say ready");
-        boolean driveOffWall = false,
+        boolean driveOffWall = true,
                 beacon1 = true,
-                beacon2 = false,
+                beacon2 = true,
 
                 shoot = false,
                 park = false,
