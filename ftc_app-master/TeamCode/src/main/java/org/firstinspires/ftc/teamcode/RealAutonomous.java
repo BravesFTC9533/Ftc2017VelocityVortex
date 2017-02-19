@@ -30,6 +30,9 @@ import org.firstinspires.ftc.robotcontroller.Util.Global;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
@@ -66,10 +69,14 @@ import static org.firstinspires.ftc.teamcode.Util.VortexUtils.getImageFromFrame;
 @Autonomous(name = "RealAutonomous", group = "Autobot")
 public class RealAutonomous extends MMOpMode_Linear {
 
-    private VuforiaLocalizer vuforia;
+    //private VuforiaLocalizer vuforia;
     private ElapsedTime runtime = new ElapsedTime();
-    private VuforiaTrackables beacons;
-    public static TeamColor teamColor = TeamColor.RED;
+    //private VuforiaTrackables beacons;
+
+    VuforiaVision vuforiaVision = null;
+
+
+    public static TeamColor teamColor = TeamColor.BLUE;
     public static int STRAFE = 0, FORWARD = 1;
 
     static final float      MM_PER_INCH             = 25.4f;
@@ -84,7 +91,8 @@ public class RealAutonomous extends MMOpMode_Linear {
 
     //inches per count
     double ENCODER_Y_INCHES_PER_COUNT = 0.008726388889;
-    double ENCODER_X_INCHES_PER_COUNT = 0.008180989581; // 0.007817390046;
+    double ENCODER_X_INCHES_PER_COUNT = 0.007953739871; //0.008180989581; // 0.007817390046;
+
 
     int leftFrontPosition = 0;
     int leftBackPosition = 0;
@@ -100,49 +108,52 @@ public class RealAutonomous extends MMOpMode_Linear {
 
     private void initVuforia() {
 
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
-        parameters.vuforiaLicenseKey = "AeWceoD/////AAAAGWvk7AQGLUiTsyU4mSW7gfldjSCDQHX76lt9iPO5D8zaboG428rdS9WN0+AFpAlc/g4McLRAQIb5+ijFCPJJkLc+ynXYdhljdI2k9R4KL8t3MYk/tbmQ75st9VI7//2vNkp0JHV6oy4HXltxVFcEbtBYeTBJ9CFbMW+0cMNhLBPwHV7RYeNPZRgxf27J0oO8VoHOlj70OYdNYos5wvDM+ZbfWrOad/cpo4qbAw5iB95T5I9D2/KRf1HQHygtDl8/OtDFlOfqK6v2PTvnEbNnW1aW3vPglGXknX+rm0k8b0S7GFJkgl7SLq/HFNl0VEIVJGVQe9wt9PB6bJuxOMMxN4asy4rW5PRRBqasSM7OLl4W";
-        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
-        this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
-        vuforia.setFrameQueueCapacity(1);
+        vuforiaVision = new VuforiaVision(robot);
+        vuforiaVision.setEnabled(true);
+
+//        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
+//        parameters.vuforiaLicenseKey = "AeWceoD/////AAAAGWvk7AQGLUiTsyU4mSW7gfldjSCDQHX76lt9iPO5D8zaboG428rdS9WN0+AFpAlc/g4McLRAQIb5+ijFCPJJkLc+ynXYdhljdI2k9R4KL8t3MYk/tbmQ75st9VI7//2vNkp0JHV6oy4HXltxVFcEbtBYeTBJ9CFbMW+0cMNhLBPwHV7RYeNPZRgxf27J0oO8VoHOlj70OYdNYos5wvDM+ZbfWrOad/cpo4qbAw5iB95T5I9D2/KRf1HQHygtDl8/OtDFlOfqK6v2PTvnEbNnW1aW3vPglGXknX+rm0k8b0S7GFJkgl7SLq/HFNl0VEIVJGVQe9wt9PB6bJuxOMMxN4asy4rW5PRRBqasSM7OLl4W";
+//        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
+//        this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
+//        vuforia.setFrameQueueCapacity(1);
         Vuforia.setFrameFormat(PIXEL_FORMAT.RGB565, true);
-
-
-        Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS, 4);
-
-        beacons = this.vuforia.loadTrackablesFromAsset("FTC_2016-17");
-        beacons.get(0).setName("Wheels");
-        beacons.get(1).setName("Tools");
-        beacons.get(2).setName("Legos");
-        beacons.get(3).setName("Gears");
-
-        beacons.activate();
+//
+//
+//        Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS, 4);
+//
+//        beacons = this.vuforia.loadTrackablesFromAsset("FTC_2016-17");
+//        beacons.get(0).setName("Wheels");
+//        beacons.get(1).setName("Tools");
+//        beacons.get(2).setName("Legos");
+//        beacons.get(3).setName("Gears");
+//
+//        beacons.activate();
     }
 
-    private VuforiaTrackableDefaultListener getVisibleBeacon() {
-        for (VuforiaTrackable b : beacons) {
+//    private VuforiaTrackableDefaultListener getVisibleBeacon() {
+//        for (VuforiaTrackable b : beacons) {
+//
+//            VuforiaTrackableDefaultListener beacon = (VuforiaTrackableDefaultListener) b.getListener();
+//
+//            if(beacon.isVisible()){
+//                return beacon;
+//            }
+//
+//        }
+//        return null;
+//    }
 
-            VuforiaTrackableDefaultListener beacon = (VuforiaTrackableDefaultListener) b.getListener();
-
-            if(beacon.isVisible()){
-                return beacon;
-            }
-
-        }
-        return null;
-    }
-
-    private VuforiaTrackableDefaultListener getBeacon(String name) {
-        for (VuforiaTrackable b : beacons)
-        {
-            VuforiaTrackableDefaultListener beacon = (VuforiaTrackableDefaultListener) b.getListener();
-            if (b.getName().equalsIgnoreCase(name) && beacon.isVisible())
-            {
-                return beacon;
-            }
-        }
-        return null;
-    }
+//    private VuforiaTrackableDefaultListener getBeacon(String name) {
+//        for (VuforiaTrackable b : beacons)
+//        {
+//            VuforiaTrackableDefaultListener beacon = (VuforiaTrackableDefaultListener) b.getListener();
+//            if (b.getName().equalsIgnoreCase(name) && beacon.isVisible())
+//            {
+//                return beacon;
+//            }
+//        }
+//        return null;
+//    }
 
     private MMTranslation getCurrentLocation(VuforiaTrackableDefaultListener beacon) {
         OpenGLMatrix pose = beacon.getPose();
@@ -338,12 +349,12 @@ public class RealAutonomous extends MMOpMode_Linear {
         robot.dashboard.displayPrintf(11, msg, args);
     }
 
-    private void driveFor(double secs, double h, double v, double r) {
-        runtime.reset();
-        Drive(h, v, r);
-        do {
-        } while(opModeIsActive() && runtime.seconds() < secs);
-    }
+//    private void driveFor(double secs, double h, double v, double r) {
+//        runtime.reset();
+//        Drive(h, v, r);
+//        do {
+//        } while(opModeIsActive() && runtime.seconds() < secs);
+//    }
 
     private void driveTo(double dist, double h, double v, double r) {
 
@@ -351,6 +362,9 @@ public class RealAutonomous extends MMOpMode_Linear {
         //21 1/2
         //21 1/8
 
+        if(teamColor == TeamColor.BLUE) {
+            v *= -1;
+        }
 
         if(Math.abs(h) > 0 && v == 0) {
             dist *= 1.11;
@@ -363,7 +377,7 @@ public class RealAutonomous extends MMOpMode_Linear {
 
         robot.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        robot.setMaxSpeed(4000);
+        robot.setMaxSpeed(3000);
 
         if (opModeIsActive())
         {
@@ -386,7 +400,11 @@ public class RealAutonomous extends MMOpMode_Linear {
                 robot.dashboard.displayText(4, "frontLeft: " + robot.rightMotor.getPosition() + " target: " + target);
                 robot.dashboard.displayText(5, "frontRight: " + robot.leftMotor.getPosition() + " target: " + target);
 
-                scaleDrive(target, h, v);
+                if(dist < 20) {
+                    mechDrive.Drive(h, v, 0, false);
+                } else {
+                    scaleDrive(target, h, v);
+                }
 
             }
             while ( opModeIsActive()
@@ -403,15 +421,57 @@ public class RealAutonomous extends MMOpMode_Linear {
 
         if(h == 0 && v != 0) {
             scaleDriveV(target, v);
-        } else if(v == 0 && h != 0) {
-            scaleDriveH(target, h);
+//        } else if(v == 0 && h != 0) {
+//            scaleDriveH(target, h);
         } else {
             mechDrive.Drive(h, v, 0, false);
         }
 
     }
 
+    private double easingInOut(double pos, double target, double currentPower, double targetPower) {
+        //t = current time
+        //d = duration
+        //b = initial value
+        //c = change in value
+
+        double t= pos;
+        double d = target;
+        double b = currentPower * 100;
+        double c = targetPower * 100;
+        double retval = 0.0;
+
+//        t /= d/2;
+//        if(t < 1) {
+//            if(t == 0) {
+//                t = 0.01;
+//            }
+//            retval = c/2*t*t*t+b;
+//        } else {
+//            t -= 2;
+//            retval = c / 2 * (t * t * t + 2) + b;
+//        }
+//
+//        retval /= 100;
+
+        double ts =(t/=d)*t;
+        double tc =ts*t;
+        retval = (b+c*(6*tc*ts + -15*ts*ts + 10*tc)) / 100;
+
+
+        if(Math.abs(retval) < 0.1) {
+            retval = 0.1;
+            if(targetPower < 0) {
+                retval *= -1;
+            }
+        }
+        return  retval;
+    }
+
     private double getScalePower(double target, double pos, double power) {
+
+
+
         double percent = 0.0 ;
         double max = power;
 
@@ -423,16 +483,26 @@ public class RealAutonomous extends MMOpMode_Linear {
 
         if(percent >= 0.90) {
             newVal = max * 0.3;
-        } else if(percent >= 0.75) {
+        } else if(percent >= 0.85) {
             newVal = max * 0.5;
-        } else if(percent >= 0.5) {
+        } else if(percent >= 0.8) {
             newVal = max * 0.75;
+        } else if(percent >= 0.2) {
+            newVal = max;
+        } else if(percent >= 0.15) {
+            newVal = max * 0.75;
+        } else if(percent >= 0.10) {
+            newVal = max * 0.5;
+        } else if(percent >= 0.05) {
+            newVal = max * 0.4;
+        } else {
+            newVal = max * 0.3;
         }
 
-        robot.dashboard.displayPrintf(9,  "Max power: %f", newVal);
-        robot.dashboard.displayPrintf(10, "pos      : %f", pos);
-        robot.dashboard.displayPrintf(11, "target   : %f", target);
-        robot.dashboard.displayPrintf(12, "percent  : %f", percent);
+//        robot.dashboard.displayPrintf(9,  "Max power: %f", newVal);
+//        robot.dashboard.displayPrintf(10, "pos      : %f", pos);
+//        robot.dashboard.displayPrintf(11, "target   : %f", target);
+//        robot.dashboard.displayPrintf(12, "percent  : %f", percent);
 
 
 
@@ -442,6 +512,9 @@ public class RealAutonomous extends MMOpMode_Linear {
 
     private void scaleDriveV(int target, double v){
         double pos = Math.abs(robot.leftMotor.getPosition());
+        double power = robot.leftMotor.getPower();
+        //double scalePower = easingInOut(pos, target, power, v);
+
         double scalePower = getScalePower(target, pos, v);
 
         //robot.setMaxSpeed((int)scalePower);
@@ -452,6 +525,9 @@ public class RealAutonomous extends MMOpMode_Linear {
 
     private void scaleDriveH(int target, double h){
         double pos = Math.abs(robot.leftMotor.getPosition());
+        double power = robot.leftMotor.getPower();
+        //double scalePower = easingInOut(pos, target, power, h);
+
         double scalePower = getScalePower(target, pos, h);
         //robot.setMaxSpeed((int)scalePower);
         mechDrive.Drive(scalePower, 0, 0, false);
@@ -556,18 +632,15 @@ public class RealAutonomous extends MMOpMode_Linear {
         boolean usingFrontCamera = true;
 
         try {
-            Image img = getImageFromFrame(vuforia.getFrameQueue().take(), PIXEL_FORMAT.RGB565);
+            Image img = getImageFromFrame(vuforiaVision.getFrame(), PIXEL_FORMAT.RGB565);
 
             runtime.reset();
 
             do {
-                color = getBeaconConfig(img, listener, vuforia.getCameraCalibration()); //TODO
+                color = getBeaconConfig(img, listener, vuforiaVision.getCameraCalibration()); //TODO
             }
             while (opModeIsActive() && runtime.seconds() < 5 && color == -1);
 
-
-
-        } catch (InterruptedException e) {
         }
         catch(Throwable e) {
             robot.dashboard.displayText(0, e.getMessage().toString());
@@ -636,86 +709,105 @@ public class RealAutonomous extends MMOpMode_Linear {
 
     }
 
-    private void moveToBeacon(VuforiaTrackableDefaultListener visibleBeacon) {
-        logState("[MOVE_TO_BEACON] Move closer to beacon");
+//    private void moveToBeacon(VuforiaTrackableDefaultListener visibleBeacon) {
+//        logState("[MOVE_TO_BEACON] Move closer to beacon");
+//
+//        //VuforiaTrackableDefaultListener visibleBeacon = null;
+//        MMTranslation angles;
+//        MMTranslation currentLocation = null;
+//        double angleToWall;
+//
+//        angles = anglesFromTarget(visibleBeacon);
+//        runtime.reset();
+//        do {
+//            //visibleBeacon = getVisibleBeacon();
+//            if(visibleBeacon == null){
+//                Stop();
+//                logState("Unable to find beacon");
+//                return;
+//            }
+//            currentLocation = getCurrentLocation(visibleBeacon);
+//
+//            angleToWall = (Math.toDegrees(angles.getX()) + 270) % 360;
+//            moveToBeacon(currentLocation.getX(), currentLocation.getZ(), angleToWall - 90);
+//        } while(opModeIsActive()
+//                && runtime.seconds() < 10
+////                && ((currentLocation.getX() > 50 || currentLocation.getX() < -50)
+//                && currentLocation.getZ() < -(8*MM_PER_INCH));
+//
+//    }
 
-        //VuforiaTrackableDefaultListener visibleBeacon = null;
-        MMTranslation angles;
-        MMTranslation currentLocation = null;
-        double angleToWall;
+//    private void moveToBeacon(double x, double z, double angle) {
+//        double h=0,v=0,r=0;
+//
+//
+//        // slow movement into beacon as we get closer
+//        if (z < -650) {
+//            h = -0.6;
+//        } else if (z < -600) {
+//            h = -0.5;
+//        } else {
+//            h = -0.3;
+//        }
+//
+//        //fix side to side movement
+//
+//        if(x > 100 || x < -100)
+//        {
+//            v = 0.15;
+//        }
+//        else if(x > 50 || x < -50)
+//        {
+//            v = 0.1;
+//        }
+//        else if(x < 25 && x > -25)
+//        {
+//            v = 0.0;
+//        }
+//
+//        robot.dashboard.displayText(10, ""+x);
+//
+//
+//        if(x < 0) {
+//            v *= -1;
+//        }
+//
+//
+//        if(Math.abs(angle) > 10) {
+//            r = 0.1;
+//        }
+//        if (Math.abs((angle)) > 5) {
+//            r = 0.05;
+//        } else if (Math.abs((angle)) < 2.1) {
+//            r = 0;
+//        }
+//
+//        if(angle < 0) {
+//            r = 0-r;
+//        }
+//
+//        if (opModeIsActive())
+//        {
+//            Drive(h, v, r);
+//        }
+//
+//    }
 
-        angles = anglesFromTarget(visibleBeacon);
-        runtime.reset();
-        do {
-            //visibleBeacon = getVisibleBeacon();
-            if(visibleBeacon == null){
-                Stop();
-                logState("Unable to find beacon");
-                return;
+
+    private void centerOnBeacon(MMTranslation currentLocation) {
+        if(Math.abs(currentLocation.getX() + 20) > 10) {
+
+            //we need to move!
+            double inches = Math.abs(currentLocation.getX() + 20) / MM_PER_INCH;
+
+            logState("[Center on beacon] NEED TO CORRECT x: %f, inches: %f", currentLocation.getX(), inches);
+
+            double power = (currentLocation.getX() + 20) > 0 ? 0.3 : -0.3;
+            if(teamColor == TeamColor.BLUE) {
+                power *= -1;
             }
-            currentLocation = getCurrentLocation(visibleBeacon);
-
-            angleToWall = (Math.toDegrees(angles.getX()) + 270) % 360;
-            moveToBeacon(currentLocation.getX(), currentLocation.getZ(), angleToWall - 90);
-        } while(opModeIsActive()
-                && runtime.seconds() < 10
-//                && ((currentLocation.getX() > 50 || currentLocation.getX() < -50)
-                && currentLocation.getZ() < -(8*MM_PER_INCH));
-
-    }
-
-    private void moveToBeacon(double x, double z, double angle) {
-        double h=0,v=0,r=0;
-
-
-        // slow movement into beacon as we get closer
-        if (z < -650) {
-            h = -0.6;
-        } else if (z < -600) {
-            h = -0.5;
-        } else {
-            h = -0.3;
-        }
-
-        //fix side to side movement
-
-        if(x > 100 || x < -100)
-        {
-            v = 0.15;
-        }
-        else if(x > 50 || x < -50)
-        {
-            v = 0.1;
-        }
-        else if(x < 25 && x > -25)
-        {
-            v = 0.0;
-        }
-
-        robot.dashboard.displayText(10, ""+x);
-
-
-        if(x < 0) {
-            v *= -1;
-        }
-
-
-        if(Math.abs(angle) > 10) {
-            r = 0.1;
-        }
-        if (Math.abs((angle)) > 5) {
-            r = 0.05;
-        } else if (Math.abs((angle)) < 2.1) {
-            r = 0;
-        }
-
-        if(angle < 0) {
-            r = 0-r;
-        }
-
-        if (opModeIsActive())
-        {
-            Drive(h, v, r);
+            driveTo(inches, 0, power, 0);
+            pauseBetweenSteps();
         }
 
     }
@@ -729,10 +821,11 @@ public class RealAutonomous extends MMOpMode_Linear {
             fixAngles(visibleBeacon);
         }
 
-        Stop();
+        //Stop();
 
 
-        pauseBetweenSteps();
+        waitFor(1);
+        //pauseBetweenSteps();
 
         targetButton = getTargetButton(visibleBeacon);
         if(targetButton == null || targetButton.getName().equals(ButtonRange.Unknown().getName())){
@@ -740,15 +833,21 @@ public class RealAutonomous extends MMOpMode_Linear {
             return;
         }
 
-        robot.dashboard.displayText(13, "Beacon Config: " + targetButton.getName());
 
-        if (opModeIsActive())
-        {
-            logState("Moving in closer to beacon");
-            moveToBeacon(visibleBeacon); //move in closer
-            Stop();
-            waitFor(0.1);
-        }
+        robot.dashboard.displayText(13, "Beacon Config: " + targetButton.getName());
+        MMTranslation currentLocation = getCurrentLocation(visibleBeacon);
+
+
+        centerOnBeacon(currentLocation);
+
+
+//        if (opModeIsActive())
+//        {
+//            logState("Moving in closer to beacon");
+//            moveToBeacon(visibleBeacon); //move in closer
+//            Stop();
+//            waitFor(0.1);
+//        }
 
         // looks like its stopping after it moves towards the beacon (at the -500 mm mark)
 
@@ -758,43 +857,53 @@ public class RealAutonomous extends MMOpMode_Linear {
             logState("Fixing angle..");
             fixAngles(visibleBeacon);
             Stop();
-            waitFor(0.1);
+            waitFor(0.3);
         }
 
 
         //calculate how far away in inches from image
-        MMTranslation currentLocation = getCurrentLocation(visibleBeacon);
-        double inches = Math.abs(currentLocation.getZ() / MM_PER_INCH) - 5;
+        currentLocation = getCurrentLocation(visibleBeacon);
+        double inches = Math.abs(currentLocation.getZ() / MM_PER_INCH) - 4.3;
 
 
+        pauseBetweenSteps();
 
         if (opModeIsActive())
         {
             logState("Driving into beacon %f inches", inches);
             //move in to press button
-            driveTo(inches / 2, -0.6, 0, 0);
+            driveTo(inches / 2, -0.4, 0, 0);
             pauseBetweenSteps();
 
 
             fixAngles(visibleBeacon);
 
+            waitFor(0.3);
+
             currentLocation = getCurrentLocation(visibleBeacon);
 
-            if(Math.abs(currentLocation.getX() + 20) > 10) {
+            centerOnBeacon(currentLocation);
+            waitFor(0.3);
+//            if(Math.abs(currentLocation.getX() + 20) > 10) {
+//
+//                //we need to move!
+//                inches = Math.abs(currentLocation.getX() + 20) / MM_PER_INCH;
+//
+//                logState("[Center on beacon] NEED TO CORRECT x: %f, inches: %f", currentLocation.getX(), inches);
+//
+//                //waitFor();
+//
+//                double power = (currentLocation.getX() + 20) > 0 ? 0.3 : -0.3;
+//                driveTo(inches, 0, power, 0);
+//                pauseBetweenSteps();
+//            }
 
-                //we need to move!
-                inches = Math.abs(currentLocation.getX() + 20) / MM_PER_INCH;
+            fixAngles(visibleBeacon);
 
-                logState("[Center on beacon] NEED TO CORRECT x: %f, inches: %f", currentLocation.getX(), inches);
+            currentLocation = getCurrentLocation(visibleBeacon);
 
-                //waitFor();
-
-                double power = (currentLocation.getX() + 20) > 0 ? 0.3 : -0.3;
-                driveTo(inches, 0, power, 0);
-                pauseBetweenSteps();
-            }
-
-            driveTo(inches / 2, -0.6, 0, 0);
+            inches = Math.abs(currentLocation.getZ() / MM_PER_INCH) - 4.3;
+            driveTo(inches, -0.3, 0, 0);
             pauseBetweenSteps();
 
             logState("Pushing button..");
@@ -860,8 +969,9 @@ public class RealAutonomous extends MMOpMode_Linear {
         driveTo(67, -0.5, -0.5, 0);
         waitFor(0.1);
 
-        // move over to right a lil
-        driveTo(17, 0, -0.9, 0);
+        // move over a lil
+        double length = teamColor == TeamColor.RED ? 17 : 19;
+        driveTo(length, 0, -0.9, 0);
         Stop();
 
         waitFor(0.5);
@@ -873,18 +983,20 @@ public class RealAutonomous extends MMOpMode_Linear {
         VuforiaTrackableDefaultListener visibleBeacon = null;
 
 
+        int target = teamColor == TeamColor.RED ? VuforiaVision.TARGET_GEARS : VuforiaVision.TARGET_WHEELS;
 
         // find 1st picture
         runtime.reset();
         do {
-            if (teamColor == TeamColor.RED)
-            {
-                visibleBeacon = getBeacon("gears");
-            }
-            else if (teamColor == TeamColor.BLUE)
-            {
-                visibleBeacon = getBeacon("wheels");
-            }
+            visibleBeacon = vuforiaVision.getBeacon(target);
+//            if (teamColor == TeamColor.RED)
+//            {
+//                visibleBeacon = vuforiaVision.getBeacon(VuforiaVision.TARGET_GEARS); //getBeacon("gears");
+//            }
+//            else if (teamColor == TeamColor.BLUE)
+//            {
+//                visibleBeacon = vuforiaVision.getBeacon(VuforiaVision.TARGET_WHEELS); //getBeacon("wheels");
+//            }
         }while (opModeIsActive() && runtime.seconds() < 5 && visibleBeacon == null);
 
 
@@ -908,15 +1020,20 @@ public class RealAutonomous extends MMOpMode_Linear {
 
         waitFor(1);
         runtime.reset();
+
+        int target = teamColor == TeamColor.RED ? VuforiaVision.TARGET_TOOLS : VuforiaVision.TARGET_LEGOS;
+
         do {
-            if (teamColor == TeamColor.RED)
-            {
-                visibleBeacon = getBeacon("tools");//getVisibleBeacon();
-            }
-            else if (teamColor == TeamColor.BLUE)
-            {
-                visibleBeacon = getBeacon("legos");
-            }
+
+            visibleBeacon = vuforiaVision.getBeacon(target);
+//            if (teamColor == TeamColor.RED)
+//            {
+//                visibleBeacon = vuforiaVision.getBeacon(VuforiaVision.TARGET_TOOLS); //getBeacon("tools");//getVisibleBeacon();
+//            }
+//            else if (teamColor == TeamColor.BLUE)
+//            {
+//                visibleBeacon = vuforiaVision.getBeacon(VuforiaVision.TARGET_TOOLS);//getBeacon("legos");
+//            }
 
         }while(opModeIsActive() && runtime.seconds() < 5 && visibleBeacon == null);
 
@@ -937,12 +1054,12 @@ public class RealAutonomous extends MMOpMode_Linear {
         super.runOpMode();
         robot.dashboard.displayText(0, "*****WAAAAAIITT!!!!!  for it to say ready");
         boolean driveOffWall = false,
-                beacon1 = false,
+                beacon1 = true,
                 beacon2 = false,
 
                 shoot = false,
                 park = false,
-                test= true,
+                test= false,
                 test2 = false;
 
         robot.setBrakeModeEnabled(true);
@@ -1008,23 +1125,63 @@ public class RealAutonomous extends MMOpMode_Linear {
 
                 while(opModeIsActive()) {
 
-                    MMTranslation curLoc = null;
-                    VuforiaTrackableDefaultListener gearsBeacon = getBeacon("gears");
-                    VuforiaTrackableDefaultListener toolsBeacon = getBeacon("tools");
+                    VectorF targetPos;
+                    OpenGLMatrix robotPos;
 
-                    if(gearsBeacon != null) {
-                        curLoc = getCurrentLocation(gearsBeacon);
-                    } else if(toolsBeacon != null){
-                        curLoc = getCurrentLocation(toolsBeacon);
-                    }
+                    int target = VuforiaVision.TARGET_WHEELS;
 
-                    if(curLoc == null){
-                        logState("[LOC] cannot find beacon");
-                    } else {
-                        double x = curLoc.getX();
-                        double z = curLoc.getZ();
-                        logState("[LOC] x: %f, z: %f", x, z);
+                    targetPos = vuforiaVision.getTargetPosition(target);
+                    //robotPos = vuforiaVision.getRobotLocation(target);
+
+
+                    if(targetPos == null){
+                        idle();
+                        continue;
                     }
+                    double xTargetDistance = targetPos.get(2) / RobotInfo.MM_PER_INCH;
+                    double xDistance = 52.0 - xTargetDistance;
+                    //double yDistance = alliance == AltRyanOpFtcAuto.Alliance.RED_ALLIANCE? 16.0: -16.0;
+                    robotPos = vuforiaVision.getRobotLocation(target);
+
+                    robot.dashboard.displayPrintf(3, "%s found at %d inches",
+                            vuforiaVision.getTargetName(target),
+                            (int) xTargetDistance);
+
+//                    robot.tracer.traceInfo("Auto40DF", "xDistance=%.2f, yDistance=%.2f, heading=%.1f",
+//                            xDistance, yDistance, robot.targetHeading);
+
+                    //robot.dashboard.displayPrintf(4, "RobotLoc: %s", robotPos.formatAsTransform());
+
+
+//                    VuforiaTrackableDefaultListener b1 = teamColor == TeamColor.RED ? vuforiaVision.getBeacon(VuforiaVision.TARGET_GEARS) : vuforiaVision.getBeacon(VuforiaVision.TARGET_WHEELS);
+//                    VuforiaTrackableDefaultListener b2 = teamColor == TeamColor.RED ? vuforiaVision.getBeacon(VuforiaVision.TARGET_TOOLS) :vuforiaVision.getBeacon(VuforiaVision.TARGET_LEGOS);
+//
+//                    VuforiaTrackableDefaultListener vis = null;
+//                    if(b1 != null) {
+//                        vis = b1;
+//                        curLoc = getCurrentLocation(b1);
+//                    } else if(b2 != null){
+//                        vis = b2;
+//                        curLoc = getCurrentLocation(b2);
+//                    }
+//
+//
+//
+//
+//                    if(curLoc == null){
+//                        logState("[LOC] cannot find beacon");
+//                    } else {
+//                        OpenGLMatrix matrix = vuforiaVision.getRobotLocation(VuforiaVision.TARGET_WHEELS); //vis.getRobotLocation();
+//
+//                        double x = curLoc.getX();
+//                        double z = curLoc.getZ();
+//                        logState("[LOC] x: %f, z: %f", x, z);
+//                        if(matrix == null){
+//                            robot.dashboard.displayPrintf(12, "robot location unknown");
+//                        } else {
+//                            robot.dashboard.displayPrintf(12, "robot Location: %s", matrix.formatAsTransform(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES));
+//                        }
+//                    }
                 }
             }
         }

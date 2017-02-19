@@ -136,8 +136,9 @@ public class Hardware9533
         backLeftMotor = new FtcDcMotor(hwMap, "backLeft");
         backRightMotor = new FtcDcMotor(hwMap, "backRight");
 
-        //leftHold = hwMap.servo.get("leftHold");
-        //rightHold= hwMap.servo.get("rightHold");
+        leftHold = hwMap.servo.get("leftHold");
+        rightHold= hwMap.servo.get("rightHold");
+
 
 
 

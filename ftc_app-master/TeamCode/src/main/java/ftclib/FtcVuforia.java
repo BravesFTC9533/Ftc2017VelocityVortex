@@ -23,8 +23,11 @@
 
 package ftclib;
 
+import com.vuforia.CameraCalibration;
 import com.vuforia.HINT;
+import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.Vuforia;
+
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
@@ -81,6 +84,7 @@ public class FtcVuforia
 
     private VuforiaLocalizer.Parameters params;
     private VuforiaTrackables targetList;
+    VuforiaLocalizer localizer;
 
     /**
      * Constructor: Create an instance of this object. It initializes Vuforia with the specified target images and
@@ -102,9 +106,12 @@ public class FtcVuforia
         params.vuforiaLicenseKey = licenseKey;
         params.cameraDirection = cameraDir;
         params.cameraMonitorFeedback = cameraMonitorFeedback;
-        VuforiaLocalizer localizer = ClassFactory.createVuforiaLocalizer(params);
+        localizer = ClassFactory.createVuforiaLocalizer(params);
         Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS, numTargets);
         targetList = localizer.loadTrackablesFromAsset(trackablesFile);
+
+        localizer.setFrameQueueCapacity(1);
+        Vuforia.setFrameFormat(PIXEL_FORMAT.RGB565, true);
     }   //FtcVuforia
 
     /**
@@ -141,6 +148,21 @@ public class FtcVuforia
             targetList.deactivate();
         }
     }   //setTrackingEnabled
+
+
+    public VuforiaLocalizer.CloseableFrame getFrame(){
+        VuforiaLocalizer.CloseableFrame frame = null;
+        try {
+            frame = localizer.getFrameQueue().take();
+        } catch (InterruptedException ex){}
+        return frame;
+    }
+
+    public CameraCalibration getCameraCalibration() {
+
+        return localizer.getCameraCalibration();
+
+    }
 
     /**
      * This method sets the properties of the specified target.

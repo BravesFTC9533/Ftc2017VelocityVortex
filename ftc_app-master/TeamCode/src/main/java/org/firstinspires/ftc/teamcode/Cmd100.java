@@ -67,8 +67,8 @@ public class Cmd100 implements TrcRobot.RobotCommand {
         this.numberParticles = numParticles;
         this.alliance = alliance;
 
-        vuforiaVision = new VuforiaVision(robot);
-        vuforiaVision.setEnabled(true);
+//        vuforiaVision = new VuforiaVision(robot);
+//        vuforiaVision.setEnabled(true);
 
         event = new TrcEvent(moduleName);
         timerEvent = new TrcEvent(moduleName + ".timer");
