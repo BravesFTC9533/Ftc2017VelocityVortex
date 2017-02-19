@@ -357,45 +357,24 @@ public class RealAutonomous extends MMOpMode_Linear {
         robot.leftMotor.resetPosition();
         robot.rightMotor.resetPosition();
 
-//        leftBackPosition = robot.backLeftMotor.getPosition();
-//        leftFrontPosition = robot.leftMotor.getCurrentPosition();
-//        rightBackPosition = robot.backRightMotor.getCurrentPosition();
-//        rightFrontPosition = robot.rightMotor.getCurrentPosition();
+        robot.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-
-
-//        while (robot.backLeftMotor.getCurrentPosition() != 0 && robot)
-//        {
-//            robot.backLeftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//            robot.backRightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//            robot.leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//            robot.rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        }
-
-//        robot.leftMotor.setMaxSpeed(4000);
-//        robot.rightMotor.setMaxSpeed(4000);
-//        robot.backLeftMotor.setMaxSpeed(4000);
-//        robot.backRightMotor.setMaxSpeed(4000);
-//
-//        robot.leftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        robot.backLeftMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        robot.backRightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.setMaxSpeed(4000);
 
         if (opModeIsActive())
         {
-//            int backLeftTarget = Math.abs(robot.backLeftMotor.getCurrentPosition()) + (int)(dist*COUNTS_PER_INCH);          //-4000 , 1000   or    4000 , 7000      using abs limits direction
-//            int frontLeftTarget = Math.abs(robot.leftMotor.getCurrentPosition()) + (int)(dist*COUNTS_PER_INCH);
-//            int backRightTarget = Math.abs(robot.backRightMotor.getCurrentPosition()) + (int)(dist*COUNTS_PER_INCH);
-//            int frontRightTarget = Math.abs(robot.rightMotor.getCurrentPosition()) + (int)(dist*COUNTS_PER_INCH);
 
             int target = (int)(dist*COUNTS_PER_INCH);
-            mechDrive.Drive(h, v, r, false);
+            boolean closeToTarget = false;
+            //mechDrive.Drive(h, v, r, false);
+            //scaleDrive(target, h, v);
             do{
                 robot.dashboard.displayText(2, "backLeft: " + robot.backLeftMotor.getPosition() + " target: " + target);
                 robot.dashboard.displayText(3, "backRight: " + robot.backRightMotor.getPosition() + " target: " + target);
                 robot.dashboard.displayText(4, "frontLeft: " + robot.rightMotor.getPosition() + " target: " + target);
                 robot.dashboard.displayText(5, "frontRight: " + robot.leftMotor.getPosition() + " target: " + target);
+
+                scaleDrive(target, h, v);
 
             }
             while ( opModeIsActive()
@@ -406,6 +385,64 @@ public class RealAutonomous extends MMOpMode_Linear {
             mechDrive.Stop();
         }
 
+    }
+
+    private void scaleDrive(int target, double h, double v) {
+
+        if(h == 0 && v != 0) {
+            scaleDriveV(target, v);
+        } else if(v == 0 && h != 0) {
+            scaleDriveH(target, h);
+        } else {
+            mechDrive.Drive(h, v, 0, false);
+        }
+
+    }
+
+    private double getScalePower(double target, double pos) {
+        double percent = 0.0 ;
+        double max = 4000;
+
+        if(pos > 0) {
+            percent = pos / target;
+        }
+
+        double newVal = max;
+
+        if(percent >= 0.90) {
+            newVal = max * 0.3;
+        } else if(percent >= 0.75) {
+            newVal = max * 0.5;
+        } else if(percent >= 0.5) {
+            newVal = max * 0.75;
+        }
+
+        robot.dashboard.displayPrintf(9,  "Max speed: %f", newVal);
+        robot.dashboard.displayPrintf(10, "pos      : %f", pos);
+        robot.dashboard.displayPrintf(11, "target   : %f", target);
+        robot.dashboard.displayPrintf(12, "percent  : %f", percent);
+
+
+
+
+        return  newVal;
+    }
+
+    private void scaleDriveV(int target, double v){
+        double pos = Math.abs(robot.leftMotor.getPosition());
+        double scalePower = getScalePower(target, pos);
+
+        robot.setMaxSpeed((int)scalePower);
+
+        mechDrive.Drive(0, v, 0, false);
+
+    }
+
+    private void scaleDriveH(int target, double h){
+        double pos = Math.abs(robot.leftMotor.getPosition());
+        double scalePower = getScalePower(target, pos);
+        robot.setMaxSpeed((int)scalePower);
+        mechDrive.Drive(h, 0, 0, false);
     }
 
     public MMTranslation anglesFromTarget(VuforiaTrackableDefaultListener image) {
@@ -435,9 +472,15 @@ public class RealAutonomous extends MMOpMode_Linear {
         double timeForTurn = 0.0;
 
         if(angle < 0) {
+//            if(angle > -2){
+//                angle -= 1;
+//            }
             timeForTurn = (timePerRotationCounterClockwiseMS / 360) * Math.abs(angle);
 
         } else {
+//            if(angle < 2) {
+//                angle += 1;
+//            }
             timeForTurn = (timePerRotationClockwiseMS / 360) * Math.abs(angle);
         }
 
@@ -451,11 +494,13 @@ public class RealAutonomous extends MMOpMode_Linear {
         }
 
         runtime.reset();
-        Drive(0, 0, rotationSpeed);
-        while(opModeIsActive() && runtime.milliseconds() < timeForTurn) {
-            robot.dashboard.displayPrintf(14, "Runtime: %f", runtime.milliseconds());
-        }
+        if(opModeIsActive()) {
+            Drive(0, 0, rotationSpeed);
 
+            while (opModeIsActive() && runtime.milliseconds() < timeForTurn) {
+                robot.dashboard.displayPrintf(14, "Runtime: %f", runtime.milliseconds());
+            }
+        }
         Stop();
     }
 
@@ -487,7 +532,7 @@ public class RealAutonomous extends MMOpMode_Linear {
         double angle = angleToWall - 90;
         logState("[SQUARE UP TO WALL] Angle: %f", angle);
 
-        if(Math.abs(angle) > 4) {
+        if(Math.abs(angle) > 1) {
             turn(angle);
         }
 
@@ -613,11 +658,11 @@ public class RealAutonomous extends MMOpMode_Linear {
 
         // slow movement into beacon as we get closer
         if (z < -650) {
-            h = -0.35;
+            h = -0.6;
         } else if (z < -600) {
-            h = -0.3;
+            h = -0.5;
         } else {
-            h = -0.2;
+            h = -0.3;
         }
 
         //fix side to side movement
@@ -668,12 +713,14 @@ public class RealAutonomous extends MMOpMode_Linear {
 
         if (opModeIsActive())
         {
+            logState("Fixing angle..");
             fixAngles(visibleBeacon);
-
         }
 
         Stop();
-        waitFor(1);
+
+
+        pauseBetweenSteps();
 
         targetButton = getTargetButton(visibleBeacon);
         if(targetButton == null || targetButton.getName().equals(ButtonRange.Unknown().getName())){
@@ -685,6 +732,7 @@ public class RealAutonomous extends MMOpMode_Linear {
 
         if (opModeIsActive())
         {
+            logState("Moving in closer to beacon");
             moveToBeacon(visibleBeacon); //move in closer
             Stop();
             waitFor(0.1);
@@ -695,49 +743,95 @@ public class RealAutonomous extends MMOpMode_Linear {
 
         if (opModeIsActive())
         {
+            logState("Fixing angle..");
             fixAngles(visibleBeacon);
             Stop();
             waitFor(0.1);
         }
 
-        if (opModeIsActive())
-        {
-            if (targetButton.getName().equals("Left Button"))
-            {
-                driveTo(Math.abs(targetButton.getOffset()), 0, 0.25, 0);
-                //waitFor(3000);
-            }
-            else if (targetButton.getName().equals("Right Button"))
-            {
-                driveTo(Math.abs(targetButton.getOffset()), 0, -0.25, 0);
-            }
-            else
-            {
+//        if (opModeIsActive())
+//        {
+//            if (targetButton.getName().equals("Left Button"))
+//            {
+//                driveTo(Math.abs(targetButton.getOffset()), 0, 0.25, 0);
+//
+//            }
+//            else if (targetButton.getName().equals("Right Button"))
+//            {
+//                driveTo(Math.abs(targetButton.getOffset()), 0, -0.25, 0);
+//            }
+//            else
+//            {
+//
+//            }
+//            Stop();
+//        }
 
-            }
-            Stop();
-        }
-
-        if (opModeIsActive())
-        {
-            fixAngles(visibleBeacon);
-            Stop();
-            waitFor(0.1);
-        }
+//        if (opModeIsActive())
+//        {
+//            fixAngles(visibleBeacon);
+//            Stop();
+//            waitFor(0.1);
+//        }
 
         MMTranslation currentLocation = getCurrentLocation(visibleBeacon);
-        double inches = Math.abs(currentLocation.getZ() / MM_PER_INCH);
+        double inches = Math.abs(currentLocation.getZ() / MM_PER_INCH) - 5;
+
+
 
         if (opModeIsActive())
         {
+            logState("Driving into beacon %f inches", inches);
             //move in to press button
-            driveTo(inches, -0.2, 0, 0);
+            driveTo(inches / 2, -0.6, 0, 0);
+            pauseBetweenSteps();
 
+
+            fixAngles(visibleBeacon);
+
+            currentLocation = getCurrentLocation(visibleBeacon);
+
+            if(Math.abs(currentLocation.getX() + 20) > 10) {
+
+                //we need to move!
+                inches = Math.abs(currentLocation.getX() + 20) / MM_PER_INCH;
+
+                logState("[Center on beacon] NEED TO CORRECT x: %f, inches: %f", currentLocation.getX(), inches);
+
+                //waitFor();
+
+                double power = (currentLocation.getX() + 20) > 0 ? 0.3 : -0.3;
+                driveTo(inches, 0, power, 0);
+                pauseBetweenSteps();
+            }
+
+            driveTo(inches / 2, -0.6, 0, 0);
+            pauseBetweenSteps();
+
+            logState("Pushing button..");
+            pushButton(targetButton);
+
+            pauseBetweenSteps();
+
+
+            logState("Resetting button pusher");
+            resetPusher();
             //move out away from button
-            driveTo(23, 0.6, 0, 0);
+            logState("Driving out from beacon");
+            driveTo(6, 0.4, 0, 0);
+
+
+            //pauseBetweenSteps();
+
+            fixAngles(visibleBeacon);
+
+            pauseBetweenSteps();
+
+            driveTo(17, 0.6, 0, 0);
+            fixAngles(visibleBeacon);
         }
 
-        waitFor(0.2);
+        pauseBetweenSteps();
 
         if (opModeIsActive())
         {
@@ -748,25 +842,48 @@ public class RealAutonomous extends MMOpMode_Linear {
     }
 
 
+
+    private void resetPusher(){
+        robot.buttonPusher.setPosition(0.5);
+    }
+
+    private void pushButton(ButtonRange targetButton){
+        if (targetButton.getName().equals("Left Button")) {
+
+            robot.buttonPusher.setPosition(0);
+
+        } else {
+            robot.buttonPusher.setPosition(1);
+        }
+    }
     /******************************************************************************************************************************************************************************
      * *****************************************************************************************************************************************************************************
      * *********************************************************************************************************
      */
 
 
-
-
-    private void DriveOffWall() {
-        driveTo(67, -0.9, -0.9, 0);
+    private void pauseBetweenSteps(){
+        //logPath("pausing waiting 2 seconds");
         waitFor(0.1);
     }
+
+    private void DriveOffWall() {
+        driveTo(67, -0.5, -0.5, 0);
+        waitFor(0.1);
+
+        // move over to right a lil
+        driveTo(17, 0, -0.9, 0);
+        Stop();
+
+        waitFor(0.5);
+
+    }
+
+
     private void Beacon1() {
         VuforiaTrackableDefaultListener visibleBeacon = null;
 
-        // move over to right a lil
-        driveTo(15, 0, -0.9, 0);
-        Stop();
-        waitFor(0.5);
+
 
         // find 1st picture
         runtime.reset();
@@ -792,37 +909,15 @@ public class RealAutonomous extends MMOpMode_Linear {
     private void Beacon2(boolean didBeacon1) {
         VuforiaTrackableDefaultListener visibleBeacon = null;
 
-        double dist = 48;
+        double dist = 44;
 
         if(didBeacon1) {
 
         }
 
-        if(teamColor == TeamColor.RED) {
-            dist = (dist - lastTarget.getOffset());
-        } else {
-            dist = (dist + lastTarget.getOffset());
-        }
+        driveTo(dist, 0, -1, 0);
 
-
-//        if (teamColor == TeamColor.BLUE)
-//        {
-//            if (lastTarget.getName().equals("Left Button"))
-//            {
-//                dist -= 3;
-//            }
-//        }
-//        else if (teamColor == TeamColor.RED)
-//        {
-//            if (lastTarget.getName().equals("Right Button"))
-//            {
-//                dist -= 3;
-//            }
-//        }
-
-
-        driveTo(dist, 0, -0.9, 0);
-
+        waitFor(1);
         runtime.reset();
         do {
             if (teamColor == TeamColor.RED)
@@ -852,12 +947,18 @@ public class RealAutonomous extends MMOpMode_Linear {
     public void runOpMode() throws InterruptedException {
         super.runOpMode();
         robot.dashboard.displayText(0, "*****WAAAAAIITT!!!!!  for it to say ready");
-        boolean driveOffWall = true,
-                beacon1 = true,
-                beacon2 = true,
+        boolean driveOffWall = false,
+                beacon1 = false,
+                beacon2 = false,
+
                 shoot = false,
                 park = false,
-                test=false;
+                test= true,
+                test2 = false;
+
+        robot.setBrakeModeEnabled(true);
+
+        resetPusher();
 
         if(!test) {
             initVuforia();
@@ -885,29 +986,57 @@ public class RealAutonomous extends MMOpMode_Linear {
             {
                 logState("[DriveOffWall]");
                 DriveOffWall();
+                pauseBetweenSteps();
             }
             if (beacon1)
             {
                 logState("[Beacon 1]");
                 Beacon1();
+                pauseBetweenSteps();
             }
             if (beacon2)
             {
                 logState("[Beacon 2]");
                 Beacon2(beacon1);
+                pauseBetweenSteps();
             }
             if (shoot)
             {
                 logState("[Shoot]");
                 Shoot();
+                pauseBetweenSteps();
             }
             if (park)
             {
                 logState("[Park]");
                 Park();
+                pauseBetweenSteps();
             }
             if(test){
-                driveTo(24, 0.3, 0, 0);
+                driveTo(48*2, 1, 0, 0);
+            }
+            if(test2) {
+
+                while(opModeIsActive()) {
+
+                    MMTranslation curLoc = null;
+                    VuforiaTrackableDefaultListener gearsBeacon = getBeacon("gears");
+                    VuforiaTrackableDefaultListener toolsBeacon = getBeacon("tools");
+
+                    if(gearsBeacon != null) {
+                        curLoc = getCurrentLocation(gearsBeacon);
+                    } else if(toolsBeacon != null){
+                        curLoc = getCurrentLocation(toolsBeacon);
+                    }
+
+                    if(curLoc == null){
+                        logState("[LOC] cannot find beacon");
+                    } else {
+                        double x = curLoc.getX();
+                        double z = curLoc.getZ();
+                        logState("[LOC] x: %f, z: %f", x, z);
+                    }
+                }
             }
         }
     }

@@ -64,6 +64,7 @@ public class Hardware9533
 
     public Servo leftHold = null;
     public Servo rightHold = null;
+    public Servo buttonPusher = null;
 
     public OpticalDistanceSensor ods = null;
 
@@ -82,6 +83,33 @@ public class Hardware9533
 
     }
 
+    public void setBrakeModeEnabled(boolean enabled) {
+        leftMotor.setBrakeModeEnabled(enabled);
+        rightMotor.setBrakeModeEnabled(enabled);
+        backLeftMotor.setBrakeModeEnabled(enabled);
+        backRightMotor.setBrakeModeEnabled(enabled);
+    }
+
+    public void setMotorMode(DcMotor.RunMode runMode){
+        leftMotor.motor.setMode(runMode);
+        rightMotor.motor.setMode(runMode);
+        backLeftMotor.motor.setMode(runMode);
+        backRightMotor.motor.setMode(runMode);
+    }
+
+    public void setMaxSpeed(int speed) {
+        leftMotor.motor.setMaxSpeed(speed);
+        leftMotor.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        rightMotor.motor.setMaxSpeed(speed);
+        rightMotor.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        backLeftMotor.motor.setMaxSpeed(speed);
+        backLeftMotor.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        backRightMotor.motor.setMaxSpeed(speed);
+        backRightMotor.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
 //
 //    static final double     COUNTS_PER_MOTOR_REV    = 21000 ;    // eg: TETRIX Motor Encoder
 //    static final double     DRIVE_GEAR_REDUCTION    = 2.0 ;     // This is < 1.0 if geared UP
@@ -125,6 +153,9 @@ public class Hardware9533
         elevator.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
+        buttonPusher = hwMap.servo.get("buttonpusher");
+        buttonPusher.scaleRange(0.25, 0.55);
+        //buttonPusher.
 
         shooterMotor = hwMap.dcMotor.get("shooterMotor");
 
