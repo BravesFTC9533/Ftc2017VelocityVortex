@@ -10,33 +10,21 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.qualcomm.ftcrobotcontroller.R;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Engagable;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import com.vuforia.CameraCalibration;
-import com.vuforia.HINT;
 import com.vuforia.Image;
 import com.vuforia.Matrix34F;
 import com.vuforia.PIXEL_FORMAT;
 import com.vuforia.Tool;
 import com.vuforia.Vec3F;
-import com.vuforia.Vuforia;
 
-import org.firstinspires.ftc.robotcontroller.Util.Global;
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
 import org.firstinspires.ftc.teamcode.Util.ButtonRange;
 import org.firstinspires.ftc.teamcode.Util.OCVUtils;
@@ -49,14 +37,8 @@ import org.opencv.core.Rect;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.imgproc.Moments;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Arrays;
 
-import ftclib.FtcAndroidAccel;
-import trclib.TrcAccelerometer;
-import trclib.TrcSensor;
 
 import static org.firstinspires.ftc.teamcode.Util.VortexUtils.BEACON_BLUE_HIGH;
 import static org.firstinspires.ftc.teamcode.Util.VortexUtils.BEACON_BLUE_LOW;
@@ -69,14 +51,11 @@ import static org.firstinspires.ftc.teamcode.Util.VortexUtils.getImageFromFrame;
 @Autonomous(name = "RealAutonomous", group = "Autobot")
 public class RealAutonomous extends MMOpMode_Linear {
 
-    //private VuforiaLocalizer vuforia;
     private ElapsedTime runtime = new ElapsedTime();
-    //private VuforiaTrackables beacons;
-
     VuforiaVision vuforiaVision = null;
 
 
-    public static TeamColor teamColor = TeamColor.BLUE;
+    public static TeamColor teamColor = TeamColor.RED;
     public static int STRAFE = 0, FORWARD = 1;
 
     static final float      MM_PER_INCH             = 25.4f;
@@ -97,14 +76,6 @@ public class RealAutonomous extends MMOpMode_Linear {
     double ENCODER_Y_INCHES_PER_COUNT = 0.008726388889;
     double ENCODER_X_INCHES_PER_COUNT = 0.007953739871; //0.008180989581; // 0.007817390046;
 
-
-    int leftFrontPosition = 0;
-    int leftBackPosition = 0;
-    int rightFrontPosition = 0;
-    int rightBackPosition = 0;
-
-
-
     enum TeamColor {
         BLUE,
         RED
@@ -115,49 +86,8 @@ public class RealAutonomous extends MMOpMode_Linear {
         vuforiaVision = new VuforiaVision(robot);
         vuforiaVision.setEnabled(true);
 
-//        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(R.id.cameraMonitorViewId);
-//        parameters.vuforiaLicenseKey = "AeWceoD/////AAAAGWvk7AQGLUiTsyU4mSW7gfldjSCDQHX76lt9iPO5D8zaboG428rdS9WN0+AFpAlc/g4McLRAQIb5+ijFCPJJkLc+ynXYdhljdI2k9R4KL8t3MYk/tbmQ75st9VI7//2vNkp0JHV6oy4HXltxVFcEbtBYeTBJ9CFbMW+0cMNhLBPwHV7RYeNPZRgxf27J0oO8VoHOlj70OYdNYos5wvDM+ZbfWrOad/cpo4qbAw5iB95T5I9D2/KRf1HQHygtDl8/OtDFlOfqK6v2PTvnEbNnW1aW3vPglGXknX+rm0k8b0S7GFJkgl7SLq/HFNl0VEIVJGVQe9wt9PB6bJuxOMMxN4asy4rW5PRRBqasSM7OLl4W";
-//        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
-//        this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
-//        vuforia.setFrameQueueCapacity(1);
-        Vuforia.setFrameFormat(PIXEL_FORMAT.RGB565, true);
-//
-//
-//        Vuforia.setHint(HINT.HINT_MAX_SIMULTANEOUS_IMAGE_TARGETS, 4);
-//
-//        beacons = this.vuforia.loadTrackablesFromAsset("FTC_2016-17");
-//        beacons.get(0).setName("Wheels");
-//        beacons.get(1).setName("Tools");
-//        beacons.get(2).setName("Legos");
-//        beacons.get(3).setName("Gears");
-//
-//        beacons.activate();
     }
 
-//    private VuforiaTrackableDefaultListener getVisibleBeacon() {
-//        for (VuforiaTrackable b : beacons) {
-//
-//            VuforiaTrackableDefaultListener beacon = (VuforiaTrackableDefaultListener) b.getListener();
-//
-//            if(beacon.isVisible()){
-//                return beacon;
-//            }
-//
-//        }
-//        return null;
-//    }
-
-//    private VuforiaTrackableDefaultListener getBeacon(String name) {
-//        for (VuforiaTrackable b : beacons)
-//        {
-//            VuforiaTrackableDefaultListener beacon = (VuforiaTrackableDefaultListener) b.getListener();
-//            if (b.getName().equalsIgnoreCase(name) && beacon.isVisible())
-//            {
-//                return beacon;
-//            }
-//        }
-//        return null;
-//    }
 
     private MMTranslation getCurrentLocation(VuforiaTrackableDefaultListener beacon) {
         OpenGLMatrix pose = beacon.getPose();
@@ -353,13 +283,6 @@ public class RealAutonomous extends MMOpMode_Linear {
         robot.dashboard.displayPrintf(11, msg, args);
     }
 
-//    private void driveFor(double secs, double h, double v, double r) {
-//        runtime.reset();
-//        Drive(h, v, r);
-//        do {
-//        } while(opModeIsActive() && runtime.seconds() < secs);
-//    }
-
     private void driveTo(double dist, double h, double v, double r) {
 
         //21 5/8
@@ -395,20 +318,14 @@ public class RealAutonomous extends MMOpMode_Linear {
                 target = (int)(dist*COUNTS_PER_INCH);
             }
 
-            boolean closeToTarget = false;
-            //mechDrive.Drive(h, v, r, false);
-            //scaleDrive(target, h, v);
+            
             do{
                 robot.dashboard.displayText(2, "backLeft: " + robot.backLeftMotor.getPosition() + " target: " + target);
                 robot.dashboard.displayText(3, "backRight: " + robot.backRightMotor.getPosition() + " target: " + target);
                 robot.dashboard.displayText(4, "frontLeft: " + robot.rightMotor.getPosition() + " target: " + target);
                 robot.dashboard.displayText(5, "frontRight: " + robot.leftMotor.getPosition() + " target: " + target);
+                scaleDrive(target, h, v);
 
-                if(dist < 20) {
-                    mechDrive.Drive(h, v, 0, false);
-                } else {
-                    scaleDrive(target, h, v);
-                }
 
             }
             while ( opModeIsActive()
@@ -425,8 +342,8 @@ public class RealAutonomous extends MMOpMode_Linear {
 
         if(h == 0 && v != 0) {
             scaleDriveV(target, v);
-//        } else if(v == 0 && h != 0) {
-//            scaleDriveH(target, h);
+        } else if(v == 0 && h != 0) {
+            scaleDriveH(target, h);
         } else {
             mechDrive.Drive(h, v, 0, false);
         }
@@ -475,53 +392,54 @@ public class RealAutonomous extends MMOpMode_Linear {
     private double getScalePower(double target, double pos, double power) {
 
 
+        int encoderPositionAtFullSpeed = 1000;
 
+        //ramp up speed
+        if(pos < encoderPositionAtFullSpeed) {
+            if(power > 0) {
+                return Range.clip(pos / encoderPositionAtFullSpeed, 0.10, power);
+            } else {
+                return Range.clip((pos / encoderPositionAtFullSpeed) * -1, -1, -0.10);
+            }
+        }
+
+
+        //now that we've ramped up, ramp down towards end
         double percent = 0.0 ;
-        double max = power;
+
 
         if(pos > 0) {
             percent = pos / target;
         }
 
-        double newVal = max;
 
-        if(percent >= 0.90) {
-            newVal = max * 0.3;
-        } else if(percent >= 0.85) {
-            newVal = max * 0.5;
-        } else if(percent >= 0.8) {
-            newVal = max * 0.75;
-        } else if(percent >= 0.2) {
-            newVal = max;
-        } else if(percent >= 0.15) {
-            newVal = max * 0.75;
-        } else if(percent >= 0.10) {
-            newVal = max * 0.5;
-        } else if(percent >= 0.05) {
-            newVal = max * 0.4;
+
+        // from 80% to 100%, slowly ramp down
+        //
+
+
+        if(percent >= 0.8) {
+
+
+            double val = (1-percent) * 5; // scale last 20% up to 100%
+
+            if(power > 0) {
+                return Range.clip(power * val, 0.3, 1);
+            } else {
+                return Range.clip((power * val * -1), -1, -0.3);
+            }
+
+
         } else {
-            newVal = max * 0.3;
+            return power;
         }
-
-//        robot.dashboard.displayPrintf(9,  "Max power: %f", newVal);
-//        robot.dashboard.displayPrintf(10, "pos      : %f", pos);
-//        robot.dashboard.displayPrintf(11, "target   : %f", target);
-//        robot.dashboard.displayPrintf(12, "percent  : %f", percent);
-
-
-
-
-        return  newVal;
     }
 
     private void scaleDriveV(int target, double v){
         double pos = Math.abs(robot.leftMotor.getPosition());
-        double power = robot.leftMotor.getPower();
-        //double scalePower = easingInOut(pos, target, power, v);
 
         double scalePower = getScalePower(target, pos, v);
 
-        //robot.setMaxSpeed((int)scalePower);
 
         mechDrive.Drive(0, scalePower, 0, false);
 
@@ -529,11 +447,9 @@ public class RealAutonomous extends MMOpMode_Linear {
 
     private void scaleDriveH(int target, double h){
         double pos = Math.abs(robot.leftMotor.getPosition());
-        double power = robot.leftMotor.getPower();
-        //double scalePower = easingInOut(pos, target, power, h);
 
         double scalePower = getScalePower(target, pos, h);
-        //robot.setMaxSpeed((int)scalePower);
+
         mechDrive.Drive(scalePower, 0, 0, false);
     }
 
