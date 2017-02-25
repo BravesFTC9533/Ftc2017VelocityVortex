@@ -32,12 +32,8 @@
  */
 
 @TeleOp(name="Tele: Mech Op (USE THIS)", group="9533")
-public class Minion9533_Mech extends MMOpMode_Linear {
+public class Minion9533_Mech extends MMOpMode_Linear implements FtcGamePad.ButtonHandler {
 
-    /* Declare OpMode members. */
-    //Hardware9533   robot           = new Hardware9533();              // Use a K9'shardware
-
-    public static double shootPower = 1;
 
 
     private static final boolean USE_GYRO = false;
@@ -47,188 +43,31 @@ public class Minion9533_Mech extends MMOpMode_Linear {
     ElapsedTime timer = new ElapsedTime();
     ElapsedTime timer2 = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
+    ElapsedTime ballStopTimer = new ElapsedTime();
+
     MinionsGyro gyro = null;
 
     private HalDashboard dashboard;
 
-
-    //private double shooterPower = 1;
-    static final double SHOOTER_POWER_INCREMENT  = 0.02;
-    static int targetRPM = 2200;
-    static final int targetIncrement = 25;
-
-    private boolean currentButtonState = false;
-    private boolean previousButtonState = false;
-
-    private boolean leftPressed = false;
-    private boolean rightPressed = false;
+    FtcGamePad driverGamepad;
+    private FtcGamePad operatorGamepad;
 
 
-    int lastPos = 0;
+    private boolean capballLiftReleased = false;
+
+    private boolean ballStopOpen = false;
 
 
-    RollingAvg rollingAverage = null;
-
-
-    private void handleIntake(){
-        if(gamepad2.right_bumper) {
-            robot.intake.setPower(1);
-
-        } else if(gamepad2.left_bumper) {
-            robot.intake.setPower(-1);
-
-        } else {
-            robot.intake.setPower(0);
-
-        }
-    }
-    private void handleElevator(){
-        if(gamepad2.right_bumper) {
-            robot.ElevatorLiftBalls();
-            //robot.elevator.setPower(1);
-        } else if(gamepad2.left_bumper) {
-            robot.ElevatorDropBalls();
-            //robot.elevator.setPower(-1);
-        } else {
-            robot.ElevatorStop();
-        }
-    }
-
-    private void handleLift() {
-        if(gamepad2.y) {
-            robot.LiftLift();
-        } else if(gamepad2.x) {
-            robot.DropLift();
-        } else {
-            robot.StopLift();
-        }
-    }
-
-
-    double shooterAvg = 0;
-    double lastTime = 0;
-    int counter = 0;
-    private void calcAvgRPM(){
-
-
-        robot.dashboard.displayPrintf(11, "Time: %s", timer.seconds());
-
-        int currentPos = robot.shooterMotor.getCurrentPosition();
-        double currentTime = System.nanoTime();
-        if(counter > 0) {
-
-
-            int delta = abs(currentPos - lastPos);
-            double deltaT = (currentTime - lastTime) / ElapsedTime.MILLIS_IN_NANO;
-
-            robot.dashboard.displayPrintf(12, "Encoder Delta: %s", delta);
-            robot.dashboard.displayPrintf(13, "Time Delta: %s", deltaT);
-
-            double rpm = (delta * ((1000/deltaT) * 60)) / 28;
-            robot.dashboard.displayPrintf(14, "Instant RPM: %s", rpm);
-
-            rollingAverage.add(rpm);
-
-            shooterAvg = rollingAverage.getAverage();
-//            int index = count % 50;
-//            armp[index] = rpm;
-//
-//            int avg = 0;
-//            if (count > 50) {
-//
-//                for (int i = 0; i < 50; i++) {
-//                    avg += armp[i];
-//                }
-//                avg /= 50;
-//
-//            }
-//            shooterAvg = avg;
-        }
-
-        lastTime = currentTime;
-        lastPos = currentPos;
-        timer2.reset();
-        counter ++;
-    }
-
-
-
-    private void handleLiftDrop()
-    {
-        if (gamepad2.dpad_up && gamepad2.b)
-        {
-            robot.rightHold.setPosition(150);
-            robot.leftHold.setPosition(0);
-        }
-    }
-
-
-    double currentPower = 0;
-    private void handleShooter() {
-
-        //currentPower = robot.shooterMotor.getPower();
-        if(gamepad2.a) {
-
-           /* if(currentPower == 0) {
-                currentPower = 0.4;
-            } else if(currentPower < shootPower) {
-                currentPower += 0.005;
-            }
-
-            currentPower = Range.clip(currentPower, 0, 1);*/
-
-
-            robot.shooterMotor.setPower(-1);
-
-            //robot.shooterMotor.setPower(shooterPower);
-            //robot.shooterRight.setPower(shooterPower);
-        } else {
-            //robot.shooterRight.setPower(0);
-            robot.shooterMotor.setPower(0);
-            currentPower = 0;
-        }
-
-        robot.dashboard.displayPrintf(5, "Shooter: %.2f", currentPower);
-        //telemetry.addData("Shooter", shooterPower);
-    }
-
-//
-//    private void handleTargetRPM() {
-//
-//        if(leftPressed && gamepad2.dpad_left){
-//            return;
-//        }
-//        if(rightPressed && gamepad2.dpad_right) {
-//            return;
-//        }
-//
-//
-//
-//
-//
-//
-//        if(gamepad2.dpad_left) {
-//            targetRPM -= targetIncrement;
-//            leftPressed = true;
-//        } else {
-//            leftPressed = false;
-//        }
-//        if(gamepad2.dpad_right){
-//            targetRPM += targetIncrement;
-//            rightPressed = true;
-//        } else {
-//            rightPressed = false;
-//        }
-//
-//        targetRPM = Range.clip(targetRPM, 0,6000);
-//
-//
-//    }
 
     @Override
     public void runOpMode() throws InterruptedException{
 
         super.runOpMode();
+
+
+        driverGamepad = new FtcGamePad("DriverGamepad", gamepad1, this);
+        operatorGamepad = new FtcGamePad("OperatorGamepad", gamepad2, this);
+
 
         mechDrive.setGamepad(gamepad1);
         mechDrive.setHalBoard(robot.dashboard);
@@ -246,11 +85,6 @@ public class Minion9533_Mech extends MMOpMode_Linear {
 
         // Wait for the game to start (driver presses PLAY)
 
-        if(USE_GYRO) {
-            robot.dashboard.displayPrintf(2, "Calibrating..");
-            gyro.calibrateGyro();
-
-        }
 
         robot.dashboard.displayPrintf(2, "Waiting for start..");
         waitForStart();
@@ -261,90 +95,31 @@ public class Minion9533_Mech extends MMOpMode_Linear {
 
         timer.reset();
 
-//        robot.shooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//
-//        robot.shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//
-
-
-        //long start = System.currentTimeMillis()/60000;
-        //long next;
 
         //MediaPlayer mediaPlayer = MediaPlayer.create(Global.context, com.qualcomm.ftcrobotcontroller.R.raw.banana);
         //mediaPlayer.start();
 
-        //rollingAverage = new RollingAvg(50);
         while (opModeIsActive()) {
 
-            handleLiftDrop();
 
+            if(ballStopOpen && ballStopTimer.seconds() >= 1){
 
-
-            //robot.dashboard.displayPrintf(0, "Compass Says Z: " + Global.compass);
-
-            //handleTargetRPM();
-            //int targetSpeed = (targetRPM * 28) / 60;
-
-            //robot.shooterMotor.setMaxSpeed(targetSpeed);
-
-            //calcAvgRPM();
-
-            //robot.dashboard.displayPrintf(9, "TargetRPM: %s", targetRPM);
-            //robot.dashboard.displayPrintf(10, "RPM: %s", shooterAvg);
-
-
-            currentButtonState = gamepad1.right_bumper;
-
-            if(currentButtonState != previousButtonState) {
-                if(currentButtonState) {
-                    robot.invertedDrive = !robot.invertedDrive;
-                }
-                previousButtonState = currentButtonState;
+                ballStopOpen = false;
+                robot.ballStop.setPosition(0);
             }
 
-            robot.dashboard.displayPrintf(1, "Drive Mode:");
-            if(robot.invertedDrive) {
-                robot.dashboard.displayPrintf(2, "Reverse");
-            } else {
-                robot.dashboard.displayPrintf(2, "Normal");
-            }
 
-//
-//            if(gamepad1.start) {
-//                mechDrive.Drive(0, 0, -0.1, false);
-//            } else {
-//                mechDrive.Stop();
-//            }
+            robot.dashboard.displayPrintf(1, "Drive Mode: %s", robot.invertedDrive ? "Reverse":"Normal");
 
-            handleIntake();
-            handleElevator();
-            handleShooter();
-            handleLift();
-            //handleShooterSpeed();
+            driverGamepad.update();
+            operatorGamepad.update();
 
-            if(gamepad1.dpad_down) {
-                robot.resetPosition();
-            }
-
-            if(gamepad1.dpad_left) {
-                mechDrive.turn(45);
-            }
-            if(gamepad1.dpad_up) {
-                mechDrive.turn(90);
-            }
-            if(gamepad1.dpad_right) {
-                mechDrive.turn(180);
-            }
-
-            //robot.DriveRobot(-gamepad1.left_stick_y, -gamepad1.right_stick_y);
             mechDrive.Drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x);
 
-
-
-            robot.dashboard.displayText(2, "backLeft: " + robot.backLeftMotor.getPosition() );
-            robot.dashboard.displayText(3, "backRight: " + robot.backRightMotor.getPosition());
-            robot.dashboard.displayText(4, "frontLeft: " + robot.leftMotor.getPosition());
-            robot.dashboard.displayText(5, "frontRight: " + robot.rightMotor.getPosition());
+//            robot.dashboard.displayText(2, "backLeft: " + robot.backLeftMotor.getPosition() );
+//            robot.dashboard.displayText(3, "backRight: " + robot.backRightMotor.getPosition());
+//            robot.dashboard.displayText(4, "frontLeft: " + robot.leftMotor.getPosition());
+//            robot.dashboard.displayText(5, "frontRight: " + robot.rightMotor.getPosition());
 
             // Pause for metronome tick.  40 mS each cycle = update 25 times a second.
             robot.waitForTick(tickInterval);
@@ -353,7 +128,135 @@ public class Minion9533_Mech extends MMOpMode_Linear {
     }
 
 
+    @Override
+    public void gamepadButtonEvent(FtcGamePad gamepad, int button, boolean pressed)
+    {
+        dashboard.displayPrintf(7, "%s: %04x->%s", gamepad.toString(), button, pressed? "Pressed": "Released");
+        if (gamepad == driverGamepad)
+        {
+            switch (button)
+            {
+                case FtcGamePad.GAMEPAD_A:
+//                    if (pressed) {
+//                        driveMode = DriveMode.MECANUM_MODE;
+//                    }
+                    break;
 
+                case FtcGamePad.GAMEPAD_B:
+//                    if (pressed) {
+//                        driveMode = DriveMode.TANK_MODE;
+//                    }
+                    break;
 
+                case FtcGamePad.GAMEPAD_X:
+                    break;
+
+                case FtcGamePad.GAMEPAD_Y:
+                    break;
+
+                case FtcGamePad.GAMEPAD_LBUMPER:
+                    //drivePowerScale = pressed? 0.5: 1.0;
+                    break;
+
+                case FtcGamePad.GAMEPAD_RBUMPER:
+                    robot.invertedDrive = pressed;
+                    break;
+            }
+        }
+        else if (gamepad == operatorGamepad)
+        {
+            switch (button)
+            {
+                case FtcGamePad.GAMEPAD_A:
+
+                    if(pressed && !ballStopOpen) {
+                        ballStopOpen = true;
+                        robot.ballStop.setPosition(1);
+                        ballStopTimer.reset();
+                    }
+                    //
+                    // Load particle.
+                    //
+//                    robot.shooter.setBallGatePosition(
+//                            pressed? RobotInfo.BALLGATE_UP_POSITION : RobotInfo.BALLGATE_DOWN_POSITION);
+                    break;
+
+                case FtcGamePad.GAMEPAD_B:
+                    //
+                    // Manual firing.
+                    //
+
+                    robot.shooterMotor.setPower(pressed ? 1 : 0);
+
+                    break;
+
+                case FtcGamePad.GAMEPAD_X:
+                    //
+                    // Load particle, arm and fire the particle.
+                    // This is basically combining button A and B.
+                    //
+//                    if (pressed)
+//                    {
+//                        robot.shooter.loadAndFireOneShot();
+//                    }
+                    break;
+
+                case FtcGamePad.GAMEPAD_Y:
+
+                    break;
+
+                case FtcGamePad.GAMEPAD_LBUMPER:
+                    //intake, drop balls out front
+                    robot.elevator.setPower(pressed ? -1 : 0);
+                    break;
+
+                case FtcGamePad.GAMEPAD_RBUMPER:
+                    //intake, lift balls up
+                    robot.elevator.setPower(pressed ? 1 : 0);
+                    break;
+
+                case FtcGamePad.GAMEPAD_BACK:
+
+                    capballLiftReleased = true;
+
+                    robot.leftHold.setPosition(1);
+                    robot.rightHold.setPosition(1);
+
+                    break;
+
+                case FtcGamePad.GAMEPAD_START:
+                    break;
+
+                case FtcGamePad.GAMEPAD_DPAD_UP:
+                    if(pressed && capballLiftReleased) {
+                        robot.liftMotor.setPower(1);
+                    } else {
+                        robot.liftMotor.setPower(0);
+                    }
+
+                    break;
+
+                case FtcGamePad.GAMEPAD_DPAD_DOWN:
+                    if(pressed && capballLiftReleased) {
+                        robot.liftMotor.setPower(-0.3);
+                    } else {
+                        robot.liftMotor.setPower(0);
+                    }
+                    break;
+
+                case FtcGamePad.GAMEPAD_DPAD_LEFT:
+                    break;
+
+                case FtcGamePad.GAMEPAD_DPAD_RIGHT:
+                    /*
+                    if (pressed)
+                    {
+                        robot.shooter.fireContinuous(true);
+                    }
+                    */
+                    break;
+            }
+        }
+    }   //gamepadButtonEvent
 }
 
