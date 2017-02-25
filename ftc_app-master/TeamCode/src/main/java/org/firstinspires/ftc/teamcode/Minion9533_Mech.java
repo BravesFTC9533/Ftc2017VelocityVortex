@@ -333,8 +333,8 @@ public class Minion9533_Mech extends MMOpMode_Linear {
 
             robot.dashboard.displayText(2, "backLeft: " + robot.backLeftMotor.getPosition() );
             robot.dashboard.displayText(3, "backRight: " + robot.backRightMotor.getPosition());
-            robot.dashboard.displayText(4, "frontLeft: " + robot.rightMotor.getPosition());
-            robot.dashboard.displayText(5, "frontRight: " + robot.leftMotor.getPosition());
+            robot.dashboard.displayText(4, "frontLeft: " + robot.leftMotor.getPosition());
+            robot.dashboard.displayText(5, "frontRight: " + robot.rightMotor.getPosition());
 
             // Pause for metronome tick.  40 mS each cycle = update 25 times a second.
             robot.waitForTick(tickInterval);

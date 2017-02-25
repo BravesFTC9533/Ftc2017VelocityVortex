@@ -439,6 +439,53 @@ public class RealAutonomous extends MMOpMode_Linear {
     }
 
     private void turn(double angle) {
+
+        double ticksPerDegree_bl = 26.08055556;
+        double ticksPerDegree_br = -26.12222222;
+
+        double ticksPerDegree_fl = 27.36388889;
+        double ticksPerDegree_fr = -27.39166667;
+
+
+
+        double target_bl = ticksPerDegree_bl*angle;
+        double target_br = ticksPerDegree_br*angle;
+        double target_fl = ticksPerDegree_fl*angle;
+        double target_fr = ticksPerDegree_fr*angle;
+
+        double turnPower = 0.5;
+
+        //right negative is pos angle;
+
+
+        robot.resetPosition();
+
+        boolean rightIsNegative = angle > 0;
+
+        double leftPower = rightIsNegative ? turnPower : 1 - turnPower;
+        double rightPower = rightIsNegative ? 1-turnPower : turnPower;
+
+        while (opModeIsActive()
+                && Math.abs(robot.leftMotor.getPosition()) <= target_fl
+                && Math.abs(robot.rightMotor.getPosition()) <= target_fr
+                && Math.abs(robot.backLeftMotor.getPosition()) <= target_bl
+                && Math.abs(robot.backRightMotor.getPosition()) <= target_br
+                ) {
+
+            robot.leftMotor.setPower(leftPower);
+            robot.backLeftMotor.setPower(leftPower);
+            robot.rightMotor.setPower(rightPower);
+            robot.backRightMotor.setPower(rightPower);
+
+
+        }
+        Stop();
+
+
+
+
+    }
+    private void turn_time(double angle) {
         double timeForTurn = 0.0;
 
         if(angle < 0) {
