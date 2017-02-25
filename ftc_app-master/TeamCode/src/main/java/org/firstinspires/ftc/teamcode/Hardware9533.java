@@ -65,6 +65,7 @@ public class Hardware9533
     public Servo leftHold = null;
     public Servo rightHold = null;
     public Servo buttonPusher = null;
+    public Servo ballStop = null;
 
     public OpticalDistanceSensor ods = null;
 
@@ -140,8 +141,9 @@ public class Hardware9533
         // Define and Initialize Motors
 
         ods = hwMap.opticalDistanceSensor.get("ods");
-
         ods.enableLed(true);
+
+        ballStop = hwMap.servo.get("ballStop");
 
         leftMotor   = new FtcDcMotor(hwMap, "left");
         rightMotor  = new FtcDcMotor(hwMap, "right");
