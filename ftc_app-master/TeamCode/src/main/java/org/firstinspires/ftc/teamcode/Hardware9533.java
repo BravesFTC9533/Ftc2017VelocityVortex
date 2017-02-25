@@ -138,6 +138,10 @@ public class Hardware9533
         //ods = hwMap.opticalDistanceSensor.get("ods");
 
         // Define and Initialize Motors
+
+        ods = hwMap.opticalDistanceSensor.get("ods");
+
+
         leftMotor   = new FtcDcMotor(hwMap, "left");
         rightMotor  = new FtcDcMotor(hwMap, "right");
         backLeftMotor = new FtcDcMotor(hwMap, "backLeft");
