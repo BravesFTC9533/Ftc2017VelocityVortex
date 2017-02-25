@@ -280,7 +280,7 @@ public class RealAutonomous extends MMOpMode_Linear {
     }
 
     private void logState(String msg, Object... args){
-        robot.dashboard.displayPrintf(11, msg, args);
+        robot.dashboard.displayPrintf(1, msg, args);
     }
 
     private void driveTo(double dist, double h, double v, double r) {
@@ -293,9 +293,9 @@ public class RealAutonomous extends MMOpMode_Linear {
             v *= -1;
         }
 
-        if(Math.abs(h) > 0 && v == 0) {
-            dist *= 1.11;
-        }
+//        if(Math.abs(h) > 0 && v == 0) {
+//            dist *= 1.11;
+//        }
 
         robot.backLeftMotor.resetPosition();
         robot.backRightMotor.resetPosition();
@@ -304,7 +304,7 @@ public class RealAutonomous extends MMOpMode_Linear {
 
         robot.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        robot.setMaxSpeed(3000);
+        robot.setMaxSpeed(3500);
 
         if (opModeIsActive())
         {
@@ -441,36 +441,74 @@ public class RealAutonomous extends MMOpMode_Linear {
     private void turn(double angle) {
 
         double ticksPerDegree_bl = 26.08055556;
-        double ticksPerDegree_br = -26.12222222;
+        double ticksPerDegree_br = 26.12222222;
 
         double ticksPerDegree_fl = 27.36388889;
-        double ticksPerDegree_fr = -27.39166667;
+        double ticksPerDegree_fr = 27.39166667;
 
 
 
-        double target_bl = ticksPerDegree_bl*angle;
-        double target_br = ticksPerDegree_br*angle;
-        double target_fl = ticksPerDegree_fl*angle;
-        double target_fr = ticksPerDegree_fr*angle;
+        double target_bl = Math.abs(ticksPerDegree_bl*angle);
+        double target_br = Math.abs(ticksPerDegree_br*angle);
+        double target_fl = Math.abs(ticksPerDegree_fl*angle);
+        double target_fr = Math.abs(ticksPerDegree_fr*angle);
 
         double turnPower = 0.5;
 
         //right negative is pos angle;
 
 
+
+
         robot.resetPosition();
 
         boolean rightIsNegative = angle > 0;
 
-        double leftPower = rightIsNegative ? turnPower : 1 - turnPower;
-        double rightPower = rightIsNegative ? 1-turnPower : turnPower;
+        double leftPower = rightIsNegative ? turnPower : turnPower * -1;
+        double rightPower = rightIsNegative ? turnPower*-1 : turnPower;
+
+
+
+        double flp = robot.leftMotor.getPosition();
+        double frp = robot.rightMotor.getPosition();
+        double blp = robot.backLeftMotor.getPosition();
+        double brp = robot.backRightMotor.getPosition();
+
+        robot.dashboard.displayPrintf(9, "FL: t: %.3f, p: %.2f, pow: %.2f", target_fl, flp, leftPower);
+        robot.dashboard.displayPrintf(10, "FR: t: %.3f, p: %.2f, pow: %.2f", target_fr, frp, rightPower);
+
+        robot.dashboard.displayPrintf(12, "BL: t: %.3f, p: %.2f, pow: %.2f", target_bl, blp, leftPower);
+        robot.dashboard.displayPrintf(13, "BR: t: %.3f, p: %.2f, pow: %.2f", target_br, brp, rightPower);
+
+
+
+        robot.dashboard.displayPrintf(14, "about to run");
+
+
+        ElapsedTime time = new ElapsedTime();
 
         while (opModeIsActive()
-                && Math.abs(robot.leftMotor.getPosition()) <= target_fl
-                && Math.abs(robot.rightMotor.getPosition()) <= target_fr
-                && Math.abs(robot.backLeftMotor.getPosition()) <= target_bl
-                && Math.abs(robot.backRightMotor.getPosition()) <= target_br
+                && Math.abs(flp) <= target_fl
+                && Math.abs(frp) <= target_fr
+                && Math.abs(blp) <= target_bl
+                && Math.abs(brp) <= target_br
+                && time.seconds() < 1
                 ) {
+
+
+
+            flp = robot.leftMotor.getPosition();
+            frp = robot.rightMotor.getPosition();
+            blp = robot.backLeftMotor.getPosition();
+            brp = robot.backRightMotor.getPosition();
+
+            robot.dashboard.displayPrintf(14, "running");
+            robot.dashboard.displayPrintf(9, "FL: t: %.3f, p: %.2f, pow: %.2f", target_fl, flp, leftPower);
+            robot.dashboard.displayPrintf(10, "FR: t: %.3f, p: %.2f, pow: %.2f", target_fr, frp, rightPower);
+
+            robot.dashboard.displayPrintf(12, "BL: t: %.3f, p: %.2f, pow: %.2f", target_bl, blp, leftPower);
+            robot.dashboard.displayPrintf(13, "BR: t: %.3f, p: %.2f, pow: %.2f", target_br, brp, rightPower);
+
 
             robot.leftMotor.setPower(leftPower);
             robot.backLeftMotor.setPower(leftPower);
@@ -481,6 +519,7 @@ public class RealAutonomous extends MMOpMode_Linear {
         }
         Stop();
 
+        robot.dashboard.displayPrintf(14, "Stopped");
 
 
 
@@ -549,7 +588,7 @@ public class RealAutonomous extends MMOpMode_Linear {
         double angle = angleToWall - 90;
         logState("[SQUARE UP TO WALL] Angle: %f", angle);
 
-        if(Math.abs(angle) > 1) {
+        if(Math.abs(angle) >= 1) {
             turn(angle);
         }
 
@@ -882,10 +921,10 @@ public class RealAutonomous extends MMOpMode_Linear {
         double length = teamColor == TeamColor.BLUE ? 60 : 67;
 
 
-        driveTo(length, -0.5, -0.5, 0);
+        driveTo(length, -0.7, -0.7, 0);
         waitFor(0.1);
         length = teamColor == TeamColor.RED ? 17 : 21;
-        driveTo(length, 0, -0.7, 0);
+        driveTo(length, 0, -0.9, 0);
         Stop();
 
         waitFor(1);
@@ -967,14 +1006,14 @@ public class RealAutonomous extends MMOpMode_Linear {
     public void runOpMode() throws InterruptedException {
         super.runOpMode();
         robot.dashboard.displayText(0, "*****WAAAAAIITT!!!!!  for it to say ready");
-        boolean driveOffWall = true,
-                beacon1 = true,
-                beacon2 = true,
+        boolean driveOffWall = false,
+                beacon1 = false,
+                beacon2 = false,
 
                 shoot = false,
                 park = false,
                 test= false,
-                test2 = false;
+                test2 = true;
 
         robot.setBrakeModeEnabled(true);
 
@@ -1039,63 +1078,32 @@ public class RealAutonomous extends MMOpMode_Linear {
 
                 while(opModeIsActive()) {
 
-                    VectorF targetPos;
-                    OpenGLMatrix robotPos;
-
-                    int target = VuforiaVision.TARGET_WHEELS;
-
-                    targetPos = vuforiaVision.getTargetPosition(target);
-                    //robotPos = vuforiaVision.getRobotLocation(target);
-
-
-                    if(targetPos == null){
-                        idle();
-                        continue;
-                    }
-                    double xTargetDistance = targetPos.get(2) / RobotInfo.MM_PER_INCH;
-                    double xDistance = 52.0 - xTargetDistance;
-                    //double yDistance = alliance == AltRyanOpFtcAuto.Alliance.RED_ALLIANCE? 16.0: -16.0;
-                    robotPos = vuforiaVision.getRobotLocation(target);
-
-                    robot.dashboard.displayPrintf(3, "%s found at %d inches",
-                            vuforiaVision.getTargetName(target),
-                            (int) xTargetDistance);
-
-//                    robot.tracer.traceInfo("Auto40DF", "xDistance=%.2f, yDistance=%.2f, heading=%.1f",
-//                            xDistance, yDistance, robot.targetHeading);
-
-                    //robot.dashboard.displayPrintf(4, "RobotLoc: %s", robotPos.formatAsTransform());
-
-
-//                    VuforiaTrackableDefaultListener b1 = teamColor == TeamColor.RED ? vuforiaVision.getBeacon(VuforiaVision.TARGET_GEARS) : vuforiaVision.getBeacon(VuforiaVision.TARGET_WHEELS);
-//                    VuforiaTrackableDefaultListener b2 = teamColor == TeamColor.RED ? vuforiaVision.getBeacon(VuforiaVision.TARGET_TOOLS) :vuforiaVision.getBeacon(VuforiaVision.TARGET_LEGOS);
+//                    VectorF targetPos;
+//                    OpenGLMatrix robotPos;
 //
-//                    VuforiaTrackableDefaultListener vis = null;
-//                    if(b1 != null) {
-//                        vis = b1;
-//                        curLoc = getCurrentLocation(b1);
-//                    } else if(b2 != null){
-//                        vis = b2;
-//                        curLoc = getCurrentLocation(b2);
+                    int target = VuforiaVision.TARGET_GEARS;
+                    VuforiaTrackableDefaultListener visibleBeacon = vuforiaVision.getBeacon(target);
+                    fixAngles(visibleBeacon);
+
+                    waitFor(2);
+//
+//                    targetPos = vuforiaVision.getTargetPosition(target);
+//                    //robotPos = vuforiaVision.getRobotLocation(target);
+//
+//
+//                    if(targetPos == null){
+//                        idle();
+//                        continue;
 //                    }
+//                    double xTargetDistance = targetPos.get(2) / RobotInfo.MM_PER_INCH;
+//                    double xDistance = 52.0 - xTargetDistance;
+//                    //double yDistance = alliance == AltRyanOpFtcAuto.Alliance.RED_ALLIANCE? 16.0: -16.0;
+//                    robotPos = vuforiaVision.getRobotLocation(target);
 //
-//
-//
-//
-//                    if(curLoc == null){
-//                        logState("[LOC] cannot find beacon");
-//                    } else {
-//                        OpenGLMatrix matrix = vuforiaVision.getRobotLocation(VuforiaVision.TARGET_WHEELS); //vis.getRobotLocation();
-//
-//                        double x = curLoc.getX();
-//                        double z = curLoc.getZ();
-//                        logState("[LOC] x: %f, z: %f", x, z);
-//                        if(matrix == null){
-//                            robot.dashboard.displayPrintf(12, "robot location unknown");
-//                        } else {
-//                            robot.dashboard.displayPrintf(12, "robot Location: %s", matrix.formatAsTransform(AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES));
-//                        }
-//                    }
+//                    robot.dashboard.displayPrintf(3, "%s found at %d inches",
+//                            vuforiaVision.getTargetName(target),
+//                            (int) xTargetDistance);
+
                 }
             }
         }
