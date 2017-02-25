@@ -318,7 +318,7 @@ public class RealAutonomous extends MMOpMode_Linear {
                 target = (int)(dist*COUNTS_PER_INCH);
             }
 
-            
+
             do{
                 robot.dashboard.displayText(2, "backLeft: " + robot.backLeftMotor.getPosition() + " target: " + target);
                 robot.dashboard.displayText(3, "backRight: " + robot.backRightMotor.getPosition() + " target: " + target);

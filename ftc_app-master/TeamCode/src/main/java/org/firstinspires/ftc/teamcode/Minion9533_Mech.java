@@ -192,38 +192,38 @@ public class Minion9533_Mech extends MMOpMode_Linear {
         //telemetry.addData("Shooter", shooterPower);
     }
 
-
-    private void handleTargetRPM() {
-
-        if(leftPressed && gamepad2.dpad_left){
-            return;
-        }
-        if(rightPressed && gamepad2.dpad_right) {
-            return;
-        }
-
-
-
-
-
-
-        if(gamepad2.dpad_left) {
-            targetRPM -= targetIncrement;
-            leftPressed = true;
-        } else {
-            leftPressed = false;
-        }
-        if(gamepad2.dpad_right){
-            targetRPM += targetIncrement;
-            rightPressed = true;
-        } else {
-            rightPressed = false;
-        }
-
-        targetRPM = Range.clip(targetRPM, 0,6000);
-
-
-    }
+//
+//    private void handleTargetRPM() {
+//
+//        if(leftPressed && gamepad2.dpad_left){
+//            return;
+//        }
+//        if(rightPressed && gamepad2.dpad_right) {
+//            return;
+//        }
+//
+//
+//
+//
+//
+//
+//        if(gamepad2.dpad_left) {
+//            targetRPM -= targetIncrement;
+//            leftPressed = true;
+//        } else {
+//            leftPressed = false;
+//        }
+//        if(gamepad2.dpad_right){
+//            targetRPM += targetIncrement;
+//            rightPressed = true;
+//        } else {
+//            rightPressed = false;
+//        }
+//
+//        targetRPM = Range.clip(targetRPM, 0,6000);
+//
+//
+//    }
 
     @Override
     public void runOpMode() throws InterruptedException{
@@ -232,6 +232,11 @@ public class Minion9533_Mech extends MMOpMode_Linear {
 
         mechDrive.setGamepad(gamepad1);
         mechDrive.setHalBoard(robot.dashboard);
+
+
+        robot.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        robot.setMaxSpeed(3000);
+
 
         if(USE_GYRO) {
             gyro = new MinionsGyro(robot, "gyro");
@@ -256,10 +261,10 @@ public class Minion9533_Mech extends MMOpMode_Linear {
 
         timer.reset();
 
-        robot.shooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        robot.shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
+//        robot.shooterMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//
+//        robot.shooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//
 
 
         //long start = System.currentTimeMillis()/60000;
@@ -268,7 +273,7 @@ public class Minion9533_Mech extends MMOpMode_Linear {
         //MediaPlayer mediaPlayer = MediaPlayer.create(Global.context, com.qualcomm.ftcrobotcontroller.R.raw.banana);
         //mediaPlayer.start();
 
-        rollingAverage = new RollingAvg(50);
+        //rollingAverage = new RollingAvg(50);
         while (opModeIsActive()) {
 
             handleLiftDrop();
@@ -277,15 +282,15 @@ public class Minion9533_Mech extends MMOpMode_Linear {
 
             //robot.dashboard.displayPrintf(0, "Compass Says Z: " + Global.compass);
 
-            handleTargetRPM();
-            int targetSpeed = (targetRPM * 28) / 60;
+            //handleTargetRPM();
+            //int targetSpeed = (targetRPM * 28) / 60;
 
-            robot.shooterMotor.setMaxSpeed(targetSpeed);
+            //robot.shooterMotor.setMaxSpeed(targetSpeed);
 
-            calcAvgRPM();
+            //calcAvgRPM();
 
-            robot.dashboard.displayPrintf(9, "TargetRPM: %s", targetRPM);
-            robot.dashboard.displayPrintf(10, "RPM: %s", shooterAvg);
+            //robot.dashboard.displayPrintf(9, "TargetRPM: %s", targetRPM);
+            //robot.dashboard.displayPrintf(10, "RPM: %s", shooterAvg);
 
 
             currentButtonState = gamepad1.right_bumper;
@@ -320,6 +325,12 @@ public class Minion9533_Mech extends MMOpMode_Linear {
             //robot.DriveRobot(-gamepad1.left_stick_y, -gamepad1.right_stick_y);
             mechDrive.Drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x);
 
+
+
+            robot.dashboard.displayText(2, "backLeft: " + robot.backLeftMotor.getPosition() );
+            robot.dashboard.displayText(3, "backRight: " + robot.backRightMotor.getPosition());
+            robot.dashboard.displayText(4, "frontLeft: " + robot.rightMotor.getPosition());
+            robot.dashboard.displayText(5, "frontRight: " + robot.leftMotor.getPosition());
 
             // Pause for metronome tick.  40 mS each cycle = update 25 times a second.
             robot.waitForTick(tickInterval);
