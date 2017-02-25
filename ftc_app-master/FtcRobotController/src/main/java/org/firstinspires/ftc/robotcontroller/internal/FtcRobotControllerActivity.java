@@ -438,6 +438,13 @@ public class FtcRobotControllerActivity extends Activity {
       startActivityForResult(settingsIntent, LaunchActivityConstantsList.FTC_CONFIGURE_REQUEST_CODE_ROBOT_CONTROLLER);
       return true;
     }
+
+    else if (id == R.id.action_autonomous_settings) {
+      Intent launchNewIntent = new Intent(FtcRobotControllerActivity.this,AutonomousSettings.class);
+      startActivityForResult(launchNewIntent, 0);
+      return true;
+    }
+
     else if (id == R.id.action_about) {
       Intent intent = new Intent(AboutActivity.launchIntent);
       intent.putExtra(LaunchActivityConstantsList.ABOUT_ACTIVITY_CONNECTION_TYPE, networkType);
