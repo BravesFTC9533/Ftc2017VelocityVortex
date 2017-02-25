@@ -350,49 +350,11 @@ public class RealAutonomous extends MMOpMode_Linear {
 
     }
 
-    private double easingInOut(double pos, double target, double currentPower, double targetPower) {
-        //t = current time
-        //d = duration
-        //b = initial value
-        //c = change in value
-
-        double t= pos;
-        double d = target;
-        double b = currentPower * 100;
-        double c = targetPower * 100;
-        double retval = 0.0;
-
-//        t /= d/2;
-//        if(t < 1) {
-//            if(t == 0) {
-//                t = 0.01;
-//            }
-//            retval = c/2*t*t*t+b;
-//        } else {
-//            t -= 2;
-//            retval = c / 2 * (t * t * t + 2) + b;
-//        }
-//
-//        retval /= 100;
-
-        double ts =(t/=d)*t;
-        double tc =ts*t;
-        retval = (b+c*(6*tc*ts + -15*ts*ts + 10*tc)) / 100;
-
-
-        if(Math.abs(retval) < 0.1) {
-            retval = 0.1;
-            if(targetPower < 0) {
-                retval *= -1;
-            }
-        }
-        return  retval;
-    }
 
     private double getScalePower(double target, double pos, double power) {
 
 
-        int encoderPositionAtFullSpeed = 1000;
+        int encoderPositionAtFullSpeed = 500;
 
         //ramp up speed
         if(pos < encoderPositionAtFullSpeed) {
