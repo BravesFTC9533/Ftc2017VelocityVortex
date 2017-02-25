@@ -356,7 +356,7 @@ public class RealAutonomous extends MMOpMode_Linear {
     private double getScalePower(double target, double pos, double power) {
 
 
-        int encoderPositionAtFullSpeed = 500;
+        int encoderPositionAtFullSpeed = 250;
 
         //ramp up speed
         if(pos < encoderPositionAtFullSpeed) {
@@ -442,7 +442,7 @@ public class RealAutonomous extends MMOpMode_Linear {
 
     private void turn(double angle) {
 
-        mechDrive.turn(angle);
+        mechDrive.turn(angle, 1);
 
 //        double ticksPerDegree_bl = 26.08055556;
 //        double ticksPerDegree_br = 26.12222222;
@@ -568,8 +568,11 @@ public class RealAutonomous extends MMOpMode_Linear {
         logState("[SQUARE UP TO WALL]");
         //VuforiaTrackableDefaultListener visibleBeacon = null;
         MMTranslation angles = null;
+        MMTranslation angles2 = null;
+
         double angleToWall = 0;
 
+        double angleToWall2 = 0;
 
         //visibleBeacon = getVisibleBeacon();
         if(visibleBeacon == null){
@@ -583,13 +586,41 @@ public class RealAutonomous extends MMOpMode_Linear {
 
         angles = anglesFromTarget(visibleBeacon);
 
-        if (angles == null)
+        waitFor(0.25);
+        angles2 = anglesFromTarget(visibleBeacon);
+
+
+        if (angles == null && angles2 == null)
         {
             return;
         }
 
-        angleToWall = (Math.toDegrees(angles.getX()) + 270) % 360;
+        if(angles != null) {
+            angleToWall = (Math.toDegrees(angles.getX()) + 270) % 360;
+        }
+        if(angles2 != null){
+            angleToWall2 = (Math.toDegrees(angles.getX()) + 270) % 360;
+        }
+
+
+
         double angle = angleToWall - 90;
+        double angle2 = angleToWall2 - 90;
+
+
+        if(Math.abs(angle - angle2) > 10) {
+            //ok, this is too big a difference
+            waitFor(0.5);
+            angles = anglesFromTarget(visibleBeacon);
+            if (angles == null )
+            {
+                return;
+            }
+
+            angleToWall = (Math.toDegrees(angles.getX()) + 270) % 360;
+            angle = angleToWall - 90;
+        }
+
         logState("[SQUARE UP TO WALL] Angle: %f", angle);
 
         if(Math.abs(angle) >= 1) {
@@ -784,20 +815,17 @@ public class RealAutonomous extends MMOpMode_Linear {
 
     }
 
-    private void goForBeacon(VuforiaTrackableDefaultListener visibleBeacon) {
+    private void goForBeacon(VuforiaTrackableDefaultListener visibleBeacon, boolean fixInitialAngle) {
         ButtonRange targetButton = null;
 
-        if (opModeIsActive())
+        if (opModeIsActive() && fixInitialAngle)
         {
             logState("Fixing angle..");
             fixAngles(visibleBeacon);
         }
 
-        //Stop();
-
-
         waitFor(VUFORIA_PAUSE_TO_FIND_COLOR);
-        //pauseBetweenSteps();
+
 
         targetButton = getTargetButton(visibleBeacon);
         if(targetButton == null || targetButton.getName().equals(ButtonRange.Unknown().getName())){
@@ -812,15 +840,6 @@ public class RealAutonomous extends MMOpMode_Linear {
 
 
         waitFor(VUFORIA_PAUSE_TO_CENTER);
-//        if (opModeIsActive())
-//        {
-//            logState("Moving in closer to beacon");
-//            moveToBeacon(visibleBeacon); //move in closer
-//            Stop();
-//            waitFor(0.1);
-//        }
-
-        // looks like its stopping after it moves towards the beacon (at the -500 mm mark)
 
 
         if (opModeIsActive())
@@ -843,7 +862,7 @@ public class RealAutonomous extends MMOpMode_Linear {
         {
             logState("Driving into beacon %f inches", inches);
             //move in to press button
-            driveTo(inches / 2, -0.4, 0, 0);
+            driveTo(inches / 2, -0.7, 0, 0);
             //pauseBetweenSteps();
             waitFor(VUFORIA_PAUSE_TO_CENTER);
 
@@ -862,8 +881,8 @@ public class RealAutonomous extends MMOpMode_Linear {
 
             currentLocation = getCurrentLocation(visibleBeacon);
 
-            inches = Math.abs(currentLocation.getZ() / MM_PER_INCH) - 4.3;
-            driveTo(inches, -0.3, 0, 0);
+            inches = Math.abs(currentLocation.getZ() / MM_PER_INCH) - 3.5;
+            driveTo(inches, -0.6, 0, 0);
             pauseBetweenSteps();
 
             logState("Pushing button..");
@@ -876,18 +895,18 @@ public class RealAutonomous extends MMOpMode_Linear {
             resetPusher();
             //move out away from button
             logState("Driving out from beacon");
-            driveTo(6, 0.4, 0, 0);
+            driveTo(4, 0.8, 0, 0);
 
 
             //pauseBetweenSteps();
 
-            waitFor(VUFORIA_PAUSE_TO_CENTER);
-            fixAngles(visibleBeacon);
+            //waitFor(VUFORIA_PAUSE_TO_CENTER);
+            //fixAngles(visibleBeacon);
 
             pauseBetweenSteps();
 
-            driveTo(17, 0.6, 0, 0);
-            fixAngles(visibleBeacon);
+            //driveTo(17, 0.6, 0, 0);
+            //fixAngles(visibleBeacon);
         }
 
         pauseBetweenSteps();
@@ -918,20 +937,22 @@ public class RealAutonomous extends MMOpMode_Linear {
 
     private void pauseBetweenSteps(){
         //logPath("pausing waiting 2 seconds");
-        waitFor(0.2);
+        waitFor(0.1);
     }
 
     private void DriveOffWall() {
-        double length = teamColor == TeamColor.BLUE ? 60 : 67;
+        double length = teamColor == TeamColor.BLUE ? 60 : 44;
 
 
-        driveTo(length, -0.7, -0.7, 0);
+        driveTo(length, 0, -1, 0);
+        //driveTo(length, -0.7, -0.7, 0);
         waitFor(0.1);
-        length = teamColor == TeamColor.RED ? 17 : 21;
+        turn(45);
+        length = teamColor == TeamColor.BLUE ? 21 : 14;
         driveTo(length, 0, -0.9, 0);
         Stop();
 
-        waitFor(1);
+        waitFor(0.5);
 
     }
 
@@ -946,20 +967,13 @@ public class RealAutonomous extends MMOpMode_Linear {
         runtime.reset();
         do {
             visibleBeacon = vuforiaVision.getBeacon(target);
-//            if (teamColor == TeamColor.RED)
-//            {
-//                visibleBeacon = vuforiaVision.getBeacon(VuforiaVision.TARGET_GEARS); //getBeacon("gears");
-//            }
-//            else if (teamColor == TeamColor.BLUE)
-//            {
-//                visibleBeacon = vuforiaVision.getBeacon(VuforiaVision.TARGET_WHEELS); //getBeacon("wheels");
-//            }
+
         }while (opModeIsActive() && runtime.seconds() < 5 && visibleBeacon == null);
 
 
         if (opModeIsActive())
         {
-            goForBeacon(visibleBeacon);
+            goForBeacon(visibleBeacon, false);
         }
 
 
@@ -969,11 +983,18 @@ public class RealAutonomous extends MMOpMode_Linear {
 
         double dist = 44;
 
-        if(didBeacon1) {
 
-        }
 
-        driveTo(dist, 0, -1, 0);
+        //drive half way
+        driveTo(dist / 2, 0, -1, 0);
+
+        //fix angle by smashing wall
+        driveTo(6, -1, 0, 0);
+        driveTo(24, 1, 0, 0);
+
+
+        //drive other half
+        driveTo(dist / 2, 0, -1, 0);
 
         waitFor(1);
         runtime.reset();
@@ -983,20 +1004,13 @@ public class RealAutonomous extends MMOpMode_Linear {
         do {
 
             visibleBeacon = vuforiaVision.getBeacon(target);
-//            if (teamColor == TeamColor.RED)
-//            {
-//                visibleBeacon = vuforiaVision.getBeacon(VuforiaVision.TARGET_TOOLS); //getBeacon("tools");//getVisibleBeacon();
-//            }
-//            else if (teamColor == TeamColor.BLUE)
-//            {
-//                visibleBeacon = vuforiaVision.getBeacon(VuforiaVision.TARGET_TOOLS);//getBeacon("legos");
-//            }
+
 
         }while(opModeIsActive() && runtime.seconds() < 5 && visibleBeacon == null);
 
         if (opModeIsActive())
         {
-            goForBeacon(visibleBeacon);
+            goForBeacon(visibleBeacon, true);
         }
     }
     private void Shoot() {
@@ -1010,14 +1024,14 @@ public class RealAutonomous extends MMOpMode_Linear {
     public void runOpMode() throws InterruptedException {
         super.runOpMode();
         robot.dashboard.displayText(0, "*****WAAAAAIITT!!!!!  for it to say ready");
-        boolean driveOffWall = false,
-                beacon1 = false,
-                beacon2 = false,
+        boolean driveOffWall = true,
+                beacon1 = true,
+                beacon2 = true,
 
                 shoot = false,
                 park = false,
                 test= false,
-                test2 = true;
+                test2 = false;
 
         robot.setBrakeModeEnabled(true);
 

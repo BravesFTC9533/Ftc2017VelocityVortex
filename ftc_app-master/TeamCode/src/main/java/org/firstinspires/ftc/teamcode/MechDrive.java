@@ -167,7 +167,8 @@ public class MechDrive {
         Stop();
     }
 
-    public void turn(double angle) {
+
+    public void turn(double angle, double timeOut) {
 
         double ticksPerDegree_bl = 26.36111111;
         double ticksPerDegree_br = 26.38277778;
@@ -242,7 +243,7 @@ public class MechDrive {
         hardware.backRightMotor.setPower(rightPower);
 
 
-        while(opMode.opModeIsActive() && IsBusy() && time.seconds() < 5){
+        while(opMode.opModeIsActive() && IsBusy() && time.seconds() < timeOut){
 
             flp = hardware.leftMotor.getPosition();
             frp = hardware.rightMotor.getPosition();
@@ -300,6 +301,9 @@ public class MechDrive {
 
 
 
+    }
+    public void turn(double angle) {
+        this.turn(angle, 5);
     }
 
 
