@@ -2,8 +2,9 @@ package org.firstinspires.ftc.teamcode;
 
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
-import ftclib.FtcDcMotor;
 import ftclib.FtcServo;
 import ftclib.FtcTouchSensor;
 import trclib.TrcEvent;
@@ -26,7 +27,7 @@ class Shooter //implements TrcTaskMgr.Task, TrcPidController.PidInput
 
     private String instanceName;
     private FtcDcMotor shooterMotor;
-    private FtcServo ballGate;
+    private Servo ballGate;
 
 
     static final int COUNTS_PER_MOTOR_REV = 1440 ;    // eg: TETRIX Motor Encoder
@@ -39,22 +40,22 @@ class Shooter //implements TrcTaskMgr.Task, TrcPidController.PidInput
 
     private boolean enabled = false;
 
-    Shooter(String instanceName)
+    Shooter(String instanceName, HardwareMap map, Servo ballGate)
     {
         this.instanceName = instanceName;
 
-        shooterMotor = new FtcDcMotor("shooterMotor");
+        shooterMotor = new FtcDcMotor(map, "shooterMotor");
         shooterMotor.setInverted(false);
         shooterMotor.setBrakeModeEnabled(true);
 
 
-
-        ballGate = new FtcServo("ballStop");
         ballGate.setPosition(RobotInfo.BALLGATE_DOWN_POSITION);
 
         sm = new TrcStateMachine<>(instanceName);
         timer = new TrcTimer(instanceName);
         event = new TrcEvent(instanceName);
+
+        this.ballGate = ballGate;
     }
 
     private void setTaskEnabled(boolean enabled)

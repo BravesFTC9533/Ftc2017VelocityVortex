@@ -251,7 +251,7 @@ public class Robot implements TrcPidController.PidInput, TrcAnalogTrigger.Trigge
         // Initialize other subsystems.
         //
 
-        shooter = new Shooter("shooter");
+        //shooter = new Shooter("shooter");
 
         liftMotor = new FtcDcMotor("liftMotor");
         //liftMotor.setInverted(true);
