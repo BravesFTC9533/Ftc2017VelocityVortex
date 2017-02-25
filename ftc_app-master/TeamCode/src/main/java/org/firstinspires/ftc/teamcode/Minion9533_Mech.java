@@ -326,6 +326,16 @@ public class Minion9533_Mech extends MMOpMode_Linear {
                 robot.resetPosition();
             }
 
+            if(gamepad1.dpad_left) {
+                mechDrive.turn(45);
+            }
+            if(gamepad1.dpad_up) {
+                mechDrive.turn(90);
+            }
+            if(gamepad1.dpad_right) {
+                mechDrive.turn(180);
+            }
+
             //robot.DriveRobot(-gamepad1.left_stick_y, -gamepad1.right_stick_y);
             mechDrive.Drive(-gamepad1.left_stick_x, -gamepad1.left_stick_y, gamepad1.right_stick_x);
 

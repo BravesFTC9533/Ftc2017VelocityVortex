@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -15,6 +18,7 @@ public class MechDrive {
 
     private ElapsedTime runtime = new ElapsedTime();
     private Hardware9533 hardware;
+    private LinearOpMode opMode;
     private static double MIN_POWER = 0.0;
 
     double timePerRotationClockwiseMS = 4 * 1000.0;
@@ -26,8 +30,10 @@ public class MechDrive {
 
 
 
-    public MechDrive(Hardware9533 hardware) {
+
+    public MechDrive(Hardware9533 hardware, LinearOpMode opMode) {
         this.hardware = hardware;
+        this.opMode = opMode;
     }
 
 
@@ -131,7 +137,7 @@ public class MechDrive {
 
     }
 
-    public void Turn(double angle){
+    public void TurnByTime(double angle){
 
         double timeForTurn = 0.0;
 
@@ -159,6 +165,150 @@ public class MechDrive {
         }
 
         Stop();
+    }
+
+    public void turn(double angle) {
+
+        double ticksPerDegree_bl = 26.36111111;
+        double ticksPerDegree_br = 26.38277778;
+
+        double ticksPerDegree_fl = 26.41777778;
+        double ticksPerDegree_fr = 26.40777778;
+
+
+
+        double target_bl = Math.abs(ticksPerDegree_bl*angle);
+        double target_br = Math.abs(ticksPerDegree_br*angle);
+        double target_fl = Math.abs(ticksPerDegree_fl*angle);
+        double target_fr = Math.abs(ticksPerDegree_fr*angle);
+
+        double turnPower = 0.9;
+
+        //right negative is pos angle;
+
+
+
+
+        hardware.resetPosition();
+
+        boolean rightIsNegative = angle > 0;
+
+        double leftPower = rightIsNegative ? turnPower : turnPower * -1;
+        double rightPower = rightIsNegative ? turnPower*-1 : turnPower;
+
+
+
+        double flp = hardware.leftMotor.getPosition();
+        double frp = hardware.rightMotor.getPosition();
+        double blp = hardware.backLeftMotor.getPosition();
+        double brp = hardware.backRightMotor.getPosition();
+
+        hardware.dashboard.displayPrintf(9, "FL: t: %.3f, p: %.2f, pow: %.2f", target_fl, flp, leftPower);
+        hardware.dashboard.displayPrintf(10, "FR: t: %.3f, p: %.2f, pow: %.2f", target_fr, frp, rightPower);
+
+        hardware.dashboard.displayPrintf(12, "BL: t: %.3f, p: %.2f, pow: %.2f", target_bl, blp, leftPower);
+        hardware.dashboard.displayPrintf(13, "BR: t: %.3f, p: %.2f, pow: %.2f", target_br, brp, rightPower);
+
+
+
+        hardware.dashboard.displayPrintf(14, "about to run");
+
+
+
+        ElapsedTime time = new ElapsedTime();
+
+
+        //hardware.setMotorMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        //hardware.setMotorMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+
+        if(rightIsNegative) {
+            target_br *= -1;
+            target_fr *= -1;
+        } else {
+            target_bl *= -1;
+            target_fl *= -1;
+        }
+        hardware.rightMotor.runToPosition((int)target_fr);
+        hardware.leftMotor.runToPosition((int)target_fl);
+        hardware.backRightMotor.runToPosition((int)target_br);
+        hardware.backLeftMotor.runToPosition((int)target_bl);
+
+
+        hardware.leftMotor.setPower(leftPower);
+        hardware.backLeftMotor.setPower(leftPower);
+        hardware.rightMotor.setPower(rightPower);
+        hardware.backRightMotor.setPower(rightPower);
+
+
+        while(opMode.opModeIsActive() && IsBusy() && time.seconds() < 5){
+
+            flp = hardware.leftMotor.getPosition();
+            frp = hardware.rightMotor.getPosition();
+            blp = hardware.backLeftMotor.getPosition();
+            brp = hardware.backRightMotor.getPosition();
+
+
+            hardware.dashboard.displayPrintf(14, "running");
+            hardware.dashboard.displayPrintf(9, "FL: t: %.3f, p: %.2f, pow: %.2f", target_fl, flp, leftPower);
+            hardware.dashboard.displayPrintf(10, "FR: t: %.3f, p: %.2f, pow: %.2f", target_fr, frp, rightPower);
+
+            hardware.dashboard.displayPrintf(12, "BL: t: %.3f, p: %.2f, pow: %.2f", target_bl, blp, leftPower);
+            hardware.dashboard.displayPrintf(13, "BR: t: %.3f, p: %.2f, pow: %.2f", target_br, brp, rightPower);
+
+        }
+
+
+        hardware.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        Stop();
+
+//        while (opMode.opModeIsActive()
+//                && Math.abs(flp) <= target_fl
+//                && Math.abs(frp) <= target_fr
+//                && Math.abs(blp) <= target_bl
+//                && Math.abs(brp) <= target_br
+//                && time.seconds() < 5
+//                ) {
+//
+//
+//
+//            flp = hardware.leftMotor.getPosition();
+//            frp = hardware.rightMotor.getPosition();
+//            blp = hardware.backLeftMotor.getPosition();
+//            brp = hardware.backRightMotor.getPosition();
+//
+//            hardware.dashboard.displayPrintf(14, "running");
+//            hardware.dashboard.displayPrintf(9, "FL: t: %.3f, p: %.2f, pow: %.2f", target_fl, flp, leftPower);
+//            hardware.dashboard.displayPrintf(10, "FR: t: %.3f, p: %.2f, pow: %.2f", target_fr, frp, rightPower);
+//
+//            hardware.dashboard.displayPrintf(12, "BL: t: %.3f, p: %.2f, pow: %.2f", target_bl, blp, leftPower);
+//            hardware.dashboard.displayPrintf(13, "BR: t: %.3f, p: %.2f, pow: %.2f", target_br, brp, rightPower);
+//
+//
+//            hardware.leftMotor.setPower(leftPower);
+//            hardware.backLeftMotor.setPower(leftPower);
+//            hardware.rightMotor.setPower(rightPower);
+//            hardware.backRightMotor.setPower(rightPower);
+//
+//
+//        }
+//        Stop();
+
+        hardware.dashboard.displayPrintf(14, "Stopped");
+
+
+
+    }
+
+
+    public boolean IsBusy() {
+        return hardware.leftMotor.motor.isBusy()
+                || hardware.rightMotor.motor.isBusy()
+                || hardware.backLeftMotor.motor.isBusy()
+                || hardware.backRightMotor.motor.isBusy();
+
     }
 
     public void Stop() {

@@ -141,6 +141,18 @@ public class FtcDcMotor
      * @return current motor position.
      */
 
+
+    public void runToPosition(int target_pos_offset) {
+
+        motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        int currEncPos = motor.getCurrentPosition();
+
+        int target_pos = currEncPos + target_pos_offset;
+        motor.setTargetPosition(target_pos);
+
+    }
+
     public double getPosition()
     {
         final String funcName = "getPosition";

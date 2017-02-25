@@ -82,7 +82,7 @@ public abstract class  MMOpMode_Linear extends LinearOpMode { //extends VisionOp
         dashboard = new HalDashboard(telemetry);
         robot.init(hardwareMap);
 
-        mechDrive = new MechDrive(robot);
+        mechDrive = new MechDrive(robot, this);
 
 
     }

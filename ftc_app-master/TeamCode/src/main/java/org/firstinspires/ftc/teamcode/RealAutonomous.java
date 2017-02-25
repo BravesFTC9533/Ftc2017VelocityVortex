@@ -55,6 +55,7 @@ public class RealAutonomous extends MMOpMode_Linear {
     VuforiaVision vuforiaVision = null;
 
 
+
     public static TeamColor teamColor = TeamColor.RED;
     public static int STRAFE = 0, FORWARD = 1;
 
@@ -67,6 +68,7 @@ public class RealAutonomous extends MMOpMode_Linear {
     double timePerRotationClockwiseMS = 4 * 1000.0;
     double timePerRotationCounterClockwiseMS = 4.1 * 1000.0;
 
+    static final int MAX_ROBOT_SPEED = 3500;
 
     //vuforia pause
     static final double VUFORIA_PAUSE_TO_FIND_COLOR = 1.0;
@@ -304,7 +306,7 @@ public class RealAutonomous extends MMOpMode_Linear {
 
         robot.setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        robot.setMaxSpeed(3500);
+        robot.setMaxSpeed(MAX_ROBOT_SPEED);
 
         if (opModeIsActive())
         {
@@ -327,7 +329,7 @@ public class RealAutonomous extends MMOpMode_Linear {
                 scaleDrive(target, h, v);
 
 
-            }
+        }
             while ( opModeIsActive()
                     && (Math.abs(robot.backLeftMotor.getPosition()) < target)
                     && (Math.abs(robot.backRightMotor.getPosition()) < target)
@@ -440,86 +442,88 @@ public class RealAutonomous extends MMOpMode_Linear {
 
     private void turn(double angle) {
 
-        double ticksPerDegree_bl = 26.08055556;
-        double ticksPerDegree_br = 26.12222222;
+        mechDrive.turn(angle);
 
-        double ticksPerDegree_fl = 27.36388889;
-        double ticksPerDegree_fr = 27.39166667;
-
-
-
-        double target_bl = Math.abs(ticksPerDegree_bl*angle);
-        double target_br = Math.abs(ticksPerDegree_br*angle);
-        double target_fl = Math.abs(ticksPerDegree_fl*angle);
-        double target_fr = Math.abs(ticksPerDegree_fr*angle);
-
-        double turnPower = 0.5;
-
-        //right negative is pos angle;
-
-
-
-
-        robot.resetPosition();
-
-        boolean rightIsNegative = angle > 0;
-
-        double leftPower = rightIsNegative ? turnPower : turnPower * -1;
-        double rightPower = rightIsNegative ? turnPower*-1 : turnPower;
-
-
-
-        double flp = robot.leftMotor.getPosition();
-        double frp = robot.rightMotor.getPosition();
-        double blp = robot.backLeftMotor.getPosition();
-        double brp = robot.backRightMotor.getPosition();
-
-        robot.dashboard.displayPrintf(9, "FL: t: %.3f, p: %.2f, pow: %.2f", target_fl, flp, leftPower);
-        robot.dashboard.displayPrintf(10, "FR: t: %.3f, p: %.2f, pow: %.2f", target_fr, frp, rightPower);
-
-        robot.dashboard.displayPrintf(12, "BL: t: %.3f, p: %.2f, pow: %.2f", target_bl, blp, leftPower);
-        robot.dashboard.displayPrintf(13, "BR: t: %.3f, p: %.2f, pow: %.2f", target_br, brp, rightPower);
-
-
-
-        robot.dashboard.displayPrintf(14, "about to run");
-
-
-        ElapsedTime time = new ElapsedTime();
-
-        while (opModeIsActive()
-                && Math.abs(flp) <= target_fl
-                && Math.abs(frp) <= target_fr
-                && Math.abs(blp) <= target_bl
-                && Math.abs(brp) <= target_br
-                && time.seconds() < 1
-                ) {
-
-
-
-            flp = robot.leftMotor.getPosition();
-            frp = robot.rightMotor.getPosition();
-            blp = robot.backLeftMotor.getPosition();
-            brp = robot.backRightMotor.getPosition();
-
-            robot.dashboard.displayPrintf(14, "running");
-            robot.dashboard.displayPrintf(9, "FL: t: %.3f, p: %.2f, pow: %.2f", target_fl, flp, leftPower);
-            robot.dashboard.displayPrintf(10, "FR: t: %.3f, p: %.2f, pow: %.2f", target_fr, frp, rightPower);
-
-            robot.dashboard.displayPrintf(12, "BL: t: %.3f, p: %.2f, pow: %.2f", target_bl, blp, leftPower);
-            robot.dashboard.displayPrintf(13, "BR: t: %.3f, p: %.2f, pow: %.2f", target_br, brp, rightPower);
-
-
-            robot.leftMotor.setPower(leftPower);
-            robot.backLeftMotor.setPower(leftPower);
-            robot.rightMotor.setPower(rightPower);
-            robot.backRightMotor.setPower(rightPower);
-
-
-        }
-        Stop();
-
-        robot.dashboard.displayPrintf(14, "Stopped");
+//        double ticksPerDegree_bl = 26.08055556;
+//        double ticksPerDegree_br = 26.12222222;
+//
+//        double ticksPerDegree_fl = 27.36388889;
+//        double ticksPerDegree_fr = 27.39166667;
+//
+//
+//
+//        double target_bl = Math.abs(ticksPerDegree_bl*angle);
+//        double target_br = Math.abs(ticksPerDegree_br*angle);
+//        double target_fl = Math.abs(ticksPerDegree_fl*angle);
+//        double target_fr = Math.abs(ticksPerDegree_fr*angle);
+//
+//        double turnPower = 0.5;
+//
+//        //right negative is pos angle;
+//
+//
+//
+//
+//        robot.resetPosition();
+//
+//        boolean rightIsNegative = angle > 0;
+//
+//        double leftPower = rightIsNegative ? turnPower : turnPower * -1;
+//        double rightPower = rightIsNegative ? turnPower*-1 : turnPower;
+//
+//
+//
+//        double flp = robot.leftMotor.getPosition();
+//        double frp = robot.rightMotor.getPosition();
+//        double blp = robot.backLeftMotor.getPosition();
+//        double brp = robot.backRightMotor.getPosition();
+//
+//        robot.dashboard.displayPrintf(9, "FL: t: %.3f, p: %.2f, pow: %.2f", target_fl, flp, leftPower);
+//        robot.dashboard.displayPrintf(10, "FR: t: %.3f, p: %.2f, pow: %.2f", target_fr, frp, rightPower);
+//
+//        robot.dashboard.displayPrintf(12, "BL: t: %.3f, p: %.2f, pow: %.2f", target_bl, blp, leftPower);
+//        robot.dashboard.displayPrintf(13, "BR: t: %.3f, p: %.2f, pow: %.2f", target_br, brp, rightPower);
+//
+//
+//
+//        robot.dashboard.displayPrintf(14, "about to run");
+//
+//
+//        ElapsedTime time = new ElapsedTime();
+//
+//        while (opModeIsActive()
+//                && Math.abs(flp) <= target_fl
+//                && Math.abs(frp) <= target_fr
+//                && Math.abs(blp) <= target_bl
+//                && Math.abs(brp) <= target_br
+//                && time.seconds() < 1
+//                ) {
+//
+//
+//
+//            flp = robot.leftMotor.getPosition();
+//            frp = robot.rightMotor.getPosition();
+//            blp = robot.backLeftMotor.getPosition();
+//            brp = robot.backRightMotor.getPosition();
+//
+//            robot.dashboard.displayPrintf(14, "running");
+//            robot.dashboard.displayPrintf(9, "FL: t: %.3f, p: %.2f, pow: %.2f", target_fl, flp, leftPower);
+//            robot.dashboard.displayPrintf(10, "FR: t: %.3f, p: %.2f, pow: %.2f", target_fr, frp, rightPower);
+//
+//            robot.dashboard.displayPrintf(12, "BL: t: %.3f, p: %.2f, pow: %.2f", target_bl, blp, leftPower);
+//            robot.dashboard.displayPrintf(13, "BR: t: %.3f, p: %.2f, pow: %.2f", target_br, brp, rightPower);
+//
+//
+//            robot.leftMotor.setPower(leftPower);
+//            robot.backLeftMotor.setPower(leftPower);
+//            robot.rightMotor.setPower(rightPower);
+//            robot.backRightMotor.setPower(rightPower);
+//
+//
+//        }
+//        Stop();
+//
+//        robot.dashboard.displayPrintf(14, "Stopped");
 
 
 
