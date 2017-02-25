@@ -97,6 +97,13 @@ public class Hardware9533
         backRightMotor.motor.setMode(runMode);
     }
 
+    public void resetPosition(){
+        leftMotor.resetPosition();
+        rightMotor.resetPosition();
+        backLeftMotor.resetPosition();
+        backRightMotor.resetPosition();
+    }
+
     public void setMaxSpeed(int speed) {
         leftMotor.motor.setMaxSpeed(speed);
         //leftMotor.motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
