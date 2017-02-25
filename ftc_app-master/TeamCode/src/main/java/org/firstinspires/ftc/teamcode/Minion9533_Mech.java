@@ -52,6 +52,7 @@ public class Minion9533_Mech extends MMOpMode_Linear implements FtcGamePad.Butto
     FtcGamePad driverGamepad;
     private FtcGamePad operatorGamepad;
 
+    private Shooter shooter = new Shooter("Shooter");
 
     private boolean capballLiftReleased = false;
 
@@ -102,6 +103,7 @@ public class Minion9533_Mech extends MMOpMode_Linear implements FtcGamePad.Butto
 
         while (opModeIsActive()) {
 
+            shooter.update();
 
             if(ballStopOpen && ballStopTimer.seconds() >= 1){
 
@@ -138,6 +140,8 @@ public class Minion9533_Mech extends MMOpMode_Linear implements FtcGamePad.Butto
             switch (button)
             {
                 case FtcGamePad.GAMEPAD_A:
+
+                    shooter.fireOneShot();
 //                    if (pressed) {
 //                        driveMode = DriveMode.MECANUM_MODE;
 //                    }

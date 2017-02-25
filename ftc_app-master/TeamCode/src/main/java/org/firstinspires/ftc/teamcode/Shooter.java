@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
 
+import com.qualcomm.robotcore.hardware.DcMotor;
+
 import ftclib.FtcDcMotor;
 import ftclib.FtcServo;
 import ftclib.FtcTouchSensor;
@@ -25,6 +27,9 @@ class Shooter //implements TrcTaskMgr.Task, TrcPidController.PidInput
     private String instanceName;
     private FtcDcMotor shooterMotor;
     private FtcServo ballGate;
+
+
+    static final int COUNTS_PER_MOTOR_REV = 1440 ;    // eg: TETRIX Motor Encoder
 
     private TrcStateMachine<ShooterState> sm;
     private TrcTimer timer;
@@ -168,7 +173,12 @@ class Shooter //implements TrcTaskMgr.Task, TrcPidController.PidInput
                     // Flip the ball gate down and start turning the motor for the firing sequence.
                     //
                     ballGate.setPosition(RobotInfo.BALLGATE_DOWN_POSITION);
+
+                    shooterMotor.motor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    shooterMotor.motor.setTargetPosition((int) shooterMotor.motor.getCurrentPosition() + COUNTS_PER_MOTOR_REV);
                     shooterMotor.setPower(RobotInfo.SHOOTER_POWER);
+
+
                     //timer.set();
                     //
                     // Check the touch sensor to see if the shooter has reached the firing point. If so, stop the
