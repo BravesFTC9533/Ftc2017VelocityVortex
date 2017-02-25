@@ -42,8 +42,12 @@ public class TestODS extends MMOpMode_Linear {
 
         Direction lastDir = Direction.LEFT;
 
+        while (!(isStarted() || isStopRequested()))
+        {
+            // Display the light level while we are looking for the line
+            robot.dashboard.displayPrintf(1, "Light Level: %.4f",  robot.ods.getLightDetected());
+        }
 
-        waitForStart();
 
 
         double length = teamColor == TeamColor.BLUE ? 60 : 44;
@@ -53,20 +57,20 @@ public class TestODS extends MMOpMode_Linear {
         mechDrive.turn(45, 1);
 
         //drive past line
-        driveTo(18, 0, -0.5, 0);
+        driveTo(18, 0, -1, 0);
 
 
         //move in towards beacon
-        driveTo(10, -1, 0, 0);
+       // driveTo(10, -1, 0, 0);
 
 
         //move left across beacon until detect line
-        mechDrive.Drive(0, 0.4, 0);
+        mechDrive.Drive(0, 0.7, 0);
 
         ElapsedTime time = new ElapsedTime();
 
         // run until the white line is seen OR the driver presses STOP;
-        while (opModeIsActive() && (robot.ods.getLightDetected() > TARGET_LIGHT) && time.seconds() < 10) {
+        while (opModeIsActive() && (robot.ods.getLightDetected() < TARGET_LIGHT) && time.seconds() < 10) {
 
             // Display the light level while we are looking for the line
             robot.dashboard.displayPrintf(1, "Light Level: %.4f",  robot.ods.getLightDetected());

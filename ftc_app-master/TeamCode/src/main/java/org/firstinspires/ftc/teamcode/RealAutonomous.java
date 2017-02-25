@@ -54,7 +54,7 @@ public class RealAutonomous extends MMOpMode_Linear {
     private ElapsedTime runtime = new ElapsedTime();
     VuforiaVision vuforiaVision = null;
 
-
+    private final double TARGET_LIGHT = 0.4;
 
     public static TeamColor teamColor = TeamColor.RED;
     public static int STRAFE = 0, FORWARD = 1;
@@ -835,8 +835,22 @@ public class RealAutonomous extends MMOpMode_Linear {
 
 
         robot.dashboard.displayText(13, "Beacon Config: " + targetButton.getName());
-        MMTranslation currentLocation = getCurrentLocation(visibleBeacon);
-        centerOnBeacon(currentLocation);
+        //MMTranslation currentLocation = getCurrentLocation(visibleBeacon);
+       // centerOnBeacon(currentLocation);
+
+        driveTo(2, 0, -1, 0);
+        double inches = Math.abs(500 / MM_PER_INCH) - 4;
+        driveTo(inches, -1, 0, 0);
+
+        mechDrive.Drive(0, 0.7, 0);
+        ElapsedTime time = new ElapsedTime();
+        while (opModeIsActive() && (robot.ods.getLightDetected() < TARGET_LIGHT) && time.seconds() < 10)
+        {
+            robot.dashboard.displayPrintf(1, "Light Level: %.4f",  robot.ods.getLightDetected());
+        }
+
+        mechDrive.Stop();
+
 
 
         waitFor(VUFORIA_PAUSE_TO_CENTER);
@@ -852,15 +866,15 @@ public class RealAutonomous extends MMOpMode_Linear {
 
 
         //calculate how far away in inches from image
-        currentLocation = getCurrentLocation(visibleBeacon);
-        double inches = Math.abs(currentLocation.getZ() / MM_PER_INCH) - 4;
+        //currentLocation = getCurrentLocation(visibleBeacon);
+        /*double inches = Math.abs(500 / MM_PER_INCH) - 4;
 
 
         //pauseBetweenSteps();
 
         if (opModeIsActive())
         {
-            logState("Driving into beacon %f inches", inches);
+            /*logState("Driving into beacon %f inches", inches);
             //move in to press button
             driveTo(inches / 2, -0.7, 0, 0);
             //pauseBetweenSteps();
@@ -907,7 +921,7 @@ public class RealAutonomous extends MMOpMode_Linear {
 
             //driveTo(17, 0.6, 0, 0);
             //fixAngles(visibleBeacon);
-        }
+        }*/
 
         pauseBetweenSteps();
 
@@ -948,8 +962,8 @@ public class RealAutonomous extends MMOpMode_Linear {
         //driveTo(length, -0.7, -0.7, 0);
         waitFor(0.1);
         turn(45);
-        length = teamColor == TeamColor.BLUE ? 21 : 14;
-        driveTo(length, 0, -0.9, 0);
+        length = teamColor == TeamColor.BLUE ? 21 : 14;         //was 21 : 14
+        driveTo(length, 0, -1, 0);
         Stop();
 
         waitFor(0.5);
