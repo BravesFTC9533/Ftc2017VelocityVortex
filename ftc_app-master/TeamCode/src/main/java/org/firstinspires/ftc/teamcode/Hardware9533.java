@@ -57,7 +57,7 @@ public class Hardware9533
     public FtcDcMotor  backRightMotor = null;
 
     public DcMotor elevator = null;
-    public DcMotor intake = null;
+    //public DcMotor intake = null;
 
     public DcMotor shooterMotor = null;
     public DcMotor liftMotor = null;
@@ -159,8 +159,8 @@ public class Hardware9533
 
 
 
-        intake = hwMap.dcMotor.get("ballGrabber");
-        intake.setDirection(DcMotorSimple.Direction.REVERSE);
+//        intake = hwMap.dcMotor.get("ballGrabber");
+//        intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
         elevator = hwMap.dcMotor.get("elevator");
         elevator.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -172,7 +172,7 @@ public class Hardware9533
 
         shooterMotor = hwMap.dcMotor.get("shooterMotor");
 
-        shooterMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        //shooterMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         liftMotor = hwMap.dcMotor.get("liftMotor");
         liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -184,7 +184,7 @@ public class Hardware9533
         backLeftMotor.setPower(0);
         backRightMotor.setPower(0);
 
-        intake.setPower(0);
+        //intake.setPower(0);
         elevator.setPower(0);
 
         shooterMotor.setPower(0);
@@ -209,7 +209,7 @@ public class Hardware9533
         backRightMotor.setBrakeModeEnabled(true);
 
 
-        intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //intake.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         elevator.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
