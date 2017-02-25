@@ -36,6 +36,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.LightSensor;
+import com.qualcomm.robotcore.hardware.OpticalDistanceSensor;
 
 /**
  * This file illustrates the concept of driving up to a line and then stopping.
@@ -64,8 +65,8 @@ public class PushbotAutoDriveToLine_Linear extends LinearOpMode {
     /* Declare OpMode members. */
     HardwarePushbot         robot   = new HardwarePushbot();   // Use a Pushbot's hardware
                                                                // could also use HardwarePushbotMatrix class.
-    LightSensor             lightSensor;      // Primary LEGO Light sensor,
-    // OpticalDistanceSensor   lightSensor;   // Alternative MR ODS sensor
+    //LightSensor             lightSensor;      // Primary LEGO Light sensor,
+     OpticalDistanceSensor lightSensor;   // Alternative MR ODS sensor
 
     static final double     WHITE_THRESHOLD = 0.2;  // spans between 0.1 - 0.5 from dark to light
     static final double     APPROACH_SPEED  = 0.5;
@@ -83,8 +84,8 @@ public class PushbotAutoDriveToLine_Linear extends LinearOpMode {
         // robot.rightMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // get a reference to our Light Sensor object.
-        lightSensor = hardwareMap.lightSensor.get("sensor_light");                // Primary LEGO Light Sensor
-        //  lightSensor = hardwareMap.opticalDistanceSensor.get("sensor_ods");  // Alternative MR ODS sensor.
+        //lightSensor = hardwareMap.lightSensor.get("sensor_light");                // Primary LEGO Light Sensor
+        lightSensor = hardwareMap.opticalDistanceSensor.get("sensor_ods");  // Alternative MR ODS sensor.
 
         // turn on LED of light sensor.
         lightSensor.enableLed(true);

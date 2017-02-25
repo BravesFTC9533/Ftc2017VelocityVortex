@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Util.Helpers;
@@ -39,7 +40,7 @@ public class TestODS extends MMOpMode_Linear {
     {
         super.runOpMode();
 
-        Direction lastDir = Direction.RIGHT;
+        Direction lastDir = Direction.LEFT;
 
 
         waitForStart();
@@ -51,38 +52,72 @@ public class TestODS extends MMOpMode_Linear {
         waitFor(0.1);
         mechDrive.turn(45, 1);
 
-        driveTo(2, -0.5, 0, 0);
+        //drive past line
+        driveTo(18, 0, -0.5, 0);
 
-        while (opModeIsActive())
-        {
 
-            if (robot.ods.getLightDetected() > TARGET_LIGHT)
-            {
-                // on line
-                // go forward
+        //move in towards beacon
+        driveTo(10, -1, 0, 0);
 
-                driveTo(5, -1, 0, 0);
-            }
-            else
-            {
-                // not on line
 
-                if (lastDir == Direction.LEFT)
-                {
-                    driveTo(1, -0.5, 0, 0);
-                    lastDir = Direction.RIGHT;
-                    // go right
-                }
-                else if (lastDir == Direction.RIGHT)
-                {
-                    driveTo(1, 0.5, 0, 0);
-                    lastDir = Direction.LEFT;
-                    // go left
-                }
-            }
+        //move left across beacon until detect line
+        mechDrive.Drive(0, 0.4, 0);
 
-            robot.dashboard.displayText(1,"" + robot.ods.getLightDetected());
+        ElapsedTime time = new ElapsedTime();
+
+        // run until the white line is seen OR the driver presses STOP;
+        while (opModeIsActive() && (robot.ods.getLightDetected() > TARGET_LIGHT) && time.seconds() < 10) {
+
+            // Display the light level while we are looking for the line
+            robot.dashboard.displayPrintf(1, "Light Level: %.4f",  robot.ods.getLightDetected());
+
         }
+
+        mechDrive.Stop();
+
+//
+
+
+
+//        // Stop all motors
+//        robot.leftMotor.setPower(0);
+//        robot.rightMotor.setPower(0);
+//
+//
+//        while (opModeIsActive())
+//        {
+//
+//            if (robot.ods.getLightDetected() > TARGET_LIGHT)
+//            {
+//                mechDrive.Stop();
+//                // on line
+//                // go forward
+//
+//                driveTo(5, -1, 0, 0);
+//            }
+//            else
+//            {
+//                // not on line
+//
+//                //move forward until find
+//                mechDrive.Drive(0, lastDir == Direction.LEFT ? 0.5: -0.5, 0);
+//
+//                if (lastDir == Direction.LEFT)
+//                {
+//                    //driveTo(1, 0, -0.5, 0);
+//                    lastDir = Direction.RIGHT;
+//                    // go right
+//                }
+//                else if (lastDir == Direction.RIGHT)
+//                {
+//                    //driveTo(1, 0, 0.5, 0);
+//                    lastDir = Direction.LEFT;
+//                    // go left
+//                }
+//            }
+//
+//            robot.dashboard.displayText(1,"" + robot.ods.getLightDetected());
+//        }
     }
 
 

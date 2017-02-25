@@ -141,6 +141,7 @@ public class Hardware9533
 
         ods = hwMap.opticalDistanceSensor.get("ods");
 
+        ods.enableLed(true);
 
         leftMotor   = new FtcDcMotor(hwMap, "left");
         rightMotor  = new FtcDcMotor(hwMap, "right");
