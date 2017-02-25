@@ -106,7 +106,7 @@ public class Minion9533_Mech extends MMOpMode_Linear implements FtcGamePad.Butto
 
             //shooter.update();
 
-            if(ballStopOpen && ballStopTimer.seconds() >= 1){
+            if(ballStopOpen && ballStopTimer.seconds() >= 0.6){
 
                 ballStopOpen = false;
                 robot.ballStop.setPosition(0);
@@ -192,8 +192,9 @@ public class Minion9533_Mech extends MMOpMode_Linear implements FtcGamePad.Butto
                     // Manual firing.
                     //
 
-                    robot.shooterMotor.setPower(pressed ? 1 : 0);
-
+                    if(!ballStopOpen) {
+                        robot.shooterMotor.setPower(pressed ? 1 : 0);
+                    }
                     break;
 
                 case FtcGamePad.GAMEPAD_X:
