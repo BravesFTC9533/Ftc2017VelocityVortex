@@ -12,7 +12,7 @@ import trclib.TrcStateMachine;
 import trclib.TrcTaskMgr;
 import trclib.TrcTimer;
 
-class Shooter implements TrcTaskMgr.Task, TrcPidController.PidInput
+class Shooter //implements TrcTaskMgr.Task, TrcPidController.PidInput
 {
     private enum ShooterState
     {
@@ -24,15 +24,15 @@ class Shooter implements TrcTaskMgr.Task, TrcPidController.PidInput
 
     private String instanceName;
     private FtcDcMotor shooterMotor;
-    private TrcPidController pidCtrl;
-    private TrcPidMotor pidMotor;
-    //private FtcTouchSensor touchSensor;
-    //private FtcServo ballGate;
+    private FtcServo ballGate;
+
     private TrcStateMachine<ShooterState> sm;
     private TrcTimer timer;
     private TrcEvent event;
     private TrcEvent completionEvent = null;
     private boolean continuousModeOn = false;
+
+    private boolean enabled = false;
 
     Shooter(String instanceName)
     {
@@ -42,17 +42,10 @@ class Shooter implements TrcTaskMgr.Task, TrcPidController.PidInput
         shooterMotor.setInverted(false);
         shooterMotor.setBrakeModeEnabled(true);
 
-        pidCtrl = new TrcPidController(
-                instanceName,
-                RobotInfo.SHOOTER_KP, RobotInfo.SHOOTER_KI, RobotInfo.SHOOTER_KD, RobotInfo.SHOOTER_KF,
-                RobotInfo.SHOOTER_TOLERANCE, RobotInfo.SHOOTER_SETTLING, this);
-        pidMotor = new TrcPidMotor(instanceName, shooterMotor, pidCtrl);
-        pidMotor.setPositionScale(RobotInfo.SHOOTER_DEGREES_PER_COUNT);
 
-        //touchSensor = new FtcTouchSensor("shooterTouchSensor");
 
-        //ballGate = new FtcServo("ballGateServo");
-        //ballGate.setPosition(RobotInfo.BALLGATE_DOWN_POSITION);
+        ballGate = new FtcServo("ballStop");
+        ballGate.setPosition(RobotInfo.BALLGATE_DOWN_POSITION);
 
         sm = new TrcStateMachine<>(instanceName);
         timer = new TrcTimer(instanceName);
@@ -61,19 +54,21 @@ class Shooter implements TrcTaskMgr.Task, TrcPidController.PidInput
 
     private void setTaskEnabled(boolean enabled)
     {
-        if (enabled)
-        {
-            TrcTaskMgr.getInstance().registerTask(instanceName, this, TrcTaskMgr.TaskType.POSTCONTINUOUS_TASK);
-            TrcTaskMgr.getInstance().registerTask(instanceName, this, TrcTaskMgr.TaskType.STOP_TASK);
-        }
-        else
-        {
-            TrcTaskMgr.getInstance().unregisterTask(this, TrcTaskMgr.TaskType.POSTCONTINUOUS_TASK);
-            TrcTaskMgr.getInstance().unregisterTask(this, TrcTaskMgr.TaskType.STOP_TASK);
-        }
+        this.enabled = enabled;
+
+//        if (enabled)
+//        {
+//            TrcTaskMgr.getInstance().registerTask(instanceName, this, TrcTaskMgr.TaskType.POSTCONTINUOUS_TASK);
+//            TrcTaskMgr.getInstance().registerTask(instanceName, this, TrcTaskMgr.TaskType.STOP_TASK);
+//        }
+//        else
+//        {
+//            TrcTaskMgr.getInstance().unregisterTask(this, TrcTaskMgr.TaskType.POSTCONTINUOUS_TASK);
+//            TrcTaskMgr.getInstance().unregisterTask(this, TrcTaskMgr.TaskType.STOP_TASK);
+//        }
     }
 
-    void stop()
+    public void stop()
     {
         if (sm.isEnabled())
         {
@@ -81,19 +76,11 @@ class Shooter implements TrcTaskMgr.Task, TrcPidController.PidInput
         }
         setTaskEnabled(false);
         continuousModeOn = false;
-        pidMotor.cancel();
+
     }
 
-    double getPosition()
-    {
-        return pidMotor.getPosition();
-    }
 
-    boolean isTouchActive()
-    {
-        return  false;
-        //return touchSensor.isActive();
-    }
+
 
     void setPower(double power)
     {
@@ -102,8 +89,7 @@ class Shooter implements TrcTaskMgr.Task, TrcPidController.PidInput
 
     void setBallGatePosition(double position)
     {
-
-        //ballGate.setPosition(position);
+        ballGate.setPosition(position);
     }
 
     private void fire(ShooterState startState, boolean continuous, TrcEvent event)
@@ -151,36 +137,16 @@ class Shooter implements TrcTaskMgr.Task, TrcPidController.PidInput
     // Implements TrcTaskMgr.Task.
     //
 
-    @Override
-    public void startTask(TrcRobot.RunMode runMode)
-    {
-    }
 
-    @Override
-    public void stopTask(TrcRobot.RunMode runMode)
-    {
-        stop();
-    }
 
-    @Override
-    public void prePeriodicTask(TrcRobot.RunMode runMode)
-    {
-    }
 
-    @Override
-    public void postPeriodicTask(TrcRobot.RunMode runMode)
+    public void update()
     {
-    }
+        //pidCtrl.displayPidInfo(3);
 
-    @Override
-    public void preContinuousTask(TrcRobot.RunMode runMode)
-    {
-    }
-
-    @Override
-    public void postContinuousTask(TrcRobot.RunMode runMode)
-    {
-        pidCtrl.displayPidInfo(3);
+        if(!this.enabled) {
+            return;
+        }
 
         if (sm.isReady())
         {
@@ -192,17 +158,18 @@ class Shooter implements TrcTaskMgr.Task, TrcPidController.PidInput
                     //
                     // Flip the ball gate up to load a particle onto the shooter.
                     //
-                    //ballGate.setPosition(RobotInfo.BALLGATE_UP_POSITION);
+                    ballGate.setPosition(RobotInfo.BALLGATE_UP_POSITION);
                     timer.set(RobotInfo.SHOOTER_BALLGATE_OPEN_TIME, event);
-                    sm.waitForSingleEvent(event, ShooterState.ARM_AND_FIRE);
-                    break;
+                sm.waitForSingleEvent(event, ShooterState.ARM_AND_FIRE);
+                break;
 
                 case ARM_AND_FIRE:
                     //
                     // Flip the ball gate down and start turning the motor for the firing sequence.
                     //
-                    //ballGate.setPosition(RobotInfo.BALLGATE_DOWN_POSITION);
+                    ballGate.setPosition(RobotInfo.BALLGATE_DOWN_POSITION);
                     shooterMotor.setPower(RobotInfo.SHOOTER_POWER);
+                    //timer.set();
                     //
                     // Check the touch sensor to see if the shooter has reached the firing point. If so, stop the
                     // motor for a brief moment.
@@ -221,8 +188,8 @@ class Shooter implements TrcTaskMgr.Task, TrcPidController.PidInput
                     // Pull back the shooter a little bit to prepare the next firing cycle. Set a timeout to prevent
                     // the shooter from being stuck not making target.
                     //
-                    pidMotor.setTarget(RobotInfo.SHOOTER_PULLBACK_TARGET, event, 0.5);
-                    sm.waitForSingleEvent(event, continuousModeOn? ShooterState.LOAD_PARTICLE: ShooterState.DONE);
+
+                    //sm.waitForSingleEvent(event, continuousModeOn? ShooterState.LOAD_PARTICLE: ShooterState.DONE);
                     break;
 
                 default:
@@ -242,21 +209,6 @@ class Shooter implements TrcTaskMgr.Task, TrcPidController.PidInput
         }
     }
 
-    //
-    // Implements TrcPidController.PidInput
-    //
 
-    @Override
-    public double getInput(TrcPidController pidCtrl)
-    {
-        double input = 0.0;
-
-        if (pidCtrl == this.pidCtrl)
-        {
-            input = pidMotor.getPosition();
-        }
-
-        return input;
-    }   //getInput
 
 }   //class Shooter

@@ -39,17 +39,9 @@ public class Hardware9533
     public static double liftDropPower = 0.1;
 
 
-    public final static double ACCEL_RATE = 0.2;
-
-    private final static double MAX_SPEED = 0.8;
 
     public boolean invertedDrive = false;
 
-    /* Public OpMode members. */
-//    public DcMotor  leftMotor   = null;
-//    public DcMotor  rightMotor  = null;
-//    public DcMotor  backLeftMotor = null;
-//    public DcMotor  backRightMotor = null;
 
     public FtcDcMotor  leftMotor   = null;
     public FtcDcMotor  rightMotor  = null;
@@ -144,6 +136,7 @@ public class Hardware9533
         ods.enableLed(true);
 
         ballStop = hwMap.servo.get("ballStop");
+        ballStop.scaleRange(0, 80);
 
         leftMotor   = new FtcDcMotor(hwMap, "left");
         rightMotor  = new FtcDcMotor(hwMap, "right");
@@ -164,8 +157,8 @@ public class Hardware9533
 //        intake = hwMap.dcMotor.get("ballGrabber");
 //        intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        elevator = hwMap.dcMotor.get("elevator");
-        elevator.setDirection(DcMotorSimple.Direction.REVERSE);
+        elevator = hwMap.dcMotor.get("ballGrabber");
+        //elevator.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
         buttonPusher = hwMap.servo.get("buttonpusher");
@@ -173,8 +166,7 @@ public class Hardware9533
         //buttonPusher.
 
         shooterMotor = hwMap.dcMotor.get("shooterMotor");
-
-        //shooterMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        shooterMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         liftMotor = hwMap.dcMotor.get("liftMotor");
         liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);

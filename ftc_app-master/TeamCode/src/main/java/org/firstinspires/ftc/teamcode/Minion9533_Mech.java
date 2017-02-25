@@ -47,7 +47,7 @@ public class Minion9533_Mech extends MMOpMode_Linear implements FtcGamePad.Butto
 
     MinionsGyro gyro = null;
 
-    private HalDashboard dashboard;
+    //private HalDashboard dashboard;
 
     FtcGamePad driverGamepad;
     private FtcGamePad operatorGamepad;
@@ -89,6 +89,7 @@ public class Minion9533_Mech extends MMOpMode_Linear implements FtcGamePad.Butto
         robot.dashboard.displayPrintf(2, "Waiting for start..");
         waitForStart();
 
+        robot.buttonPusher.setPosition(0.5);
 
         robot.dashboard.clearDisplay();
         // run until the end of the match (driver presses STOP)
@@ -131,7 +132,7 @@ public class Minion9533_Mech extends MMOpMode_Linear implements FtcGamePad.Butto
     @Override
     public void gamepadButtonEvent(FtcGamePad gamepad, int button, boolean pressed)
     {
-        dashboard.displayPrintf(7, "%s: %04x->%s", gamepad.toString(), button, pressed? "Pressed": "Released");
+        robot.dashboard.displayPrintf(7, "%s: %04x->%s", gamepad.toString(), button, pressed? "Pressed": "Released");
         if (gamepad == driverGamepad)
         {
             switch (button)
