@@ -838,43 +838,55 @@ public class RealAutonomous extends MMOpMode_Linear {
         //MMTranslation currentLocation = getCurrentLocation(visibleBeacon);
        // centerOnBeacon(currentLocation);
 
-        driveTo(2, 0, -1, 0);
-        double inches = Math.abs(500 / MM_PER_INCH) - 4;
-        driveTo(inches, -1, 0, 0);
+        // move to right a lil
+        driveTo(12, 0, -1, 0);
 
-        mechDrive.Drive(0, 0.7, 0);
+        // smash into wall
+        driveTo(20, -1, 0, 0);
+
+        // move out of wall
+        driveTo(3, 1, 0, 0);
+
+        mechDrive.Drive(0, 0.6, 0);
         ElapsedTime time = new ElapsedTime();
         while (opModeIsActive() && (robot.ods.getLightDetected() < TARGET_LIGHT) && time.seconds() < 10)
         {
-            robot.dashboard.displayPrintf(1, "Light Level: %.4f",  robot.ods.getLightDetected());
+            robot.dashboard.displayPrintf(0, "Light Level: %.4f",  robot.ods.getLightDetected());
         }
-
         mechDrive.Stop();
-
-
 
         waitFor(VUFORIA_PAUSE_TO_CENTER);
 
+        // move in to press beacon
+        driveTo(3, -0.5, 0, 0);
 
-        if (opModeIsActive())
+        pushButton(targetButton);
+        waitFor(0.3);
+        resetPusher();
+
+        // move out from beacon
+        driveTo(4, 0.8, 0, 0);
+
+        /*if (opModeIsActive())
         {
             logState("Fixing angle..");
             fixAngles(visibleBeacon);
             Stop();
             waitFor(VUFORIA_PAUSE_TO_CENTER);
-        }
+        }*/
 
+    waitFor(10000);
 
         //calculate how far away in inches from image
         //currentLocation = getCurrentLocation(visibleBeacon);
-        /*double inches = Math.abs(500 / MM_PER_INCH) - 4;
+      /*  double inches = Math.abs(500 / MM_PER_INCH) - 4;
 
 
         //pauseBetweenSteps();
 
         if (opModeIsActive())
         {
-            /*logState("Driving into beacon %f inches", inches);
+            logState("Driving into beacon %f inches", inches);
             //move in to press button
             driveTo(inches / 2, -0.7, 0, 0);
             //pauseBetweenSteps();
@@ -921,10 +933,10 @@ public class RealAutonomous extends MMOpMode_Linear {
 
             //driveTo(17, 0.6, 0, 0);
             //fixAngles(visibleBeacon);
-        }*/
+        }
 
         pauseBetweenSteps();
-
+*/
 
     }
 

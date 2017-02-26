@@ -210,6 +210,13 @@ public class Minion9533_Mech extends MMOpMode_Linear implements FtcGamePad.Butto
 
                 case FtcGamePad.GAMEPAD_Y:
 
+                    capballLiftReleased = true;
+
+                    robot.dashboard.displayText(3, "y button working");
+
+                    robot.leftHold.setPosition(0);
+                    robot.rightHold.setPosition(0);
+
                     break;
 
                 case FtcGamePad.GAMEPAD_LBUMPER:
@@ -224,10 +231,7 @@ public class Minion9533_Mech extends MMOpMode_Linear implements FtcGamePad.Butto
 
                 case FtcGamePad.GAMEPAD_BACK:
 
-                    capballLiftReleased = true;
 
-                    robot.leftHold.setPosition(1);
-                    robot.rightHold.setPosition(1);
 
                     break;
 

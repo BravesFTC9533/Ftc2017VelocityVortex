@@ -146,7 +146,10 @@ public class Hardware9533
         leftHold = hwMap.servo.get("leftHold");
         rightHold= hwMap.servo.get("rightHold");
 
+        rightHold.setDirection(Servo.Direction.REVERSE);
 
+        //leftHold.scaleRange(0, 90);
+        //rightHold.scaleRange(0, 90);
 
 
         leftMotor.setInverted(true);
