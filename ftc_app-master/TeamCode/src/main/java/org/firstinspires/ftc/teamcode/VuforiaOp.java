@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.qualcomm.ftcrobotcontroller.R;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -62,6 +63,7 @@ import static org.firstinspires.ftc.teamcode.Util.VortexUtils.BEACON_BLUE_LOW;
 import static org.firstinspires.ftc.teamcode.Util.VortexUtils.getImageFromFrame;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "DONT USE ME", group = "vuf")
+@Disabled
 //@Autonomous(name="Concept: Vuforia Navigation", group =sensorManager = (SensorManager) Activity.getSystemService(SENSOR_SERVICE);"Concept")
 public class VuforiaOp extends MMOpMode_Linear{ //extends MMOpMode_Linear{
 

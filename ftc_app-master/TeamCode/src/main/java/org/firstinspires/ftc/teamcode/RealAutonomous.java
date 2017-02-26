@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Looper;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
@@ -839,7 +841,7 @@ public class RealAutonomous extends MMOpMode_Linear {
        // centerOnBeacon(currentLocation);
 
         // move to right a lil
-        driveTo(12, 0, -1, 0);
+        driveTo(14, 0, -1, 0);
 
         // smash into wall
         driveTo(20, -1, 0, 0);
@@ -847,7 +849,7 @@ public class RealAutonomous extends MMOpMode_Linear {
         // move out of wall
         driveTo(3, 1, 0, 0);
 
-        mechDrive.Drive(0, 0.6, 0);
+        Drive(0, 0.6, 0);
         ElapsedTime time = new ElapsedTime();
         while (opModeIsActive() && (robot.ods.getLightDetected() < TARGET_LIGHT) && time.seconds() < 10)
         {
@@ -858,14 +860,16 @@ public class RealAutonomous extends MMOpMode_Linear {
         waitFor(VUFORIA_PAUSE_TO_CENTER);
 
         // move in to press beacon
-        driveTo(3, -0.5, 0, 0);
+        driveTo(1, -0.5, 0, 0);
+
+        Stop();
 
         pushButton(targetButton);
-        waitFor(0.3);
+        waitFor(1);
         resetPusher();
 
         // move out from beacon
-        driveTo(4, 0.8, 0, 0);
+        driveTo(10, 0.8, 0, 0);
 
         /*if (opModeIsActive())
         {
@@ -874,8 +878,6 @@ public class RealAutonomous extends MMOpMode_Linear {
             Stop();
             waitFor(VUFORIA_PAUSE_TO_CENTER);
         }*/
-
-    waitFor(10000);
 
         //calculate how far away in inches from image
         //currentLocation = getCurrentLocation(visibleBeacon);
@@ -940,6 +942,59 @@ public class RealAutonomous extends MMOpMode_Linear {
 
     }
 
+    private void goForBeacon2(VuforiaTrackableDefaultListener visibleBeacon, boolean fixInitialAngle) {
+        ButtonRange targetButton = null;
+
+        if (opModeIsActive() && fixInitialAngle)
+        {
+            logState("Fixing angle..");
+            fixAngles(visibleBeacon);
+        }
+
+        waitFor(VUFORIA_PAUSE_TO_FIND_COLOR);
+
+
+        targetButton = getTargetButton(visibleBeacon);
+        if(targetButton == null || targetButton.getName().equals(ButtonRange.Unknown().getName())){
+            robot.dashboard.displayText(10, "UNABLE TO FIND TEAM COLOR");
+            return;
+        }
+
+
+        robot.dashboard.displayText(13, "Beacon Config: " + targetButton.getName());
+        //MMTranslation currentLocation = getCurrentLocation(visibleBeacon);
+        // centerOnBeacon(currentLocation);
+
+        // move to left a lil
+        driveTo(16, 0, 1, 0);
+
+        // smash into wall
+        driveTo(20, -1, 0, 0);
+
+        // move out of wall
+        driveTo(3, 1, 0, 0);
+
+        Drive(0, -0.6, 0);
+        ElapsedTime time = new ElapsedTime();
+        while (opModeIsActive() && (robot.ods.getLightDetected() < TARGET_LIGHT) && time.seconds() < 10)
+        {
+            robot.dashboard.displayPrintf(0, "Light Level: %.4f",  robot.ods.getLightDetected());
+        }
+        mechDrive.Stop();
+
+        waitFor(VUFORIA_PAUSE_TO_CENTER);
+
+        // move in to press beacon
+        driveTo(1, -0.5, 0, 0);
+
+        pushButton(targetButton);
+        waitFor(0.5);
+        resetPusher();
+
+        // move out from beacon
+        driveTo(4, 0.8, 0, 0);
+
+    }
 
 
     private void resetPusher(){
@@ -973,7 +1028,7 @@ public class RealAutonomous extends MMOpMode_Linear {
         driveTo(length, 0, -1, 0);
         //driveTo(length, -0.7, -0.7, 0);
         waitFor(0.1);
-        turn(45);
+        turn(teamColor == TeamColor.RED ? 45 : -45);
         length = teamColor == TeamColor.BLUE ? 21 : 14;         //was 21 : 14
         driveTo(length, 0, -1, 0);
         Stop();
@@ -1004,25 +1059,26 @@ public class RealAutonomous extends MMOpMode_Linear {
 
 
     }
+
+
+
     private void Beacon2(boolean didBeacon1) {
         VuforiaTrackableDefaultListener visibleBeacon = null;
 
         double dist = 44;
+        driveTo(dist, 0, -1, 0);
 
+        //driveTo(6, 1, 0, 0);
 
+        Drive(0, -0.6, 0);
+        ElapsedTime time = new ElapsedTime();
+        while (opModeIsActive() && (robot.ods.getLightDetected() < TARGET_LIGHT) && time.seconds() < 10)
+        {
+            robot.dashboard.displayPrintf(0, "Light Level: %.4f",  robot.ods.getLightDetected());
+        }
+        mechDrive.Stop();
 
-        //drive half way
-        driveTo(dist / 2, 0, -1, 0);
-
-        //fix angle by smashing wall
-        driveTo(6, -1, 0, 0);
-        driveTo(24, 1, 0, 0);
-
-
-        //drive other half
-        driveTo(dist / 2, 0, -1, 0);
-
-        waitFor(1);
+        waitFor(0.5);
         runtime.reset();
 
         int target = teamColor == TeamColor.RED ? VuforiaVision.TARGET_TOOLS : VuforiaVision.TARGET_LEGOS;
@@ -1033,6 +1089,9 @@ public class RealAutonomous extends MMOpMode_Linear {
 
 
         }while(opModeIsActive() && runtime.seconds() < 5 && visibleBeacon == null);
+
+
+        //driveTo(6, -1, 0, 0);
 
         if (opModeIsActive())
         {
@@ -1077,6 +1136,19 @@ public class RealAutonomous extends MMOpMode_Linear {
             }
         }
 
+
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(hardwareMap.appContext);
+        String alliance = preferences.getString("Which alliance are we on?", "");
+        robot.dashboard.displayText(1, alliance);
+        if (alliance.equalsIgnoreCase("blue alliance"))
+        {
+            teamColor = TeamColor.BLUE;
+        }
+        else
+        {
+            teamColor = TeamColor.RED;
+        }
 
         robot.dashboard.displayText(0, "Autonomous mode READY, waiting for start...");
         waitForStart();

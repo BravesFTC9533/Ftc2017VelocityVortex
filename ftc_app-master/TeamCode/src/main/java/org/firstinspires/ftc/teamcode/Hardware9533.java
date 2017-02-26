@@ -148,9 +148,11 @@ public class Hardware9533
 
         rightHold.setDirection(Servo.Direction.REVERSE);
 
-        //leftHold.scaleRange(0, 90);
-        //rightHold.scaleRange(0, 90);
+        leftHold.scaleRange(0, 110);
+        rightHold.scaleRange(0, 110);
 
+        leftHold.setPosition(1);
+        rightHold.setPosition(1);
 
         leftMotor.setInverted(true);
         backLeftMotor.setInverted(true);
@@ -172,7 +174,7 @@ public class Hardware9533
         shooterMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
         liftMotor = hwMap.dcMotor.get("liftMotor");
-        liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        //liftMotor.setDirection(DcMotorSimple.Direction.REVERSE);
 
 
         // Set all motors to zero power

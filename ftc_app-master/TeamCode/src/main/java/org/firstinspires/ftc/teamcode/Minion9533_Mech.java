@@ -86,10 +86,13 @@ public class Minion9533_Mech extends MMOpMode_Linear implements FtcGamePad.Butto
 
         // Wait for the game to start (driver presses PLAY)
 
+        robot.leftHold.setPosition(1);
+        robot.rightHold.setPosition(1);
+
         //shooter = new Shooter("Shooter", robot.hwMap, robot.ballStop);
 
         robot.dashboard.displayPrintf(2, "Waiting for start..");
-        waitForStart();
+        waitForStart();     /***************************************************************************************************************************************/
 
         robot.buttonPusher.setPosition(0.5);
 
@@ -211,8 +214,6 @@ public class Minion9533_Mech extends MMOpMode_Linear implements FtcGamePad.Butto
                 case FtcGamePad.GAMEPAD_Y:
 
                     capballLiftReleased = true;
-
-                    robot.dashboard.displayText(3, "y button working");
 
                     robot.leftHold.setPosition(0);
                     robot.rightHold.setPosition(0);
